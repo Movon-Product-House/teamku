@@ -1,6 +1,6 @@
 import Link from "next/link";
-import {ReactNode} from "react";
-import {BrandLogo} from "./BrandLogo";
+import type { ReactNode } from "react";
+import { BrandLogo } from "@/shared/ui/brand-logo";
 
 export function AuthShell({
   title,
@@ -14,11 +14,18 @@ export function AuthShell({
   return (
     <main className="login-page">
       <section className="login-art">
-        <div className="login-logo"><BrandLogo variant="white"/></div>
+        <div className="login-logo">
+          <BrandLogo variant="white" />
+        </div>
         <div>
-          <p className="eyebrow" style={{color: "#fff"}}>powered by movon digital house</p>
+          <p className="eyebrow" style={{ color: "#fff" }}>
+            powered by movon digital house
+          </p>
           <h1>Presence with purpose.</h1>
-          <p>Kelola kehadiran, agenda harian, dan keputusan tim dalam satu ruang kerja yang tenang dan jelas.</p>
+          <p>
+            Kelola kehadiran, agenda harian, dan keputusan tim dalam satu ruang kerja yang tenang
+            dan jelas.
+          </p>
         </div>
       </section>
       <section className="login-form-wrap">
@@ -32,10 +39,10 @@ export function AuthShell({
   );
 }
 
-export function AuthLinks({children}: {children: ReactNode}) {
+export function AuthLinks({ children }: { children: ReactNode }) {
   return <p className="auth-links">{children}</p>;
 }
 
-export function AuthLink({href, children}: {href: string; children: ReactNode}) {
+export function AuthLink({ href, children }: { href: string; children: ReactNode }) {
   return <Link href={href}>{children}</Link>;
 }

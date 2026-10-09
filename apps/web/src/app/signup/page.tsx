@@ -1,11 +1,12 @@
 "use client";
-import {FormEvent, useState} from "react";
-import {useRouter} from "next/navigation";
-import {api} from "../../lib/api";
-import {waitForAuthTransition} from "../../lib/transition";
-import {AuthTransition} from "../../components/AuthTransition";
-import {AuthLink, AuthLinks, AuthShell} from "../../components/AuthShell";
-import {NotificationDialog, NotificationDialogState} from "../../components/NotificationDialog";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useState } from "react";
+import { AuthLink, AuthLinks, AuthShell } from "@/features/auth/components/auth-shell";
+import { AuthTransition } from "@/features/auth/components/auth-transition";
+import { waitForAuthTransition } from "@/features/auth/transition";
+import { api } from "@/shared/api/client";
+import { storeDemoToken } from "@/shared/api/demo-session";
+import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
 export default function Signup() {
   const [companyName, setCompanyName] = useState("");
@@ -21,7 +22,7 @@ export default function Signup() {
     const startedAt = Date.now();
     setBusy(true);
     try {
-      const result = await api<{access_token: string}>("/auth/signup", {
+      const result = await api<{ access_token: string }>("/auth/signup", {
         method: "POST",
         body: JSON.stringify({
           company_name: companyName,
@@ -30,7 +31,7 @@ export default function Signup() {
           password,
         }),
       });
-      localStorage.setItem("movon_user", result.access_token);
+      storeDemoToken(result.access_token);
       await waitForAuthTransition(startedAt);
       router.replace("/app/overview");
     } catch (reason) {
@@ -46,13 +47,50 @@ export default function Signup() {
 
   return (
     <>
-      <AuthShell title="Buat workspace perusahaan" subtitle="Daftarkan perusahaan Anda dan jadi admin pertamanya.">
-        <form className="stack" style={{marginTop: 32}} onSubmit={submit}>
-          <label>Nama perusahaan<input disabled={busy} value={companyName} onChange={event => setCompanyName(event.target.value)} /></label>
-          <label>Nama Anda<input disabled={busy} value={adminName} onChange={event => setAdminName(event.target.value)} /></label>
-          <label>Email kerja<input disabled={busy} type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="username" /></label>
-          <label>Kata sandi<input disabled={busy} type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="new-password" /></label>
-          <button disabled={busy} type="submit">{busy ? "Membuat workspace…" : "Buat workspace →"}</button>
+      <AuthShell
+        title="Buat workspace perusahaan"
+        subtitle="Daftarkan perusahaan Anda dan jadi admin pertamanya."
+      >
+        <form className="stack" style={{ marginTop: 32 }} onSubmit={submit}>
+          <label>
+            Nama perusahaan
+            <input
+              disabled={busy}
+              value={companyName}
+              onChange={(event) => setCompanyName(event.target.value)}
+            />
+          </label>
+          <label>
+            Nama Anda
+            <input
+              disabled={busy}
+              value={adminName}
+              onChange={(event) => setAdminName(event.target.value)}
+            />
+          </label>
+          <label>
+            Email kerja
+            <input
+              disabled={busy}
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="username"
+            />
+          </label>
+          <label>
+            Kata sandi
+            <input
+              disabled={busy}
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+            />
+          </label>
+          <button disabled={busy} type="submit">
+            {busy ? "Membuat workspace…" : "Buat workspace →"}
+          </button>
         </form>
         <AuthLinks>
           Sudah punya akun? <AuthLink href="/login">Masuk</AuthLink>
