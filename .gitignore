@@ -13,3 +13,6 @@ coverage/
 .vercel/
 
 .claude/settings.local.json
+
+# Ekspor PDF mockup (gabungan PNG yang sama, 20MB)
+mockups/exports/*.pdf
