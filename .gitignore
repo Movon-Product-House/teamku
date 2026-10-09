@@ -11,3 +11,5 @@ coverage/
 .service-pids/
 .service-logs/
 .vercel/
+
+.claude/settings.local.json
