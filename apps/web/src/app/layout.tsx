@@ -4,7 +4,8 @@ import { Newsreader, Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { Providers } from "./providers";
 
-const sans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
+// Nama variabel = nama keluarga font (dibaca scripts/sync-design-tokens.mjs).
+const sans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta-sans" });
 const display = Newsreader({ subsets: ["latin"], variable: "--font-newsreader" });
 
 export const metadata: Metadata = {

@@ -11,6 +11,7 @@ Keputusan arsitekturnya ada di [`docs/adr/0001-web-frontend-architecture.md`](..
 | `npm run check` | Gerbang yang sama dengan CI: `biome ci` + batas panjang file + `tsc` + `vitest` |
 | `npm run lint:fix` | Format + organize imports + fix lint yang aman |
 | `npm run lint:size` | Cek batas 600 baris per file |
+| `npm run design:sync` | Salin token `@theme` ke `DESIGN.md` + `shared/lib/text-sizes.ts` |
 | `npm test` | Vitest |
 | `npx shadcn add <nama>` | Menambah komponen shadcn ke `src/shared/ui/` (lihat aturan Komponen) |
 
@@ -67,8 +68,9 @@ src/
 ### Styling
 1. **Token & aturan visual ada di [`DESIGN.md`](../../DESIGN.md)**, nilainya di `@theme` pada `app/globals.css`. Contoh hidup semua komponen: buka `/design-system` (lokal dan preview Vercel).
 2. **Akar setiap halaman/shell v2 diberi `data-surface="v2"`.** Atribut ini memasang font v2 dan memutus style elemen legacy (margin h1/p, label grid, indentasi list).
-3. **Import `cn` dari `@/shared/lib/cn`**, bukan dari paket `cn` (dipaksa Biome). Versi ini mengenal ukuran teks custom (`text-body`, `text-caption`, …); tanpanya warna teks bisa hilang saat digabung. Setelah `npx shadcn add`, ganti import-nya. Bila menambah token `--text-*`, daftarkan juga di `shared/lib/cn.ts`.
-4. **Tipografi lewat token:** `font-display text-title` untuk judul, `font-semibold text-heading` untuk judul kartu, `font-medium text-body` untuk isi. Jangan menulis ukuran px langsung.
+3. **Import `cn` dari `@/shared/lib/cn`**, bukan dari paket `cn` (dipaksa Biome). Versi ini mengenal ukuran teks custom (`text-body`, `text-caption`, …); tanpanya warna teks bisa hilang saat digabung. Setelah `npx shadcn add`, ganti import-nya.
+4. **Tipografi lewat token:** `font-display text-title` untuk judul, `text-heading` untuk judul kartu, `text-body` untuk isi. Weight dan line-height sudah ikut token. Jangan menulis ukuran px langsung.
+5. **Mengubah token:** edit `@theme` di `app/globals.css`, lalu `npm run design:sync`. Script ini memperbarui frontmatter `DESIGN.md` dan `shared/lib/text-sizes.ts` (dipakai `cn`). `npm run check` gagal bila keduanya tidak sinkron. Ukuran teks serif ditandai kata `serif` di komentar tokennya.
 
 Urutan `@layer` di `app/globals.css`: `legacy` < `ui-reset` < `utilities`. Utility selalu menang atas CSS lama, dan `ui-reset` mencegah style elemen global legacy bocor ke komponen shadcn dan permukaan v2. Preflight Tailwind baru dinyalakan setelah revamp v2 selesai.
 

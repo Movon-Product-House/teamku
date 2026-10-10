@@ -1,61 +1,74 @@
 ---
 name: Teamku v2
 description: Presensi dan HR yang tenang, lega, fokus.
+# GENERATED:BEGIN — npm run design:sync (sumber: apps/web/src/app/globals.css)
 colors:
-  canvas: "#F3F2EF"
-  surface: "#FFFFFF"
-  surface-2: "#EFEEEA"
-  line: "#E4E2DC"
-  ink: "#17171A"
-  ink-2: "#55565C"
-  ink-3: "#6A6B71"
-  side: "#0E0E0F"
+  background: "#F3F2EF"
+  foreground: "#17171A"
+  card: "#FFFFFF"
+  card-foreground: "#17171A"
+  popover: "#FFFFFF"
+  popover-foreground: "#17171A"
+  primary: "#17171A"
+  primary-foreground: "#FFFFFF"
+  secondary: "#EFEEEA"
+  secondary-foreground: "#17171A"
+  muted: "#EFEEEA"
+  muted-foreground: "#55565C"
+  faint-foreground: "#6A6B71"
+  accent: "#EFEEEA"
+  accent-foreground: "#17171A"
+  border: "#E4E2DC"
+  input: "#E4E2DC"
+  ring: "#17171A"
+  sidebar: "#0E0E0F"
+  sidebar-foreground: "#FFFFFF"
   brand: "#E3163A"
-  ok: "#0E7C55"
-  ok-soft: "#E3F4EC"
-  warn: "#A2560A"
-  warn-soft: "#FCF0DE"
+  destructive: "#B42318"
+  destructive-muted: "#FDE9E7"
+  success: "#0E7C55"
+  success-muted: "#E3F4EC"
+  warning: "#A2560A"
+  warning-muted: "#FCF0DE"
   info: "#2C55C7"
-  info-soft: "#E7EDFB"
-  danger: "#B42318"
-  danger-soft: "#FDE9E7"
+  info-muted: "#E7EDFB"
 typography:
   display:
-    fontFamily: "Newsreader, Georgia, serif"
+    fontFamily: "Newsreader, ui-serif, Georgia, serif"
     fontSize: "64px"
     fontWeight: 400
     lineHeight: 1
     letterSpacing: "-0.02em"
   title:
-    fontFamily: "Newsreader, Georgia, serif"
+    fontFamily: "Newsreader, ui-serif, Georgia, serif"
     fontSize: "46px"
     fontWeight: 400
     lineHeight: 1.1
     letterSpacing: "-0.02em"
   headline:
-    fontFamily: "Newsreader, Georgia, serif"
+    fontFamily: "Newsreader, ui-serif, Georgia, serif"
     fontSize: "34px"
     fontWeight: 400
     lineHeight: 1.15
     letterSpacing: "-0.02em"
   title-sm:
-    fontFamily: "Newsreader, Georgia, serif"
+    fontFamily: "Newsreader, ui-serif, Georgia, serif"
     fontSize: "32px"
     fontWeight: 400
     lineHeight: 1.15
     letterSpacing: "-0.02em"
   heading:
-    fontFamily: "Plus Jakarta Sans, system-ui, sans-serif"
+    fontFamily: "Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "18px"
     fontWeight: 600
     lineHeight: 1.4
   body:
-    fontFamily: "Plus Jakarta Sans, system-ui, sans-serif"
+    fontFamily: "Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 500
     lineHeight: 1.45
   caption:
-    fontFamily: "Plus Jakarta Sans, system-ui, sans-serif"
+    fontFamily: "Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "13px"
     fontWeight: 500
     lineHeight: 1.4
@@ -64,42 +77,43 @@ rounded:
   field: "12px"
   card: "20px"
   dialog: "24px"
+# GENERATED:END
 components:
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.surface}"
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
     rounded: "{rounded.control}"
     height: "42px"
     padding: "0 16px"
   button-primary-mobile:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.surface}"
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
     rounded: "{rounded.field}"
     height: "52px"
     padding: "0 20px"
   button-light:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.control}"
     height: "42px"
   input:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.field}"
     height: "52px"
     padding: "0 16px"
   card:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.card}"
     rounded: "{rounded.card}"
     padding: "28px"
   badge-soft:
-    backgroundColor: "{colors.ok-soft}"
-    textColor: "{colors.ok}"
+    backgroundColor: "{colors.success-muted}"
+    textColor: "{colors.success}"
     rounded: "999px"
     height: "26px"
     padding: "0 10px"
   dialog:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.popover}"
     rounded: "{rounded.dialog}"
     padding: "36px"
     width: "540px"
@@ -107,7 +121,7 @@ components:
 
 # Design System: Teamku v2
 
-Sumber desain: papan `00 · Design System` di `mockups/design.pen`. Sumber kode: `@theme` di `apps/web/src/app/globals.css` (bila berbeda, kode yang benar dan file ini diperbarui). Contoh hidup: `/design-system` di dev server dan preview Vercel.
+Sumber desain: papan `00 · Design System` di `mockups/design.pen`. Sumber nilai di kode: `@theme` di `apps/web/src/app/globals.css`. Bagian frontmatter di antara penanda `GENERATED` dibuat ulang oleh `npm run design:sync` (CI gagal bila tidak sinkron); bagian lain ditulis tangan dan hanya memakai nama token. Contoh hidup: `/design-system` di dev server dan preview Vercel.
 
 ## 1. Overview
 
@@ -128,23 +142,23 @@ Sistem ini menolak tampilan Teamku lama (merah dominan) dan template dashboard S
 Netral hangat dengan status bernada redup.
 
 ### Primary
-- **Ink** (#17171A, `primary` / `foreground`): teks utama dan satu tombol utama per layar.
+- **Ink** (`primary` / `foreground`): teks utama dan satu tombol utama per layar.
 
 ### Neutral
-- **Canvas** (#F3F2EF, `background`): latar halaman.
-- **Surface** (#FFFFFF, `card` / `popover`): kartu, dialog, input.
-- **Surface-2** (#EFEEEA, `secondary` / `muted` / `accent`): pil, tab aktif, hover.
-- **Line** (#E4E2DC, `border` / `input`): hanya untuk input dan tabel.
-- **Ink-2** (#55565C, `muted-foreground`): teks kedua.
-- **Ink-3** (#6A6B71, `faint-foreground`): label, ikon pasif. Mockup memakai #86878D (3,6:1, gagal AA); kode memakai nilai yang lebih gelap.
-- **Side** (#0E0E0F, `sidebar`): sidebar desktop.
+- **Canvas** (`background`): latar halaman.
+- **Surface** (`card` / `popover`): kartu, dialog, input.
+- **Surface-2** (`secondary` / `muted` / `accent`): pil, tab aktif, hover.
+- **Line** (`border` / `input`): hanya untuk input dan tabel.
+- **Ink-2** (`muted-foreground`): teks kedua.
+- **Ink-3** (`faint-foreground`): label, ikon pasif. Lebih gelap dari mockup (#86878D, 3,6:1) agar lolos WCAG AA.
+- **Side** (`sidebar`): sidebar desktop.
 
 ### Status
-- **Brand** (#E3163A, `brand`): mendesak saja: re-verifikasi, notifikasi belum dibaca, pin peta.
-- **Ok** (#0E7C55 / #E3F4EC, `success` / `success-muted`): tepat waktu, disetujui.
-- **Warn** (#A2560A / #FCF0DE, `warning` / `warning-muted`): menunggu, terlambat.
-- **Info** (#2C55C7 / #E7EDFB, `info` / `info-muted`): cuti, informasi.
-- **Danger** (#B42318 / #FDE9E7, `destructive` / `destructive-muted`): ditolak, error.
+- **Brand** (`brand`): mendesak saja: re-verifikasi, notifikasi belum dibaca, pin peta.
+- **Ok** (`success` / `success-muted`): tepat waktu, disetujui.
+- **Warn** (`warning` / `warning-muted`): menunggu, terlambat.
+- **Info** (`info` / `info-muted`): cuti, informasi.
+- **Danger** (`destructive` / `destructive-muted`): ditolak, error.
 
 ### Named Rules
 **The Red Means Urgent Rule.** `brand` tidak pernah dipakai untuk dekorasi, tombol utama, atau aksen biasa.
@@ -158,13 +172,15 @@ Netral hangat dengan status bernada redup.
 **Character:** Serif editorial yang tenang untuk judul dan angka, sans geometris yang hangat untuk semua UI.
 
 ### Hierarchy
-- **Display** (400, 64px, 1): angka utama desktop (durasi kerja, saldo, gaji). Utility `font-display text-display`.
-- **Title** (400, 46px, 1.1): judul halaman desktop. `font-display text-title`.
-- **Headline** (400, 34px, 1.15): judul dialog. `font-display text-headline`.
-- **Title-sm** (400, 32px, 1.15): judul halaman mobile. `font-display text-title-sm`.
-- **Heading** (600, 18px, 1.4): judul kartu. `font-semibold text-heading`.
-- **Body** (500, 15px, 1.45): isi, maks 65–75ch. `font-medium text-body`.
-- **Caption** (500, 13px, 1.4): label dan meta. `font-medium text-caption`.
+Setiap utility `text-*` sudah membawa ukuran, line-height, letter-spacing, dan weight; cukup tambahkan `font-display` untuk yang serif.
+
+- **Display**: angka utama desktop (durasi kerja, saldo, gaji). Utility `font-display text-display`.
+- **Title**: judul halaman desktop. `font-display text-title`.
+- **Headline**: judul dialog. `font-display text-headline`.
+- **Title-sm**: judul halaman mobile. `font-display text-title-sm`.
+- **Heading**: judul kartu. `text-heading`.
+- **Body**: isi, maks 65–75ch. `text-body`.
+- **Caption**: label dan meta. `text-caption`.
 
 ### Named Rules
 **The Serif For Meaning Rule.** Serif hanya untuk judul halaman/dialog dan angka utama. Tombol, label, tabel, dan input selalu sans.

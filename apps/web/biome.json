@@ -115,6 +115,12 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/shared/lib/text-sizes.ts"],
+      "formatter": {
+        "enabled": false
+      }
     }
   ]
 }

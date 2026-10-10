@@ -17,12 +17,15 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Token design system v2. Sumber nilai: papan "00 · Design System" di
- * mockups/design.pen (nama variabel Pencil di komentar). Pemetaan dan aturan
- * pemakaian ada di DESIGN.md. Jangan menulis hex atau ukuran ad-hoc di komponen.
+ * Token design system v2: satu-satunya sumber nilai di kode. Nilai berasal dari
+ * papan "00 · Design System" di mockups/design.pen (nama variabel Pencil di
+ * komentar). Setelah mengubah blok ini, jalankan `npm run design:sync` untuk
+ * memperbarui frontmatter DESIGN.md dan daftar ukuran teks di shared/lib.
+ * Ukuran teks yang memakai font serif ditandai kata "serif" di komentarnya.
+ * Jangan menulis hex atau ukuran ad-hoc di komponen.
  */
 @theme {
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
 
   /* Netral */
@@ -60,24 +63,31 @@
   --color-info-muted: #e7edfb;
 
   /* Tipografi: serif untuk judul & angka utama, sans untuk semua UI */
-  --text-display: 4rem; /* 64, angka utama desktop */
+  --text-display: 4rem; /* serif · 64, angka utama desktop */
   --text-display--line-height: 1;
+  --text-display--font-weight: 400;
   --text-display--letter-spacing: -0.02em;
-  --text-title: 2.875rem; /* 46, judul halaman desktop */
+  --text-title: 2.875rem; /* serif · 46, judul halaman desktop */
   --text-title--line-height: 1.1;
+  --text-title--font-weight: 400;
   --text-title--letter-spacing: -0.02em;
-  --text-headline: 2.125rem; /* 34, judul dialog */
+  --text-headline: 2.125rem; /* serif · 34, judul dialog */
   --text-headline--line-height: 1.15;
+  --text-headline--font-weight: 400;
   --text-headline--letter-spacing: -0.02em;
-  --text-title-sm: 2rem; /* 32, judul halaman mobile */
+  --text-title-sm: 2rem; /* serif · 32, judul halaman mobile */
   --text-title-sm--line-height: 1.15;
+  --text-title-sm--font-weight: 400;
   --text-title-sm--letter-spacing: -0.02em;
-  --text-heading: 1.125rem; /* 18/600, judul kartu */
+  --text-heading: 1.125rem; /* 18, judul kartu */
   --text-heading--line-height: 1.4;
-  --text-body: 0.9375rem; /* 15/500, isi */
+  --text-heading--font-weight: 600;
+  --text-body: 0.9375rem; /* 15, isi */
   --text-body--line-height: 1.45;
-  --text-caption: 0.8125rem; /* 13/500, label */
+  --text-body--font-weight: 500;
+  --text-caption: 0.8125rem; /* 13, label */
   --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 500;
 
   /* Bentuk */
   --radius-control: 10px; /* tombol & select desktop */

@@ -36,7 +36,7 @@ Buat tabel dan tunjukkan ke user **sebelum coding**:
 
 Keputusan per elemen, urut dari yang paling diutamakan: sudah ada di `shared/ui/` → primitive shadcn baru (via CLI) → komponen feature. Komponen naik ke `shared/ui/` hanya bila memenuhi syarat reusable di README.
 
-Token dan aturan visual ada di `DESIGN.md` (root repo); contoh hidup semua komponen di `/design-system`. Bila nilai mockup belum punya token, tambahkan token di `@theme` pada `apps/web/src/app/globals.css` dan `DESIGN.md` dalam PR yang sama, bukan sebagai hex atau px di komponen.
+Token dan aturan visual ada di `DESIGN.md` (root repo); contoh hidup semua komponen di `/design-system`. Bila nilai mockup belum punya token, tambahkan token di `@theme` pada `apps/web/src/app/globals.css` lalu jalankan `npm run design:sync` dalam PR yang sama, bukan sebagai hex atau px di komponen.
 
 **Selesai bila:** setiap elemen visual punya baris di tabel dan user setuju.
 
