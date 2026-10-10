@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
+import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
 import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
 import { useDecideApproval } from "../api";
@@ -61,23 +62,20 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
   return (
     // Selama menyimpan, dialog tidak bisa ditutup agar hasil mutasi tidak hilang dari pandangan.
     <Dialog open onOpenChange={(open) => !open && !decide.isPending && onClose()}>
-      <DialogContent className="sm:max-w-md" showCloseButton={!decide.isPending}>
-        <form onSubmit={submit} className="grid gap-4">
+      <DialogContent showCloseButton={!decide.isPending}>
+        <form onSubmit={submit} className="grid gap-5.5">
           <DialogHeader>
-            <p className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-              Konfirmasi keputusan
-            </p>
-            <DialogTitle className="font-semibold text-lg leading-snug">
+            <p className="font-semibold text-caption text-faint-foreground">Konfirmasi keputusan</p>
+            <DialogTitle>
               {approving ? "Setujui" : "Tolak"} permohonan {request.employee_name}?
             </DialogTitle>
             <DialogDescription>
-              {formatDate(request.start)} — {formatDate(request.end)} · {request.days} hari kerja
+              {formatDate(request.start)} sampai {formatDate(request.end)} · {request.days} hari
+              kerja
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-2">
-            <label htmlFor={commentId} className="font-semibold text-sm">
-              Catatan keputusan
-            </label>
+          <Field>
+            <FieldLabel htmlFor={commentId}>Catatan keputusan</FieldLabel>
             <Textarea
               id={commentId}
               rows={4}
@@ -87,12 +85,8 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
               aria-invalid={error !== null}
               aria-describedby={error ? errorId : undefined}
             />
-            {error && (
-              <p id={errorId} role="alert" className="text-destructive text-sm">
-                {error}
-              </p>
-            )}
-          </div>
+            {error && <FieldError id={errorId}>{error}</FieldError>}
+          </Field>
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline" disabled={decide.isPending}>

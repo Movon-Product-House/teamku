@@ -65,7 +65,12 @@ src/
 3. Satu komponen utama per file. Sub-komponen kecil yang hanya dipakai di file itu boleh tinggal di file yang sama.
 
 ### Styling
-Komponen baru memakai utility Tailwind. Urutan `@layer` di `app/globals.css`: `legacy` < `ui-reset` < `utilities`. Artinya utility selalu menang atas CSS lama, dan `ui-reset` mencegah style elemen global legacy (h2, label, textarea, …) bocor ke komponen shadcn. Preflight Tailwind baru dinyalakan setelah revamp v2 selesai.
+1. **Token & aturan visual ada di [`DESIGN.md`](../../DESIGN.md)**, nilainya di `@theme` pada `app/globals.css`. Contoh hidup semua komponen: buka `/design-system` (lokal dan preview Vercel).
+2. **Akar setiap halaman/shell v2 diberi `data-surface="v2"`.** Atribut ini memasang font v2 dan memutus style elemen legacy (margin h1/p, label grid, indentasi list).
+3. **Import `cn` dari `@/shared/lib/cn`**, bukan dari paket `cn` (dipaksa Biome). Versi ini mengenal ukuran teks custom (`text-body`, `text-caption`, …); tanpanya warna teks bisa hilang saat digabung. Setelah `npx shadcn add`, ganti import-nya. Bila menambah token `--text-*`, daftarkan juga di `shared/lib/cn.ts`.
+4. **Tipografi lewat token:** `font-display text-title` untuk judul, `font-semibold text-heading` untuk judul kartu, `font-medium text-body` untuk isi. Jangan menulis ukuran px langsung.
+
+Urutan `@layer` di `app/globals.css`: `legacy` < `ui-reset` < `utilities`. Utility selalu menang atas CSS lama, dan `ui-reset` mencegah style elemen global legacy bocor ke komponen shadcn dan permukaan v2. Preflight Tailwind baru dinyalakan setelah revamp v2 selesai.
 
 ## Memigrasi satu halaman lama
 
