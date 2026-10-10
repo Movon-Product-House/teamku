@@ -1,8 +1,9 @@
 /*
  * Urutan layer = urutan prioritas (yang terakhir menang):
  *   legacy   → CSS lama (styles/legacy.css), dibekukan, menyusut selama migrasi
- *   ui-reset → reset mini khusus komponen shadcn ([data-slot]) agar style
- *              elemen global milik legacy (h2, label, textarea, …) tidak bocor
+ *   ui-reset → reset mini untuk komponen shadcn ([data-slot]) dan akar halaman
+ *              v2 ([data-surface="v2"]) agar style elemen global milik legacy
+ *              (h2, label, textarea, …) tidak bocor
  *   utilities→ Tailwind, selalu menang
  * Preflight Tailwind sengaja tidak dipakai karena akan mengubah tampilan halaman
  * lama. Setelah revamp v2 selesai: hapus legacy + ui-reset, ganti dengan
@@ -16,38 +17,86 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Token semantik untuk komponen shadcn (bg-primary, text-muted-foreground, …).
- * Nilai sementara dari palet Teamku sesuai arah v2: aksi utama hitam, merah
- * hanya untuk hal mendesak. Ganti nilainya di sini saat token final v2 siap;
- * jangan menulis warna hex langsung di komponen.
+ * Token design system v2: satu-satunya sumber nilai di kode. Nilai berasal dari
+ * papan "00 · Design System" di mockups/design.pen (nama variabel Pencil di
+ * komentar). Setelah mengubah blok ini, jalankan `npm run design:sync` untuk
+ * memperbarui frontmatter DESIGN.md dan daftar ukuran teks di shared/lib.
+ * Ukuran teks yang memakai font serif ditandai kata "serif" di komentarnya.
+ * Jangan menulis hex atau ukuran ad-hoc di komponen.
  */
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #151518;
-  --color-card: #ffffff;
-  --color-card-foreground: #151518;
-  --color-popover: #ffffff;
-  --color-popover-foreground: #151518;
-  --color-primary: #151518;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #f5f6f8;
-  --color-secondary-foreground: #151518;
-  --color-muted: #f5f6f8;
-  --color-muted-foreground: #747780;
-  --color-accent: #f5f6f8;
-  --color-accent-foreground: #151518;
-  --color-destructive: #e91739;
-  --color-border: #e9eaee;
-  --color-input: #dedfe3;
-  --color-ring: #ff2145;
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
 
-  --color-brand: #ff2145;
-  --color-success: #087e59;
-  --color-success-muted: #eafbf5;
-  --color-warning: #b45309;
-  --color-warning-muted: #fff4e5;
-  --color-info: #3657b2;
-  --color-info-muted: #eff3ff;
+  /* Netral */
+  --color-background: #f3f2ef; /* canvas: latar halaman */
+  --color-foreground: #17171a; /* ink */
+  --color-card: #ffffff; /* surface: kartu tanpa garis */
+  --color-card-foreground: #17171a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #17171a;
+  --color-primary: #17171a; /* ink: satu tombol utama per layar */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #efeeea; /* surface-2: pil, tab aktif */
+  --color-secondary-foreground: #17171a;
+  --color-muted: #efeeea;
+  --color-muted-foreground: #55565c; /* ink-2: teks kedua */
+  /* ink-3. Mockup #86878d hanya 3,6:1 di putih (gagal WCAG AA); digelapkan agar lolos 4,5:1 di surface-2. */
+  --color-faint-foreground: #6a6b71;
+  --color-accent: #efeeea;
+  --color-accent-foreground: #17171a;
+  --color-border: #e4e2dc; /* line: input & tabel */
+  --color-input: #e4e2dc;
+  --color-ring: #17171a;
+  --color-sidebar: #0e0e0f; /* side */
+  --color-sidebar-foreground: #ffffff;
+
+  /* Status: merah hanya untuk hal mendesak */
+  --color-brand: #e3163a; /* re-verifikasi, notifikasi belum dibaca */
+  --color-destructive: #b42318; /* danger: ditolak, error */
+  --color-destructive-muted: #fde9e7;
+  --color-success: #0e7c55; /* ok: tepat waktu, disetujui */
+  --color-success-muted: #e3f4ec;
+  --color-warning: #a2560a; /* warn: menunggu */
+  --color-warning-muted: #fcf0de;
+  --color-info: #2c55c7; /* cuti, info */
+  --color-info-muted: #e7edfb;
+
+  /* Tipografi: serif untuk judul & angka utama, sans untuk semua UI */
+  --text-display: 4rem; /* serif · 64, angka utama desktop */
+  --text-display--line-height: 1;
+  --text-display--font-weight: 400;
+  --text-display--letter-spacing: -0.02em;
+  --text-title: 2.875rem; /* serif · 46, judul halaman desktop */
+  --text-title--line-height: 1.1;
+  --text-title--font-weight: 400;
+  --text-title--letter-spacing: -0.02em;
+  --text-headline: 2.125rem; /* serif · 34, judul dialog */
+  --text-headline--line-height: 1.15;
+  --text-headline--font-weight: 400;
+  --text-headline--letter-spacing: -0.02em;
+  --text-title-sm: 2rem; /* serif · 32, judul halaman mobile */
+  --text-title-sm--line-height: 1.15;
+  --text-title-sm--font-weight: 400;
+  --text-title-sm--letter-spacing: -0.02em;
+  --text-heading: 1.125rem; /* 18, judul kartu */
+  --text-heading--line-height: 1.4;
+  --text-heading--font-weight: 600;
+  --text-body: 0.9375rem; /* 15, isi */
+  --text-body--line-height: 1.45;
+  --text-body--font-weight: 500;
+  --text-caption: 0.8125rem; /* 13, label */
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 500;
+
+  /* Bentuk */
+  --radius-control: 10px; /* tombol & select desktop */
+  --radius-field: 12px; /* input, tombol mobile (r-md) */
+  --radius-card: 20px;
+  --radius-dialog: 24px;
+
+  /* Kartu datar; bayangan hanya untuk lapisan yang melayang */
+  --shadow-overlay: 0 30px 80px rgb(0 0 0 / 0.25);
 }
 
 @layer ui-reset {
@@ -61,11 +110,46 @@
     letter-spacing: normal;
   }
 
+  /*
+   * Akar permukaan v2 (halaman/shell baru): putus semua style elemen legacy
+   * (margin h1/p, letter-spacing heading, grid label, indentasi list) dan
+   * pasang font + warna dasar v2. Hapus bersama layer ini setelah preflight aktif.
+   */
+  [data-surface="v2"] {
+    font-family: var(--font-sans);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  [data-surface="v2"] :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, dl, dd, figure, label) {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: normal;
+  }
+
+  [data-surface="v2"] :where(ul, ol) {
+    list-style: none;
+  }
+
+  [data-surface="v2"] :where(label) {
+    display: block;
+  }
+
   [data-slot]:is(button, input, textarea, select) {
     font: inherit;
     color: inherit;
     background-color: transparent;
     width: auto;
     box-shadow: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot],
+    [data-surface="v2"] * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

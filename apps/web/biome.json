@@ -30,6 +30,14 @@
             "filenameCases": ["kebab-case"],
             "requireAscii": true
           }
+        },
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "cn": "Import cn dari @/shared/lib/cn (sudah mengenal ukuran teks custom). Ganti juga setelah `npx shadcn add`."
+            }
+          }
         }
       }
     }
@@ -96,6 +104,22 @@
             "noImgElement": "warn"
           }
         }
+      }
+    },
+    {
+      "includes": ["src/shared/lib/cn.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/lib/text-sizes.ts"],
+      "formatter": {
+        "enabled": false
       }
     }
   ]

@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "cn";
 import { CircleAlert, CircleCheck, Info, type LucideIcon } from "lucide-react";
+import { cn } from "@/shared/lib/cn";
 import { Button } from "./button";
 import {
   Dialog,
@@ -26,7 +26,7 @@ const appearance: Record<NotificationType, { icon: LucideIcon; eyebrow: string; 
   error: {
     icon: CircleAlert,
     eyebrow: "Perlu perhatian",
-    tone: "bg-destructive/10 text-destructive",
+    tone: "bg-destructive-muted text-destructive",
   },
   info: { icon: Info, eyebrow: "Notifikasi", tone: "bg-info-muted text-info" },
 };
@@ -48,22 +48,18 @@ export function NotificationDialog({ notification, onClose }: Props) {
 function NotificationContent({ notification }: { notification: NotificationDialogState }) {
   const { icon: StatusIcon, eyebrow, tone } = appearance[notification.type];
   return (
-    <DialogContent showCloseButton={false} className="text-center sm:max-w-sm">
+    <DialogContent showCloseButton={false} className="text-center sm:max-w-md">
       <DialogHeader className="items-center">
-        <span className={cn("mb-1 grid size-11 place-items-center rounded-xl", tone)}>
+        <span className={cn("mb-2 grid size-12 place-items-center rounded-[14px]", tone)}>
           <StatusIcon className="size-5" aria-hidden />
         </span>
-        <p className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-          {eyebrow}
-        </p>
-        <DialogTitle className="font-semibold text-lg leading-snug">
-          {notification.title}
-        </DialogTitle>
+        <p className="font-semibold text-caption text-faint-foreground">{eyebrow}</p>
+        <DialogTitle className="pr-0">{notification.title}</DialogTitle>
         <DialogDescription>{notification.message}</DialogDescription>
       </DialogHeader>
       <DialogFooter className="sm:justify-center">
         <DialogClose asChild>
-          <Button className="w-full sm:w-auto">Mengerti</Button>
+          <Button className="w-full sm:w-auto sm:min-w-32">Mengerti</Button>
         </DialogClose>
       </DialogFooter>
     </DialogContent>

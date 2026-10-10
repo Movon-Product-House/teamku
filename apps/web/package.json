@@ -14,8 +14,9 @@
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "biome ci . && node scripts/check-file-lines.mjs && tsc --noEmit && vitest run",
-    "lint:size": "node scripts/check-file-lines.mjs"
+    "check": "biome ci . && node scripts/check-file-lines.mjs && node scripts/sync-design-tokens.mjs --check && tsc --noEmit && vitest run",
+    "lint:size": "node scripts/check-file-lines.mjs",
+    "design:sync": "node scripts/sync-design-tokens.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",

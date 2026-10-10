@@ -17,6 +17,7 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/ag
 ## Front-end (`apps/web`)
 
 Conventions, structure and the page-migration recipe: `apps/web/README.md`. Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
+Visual tokens and rules: `DESIGN.md`; product context (users, tone, principles): `PRODUCT.md`.
 
 ## Claude Code plugins
 

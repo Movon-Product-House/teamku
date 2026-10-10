@@ -36,13 +36,13 @@ Buat tabel dan tunjukkan ke user **sebelum coding**:
 
 Keputusan per elemen, urut dari yang paling diutamakan: sudah ada di `shared/ui/` → primitive shadcn baru (via CLI) → komponen feature. Komponen naik ke `shared/ui/` hanya bila memenuhi syarat reusable di README.
 
-Token: bila warna/font mockup belum ada di `@theme` pada `apps/web/src/app/globals.css` (token sekarang masih sementara), tambahkan token v2 dari `design.pen` di sana dalam PR yang sama, bukan sebagai hex di komponen.
+Token dan aturan visual ada di `DESIGN.md` (root repo); contoh hidup semua komponen di `/design-system`. Bila nilai mockup belum punya token, tambahkan token di `@theme` pada `apps/web/src/app/globals.css` lalu jalankan `npm run design:sync` dalam PR yang sama, bukan sebagai hex atau px di komponen.
 
 **Selesai bila:** setiap elemen visual punya baris di tabel dan user setuju.
 
 ## 4. Implementasi
 
-Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + `*.test.ts` → komponen → `app/.../page.tsx` re-export. Bila layar menggantikan halaman legacy, lakukan juga langkah "Memigrasi satu halaman lama" di README.
+Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + `*.test.ts` → komponen → `app/.../page.tsx` re-export. Akar layar v2 diberi `data-surface="v2"`. Bila layar menggantikan halaman legacy, lakukan juga langkah "Memigrasi satu halaman lama" di README.
 
 **Selesai bila:** setiap varian dari langkah 1 punya representasi di kode (loading, error, kosong, dan STATE dari mockup), dan logika bercabang punya test.
 
