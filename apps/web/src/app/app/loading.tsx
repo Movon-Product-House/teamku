@@ -1,3 +1,5 @@
-import {PageSkeleton} from "../../components/PageSkeleton";
+import { PageSkeleton } from "@/shared/ui/page-skeleton";
 
-export default function Loading(){return <PageSkeleton/>}
+export default function Loading() {
+  return <PageSkeleton />;
+}

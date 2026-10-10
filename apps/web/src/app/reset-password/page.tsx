@@ -1,11 +1,12 @@
 "use client";
-import {FormEvent, Suspense, useState} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
-import {api} from "../../lib/api";
-import {waitForAuthTransition} from "../../lib/transition";
-import {AuthTransition} from "../../components/AuthTransition";
-import {AuthLink, AuthLinks, AuthShell} from "../../components/AuthShell";
-import {NotificationDialog, NotificationDialogState} from "../../components/NotificationDialog";
+import { useRouter, useSearchParams } from "next/navigation";
+import { type FormEvent, Suspense, useState } from "react";
+import { AuthLink, AuthLinks, AuthShell } from "@/features/auth/components/auth-shell";
+import { AuthTransition } from "@/features/auth/components/auth-transition";
+import { waitForAuthTransition } from "@/features/auth/transition";
+import { api } from "@/shared/api/client";
+import { storeDemoToken } from "@/shared/api/demo-session";
+import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
 function ResetForm() {
   const params = useSearchParams();
@@ -20,11 +21,11 @@ function ResetForm() {
     const startedAt = Date.now();
     setBusy(true);
     try {
-      const result = await api<{access_token: string}>("/auth/reset-password", {
+      const result = await api<{ access_token: string }>("/auth/reset-password", {
         method: "POST",
-        body: JSON.stringify({token, password}),
+        body: JSON.stringify({ token, password }),
       });
-      localStorage.setItem("movon_user", result.access_token);
+      storeDemoToken(result.access_token);
       await waitForAuthTransition(startedAt);
       router.replace("/app/overview");
     } catch (reason) {
@@ -41,9 +42,20 @@ function ResetForm() {
   return (
     <>
       <AuthShell title="Atur kata sandi baru" subtitle="Masukkan kata sandi baru untuk akun Anda.">
-        <form className="stack" style={{marginTop: 32}} onSubmit={submit}>
-          <label>Kata sandi baru<input disabled={busy} type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="new-password" /></label>
-          <button disabled={busy || !token} type="submit">{busy ? "Menyimpan…" : "Simpan kata sandi →"}</button>
+        <form className="stack" style={{ marginTop: 32 }} onSubmit={submit}>
+          <label>
+            Kata sandi baru
+            <input
+              disabled={busy}
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+            />
+          </label>
+          <button disabled={busy || !token} type="submit">
+            {busy ? "Menyimpan…" : "Simpan kata sandi →"}
+          </button>
         </form>
         <AuthLinks>
           <AuthLink href="/login">Kembali masuk</AuthLink>

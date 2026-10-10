@@ -14,6 +14,10 @@ Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-
 
 Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
+## Front-end (`apps/web`)
+
+Conventions, structure and the page-migration recipe: `apps/web/README.md`. Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
+
 ## Claude Code plugins
 
 `.claude/settings.json` registers the team plugins. On first open of this repo in Claude Code, trust the folder and accept the marketplace/plugin install prompt (or run `/plugin` to install manually):

@@ -1,3 +1,19 @@
 import "./globals.css";
-export const metadata={title:"Teamku",description:"Teamku — powered by movon digital house"};
-export default function Layout({children}:{children:React.ReactNode}){return <html lang="id"><body>{children}</body></html>}
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import { Providers } from "./providers";
+
+export const metadata: Metadata = {
+  title: "Teamku",
+  description: "Teamku — powered by movon digital house",
+};
+
+export default function Layout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="id">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}

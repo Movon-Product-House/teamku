@@ -1,0 +1,102 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "root": "../.."
+  },
+  "files": {
+    "includes": ["**", "!next-env.d.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
+    },
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "requireAscii": true
+          }
+        }
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/styles/legacy.css"],
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": [
+        "src/app/app/overview/**",
+        "src/app/app/attendance/**",
+        "src/app/app/payroll/**",
+        "src/app/app/people/**",
+        "src/app/app/settings/**",
+        "src/app/app/time/**",
+        "src/app/app/ask-teamku/**",
+        "src/features/shell/shell.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useButtonType": "warn",
+            "useAriaPropsSupportedByRole": "warn",
+            "useSemanticElements": "warn",
+            "noStaticElementInteractions": "warn",
+            "useKeyWithClickEvents": "warn"
+          },
+          "correctness": {
+            "useExhaustiveDependencies": "warn"
+          },
+          "style": {
+            "noNonNullAssertion": "warn",
+            "useTemplate": "warn"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "warn",
+            "useIterableCallbackReturn": "warn"
+          },
+          "complexity": {
+            "useOptionalChain": "warn"
+          },
+          "performance": {
+            "noImgElement": "warn"
+          }
+        }
+      }
+    }
+  ]
+}

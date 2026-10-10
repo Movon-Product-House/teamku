@@ -1,5 +1,5 @@
-import teamkuBlack from "../assets/brand/teamku-black.png";
-import teamkuWhite from "../assets/brand/teamku-white.png";
+import teamkuBlack from "@/assets/brand/teamku-black.png";
+import teamkuWhite from "@/assets/brand/teamku-white.png";
 
 const assets = {
   black: teamkuBlack,
