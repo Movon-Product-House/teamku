@@ -6,6 +6,8 @@
 
 Issues and specs live in GitHub Issues (`Movon-Product-House/teamku`), via the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
+**Working an issue? Follow "Siklus tiket" in `docs/agents/issue-tracker.md`:** assign yourself + set the board status before writing code, tick the checklist as you go, `Closes #<n>` in the PR.
+
 ### Triage labels
 
 Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
