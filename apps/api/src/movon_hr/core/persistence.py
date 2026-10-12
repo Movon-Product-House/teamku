@@ -312,7 +312,9 @@ _engine: AsyncEngine | None = None
 
 
 def is_enabled() -> bool:
-    return bool(settings.database_url)
+    # Legacy snapshot persistence is disabled during the refactor (deleted in U12):
+    # database_url now has a default, and the old middleware must not write snapshots.
+    return False
 
 
 def _get_engine() -> AsyncEngine:

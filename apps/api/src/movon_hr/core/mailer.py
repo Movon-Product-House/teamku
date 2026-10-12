@@ -7,21 +7,20 @@ without a mail server. ``resend`` sends through the Resend API.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from functools import partial
 from typing import Literal
 
 import resend
+from resend.http_client_httpx import HTTPXClient
 
 from movon_hr.core.settings import settings
 
 logger = logging.getLogger("movon_hr.mailer")
 
 # The SDK default is 30s; stay under the web client's 15s fetch timeout.
-resend.default_http_client = resend.RequestsClient(timeout=10)
+resend.default_async_http_client = HTTPXClient(timeout=10)
 
 # Demo seed data uses these (e.g. @movon.test). Sending there only bounces,
 # and a high bounce rate gets the Resend account paused.
@@ -45,10 +44,17 @@ def reset_outbox() -> None:
     outbox.clear()
 
 
-def send_email(to: str, subject: str, body: str, *, kind: MailKind = "generic") -> bool:
-    """Send one plain-text email; True if sent. Never raises: callers must not fail on mail."""
+async def send_email(to: str, subject: str, body: str, *, kind: MailKind = "generic") -> bool:
+    """Send one plain-text email; True if sent. Never raises: callers must not fail on mail.
+
+    Routes schedule it with ``BackgroundTasks`` so it runs only after the commit.
+    """
     if settings.mail_provider == "resend":
-        return _send_resend(to, subject, body, kind)
+        return await _send_resend(to, subject, body, kind)
+    return _queue_console(to, subject, body, kind)
+
+
+def _queue_console(to: str, subject: str, body: str, kind: MailKind) -> bool:
     outbox.append(EmailMessage(to=to, subject=subject, body=body))
     if settings.environment == "development":
         logger.info("Email queued to=%s subject=%s\n%s", to, subject, body)
@@ -58,22 +64,7 @@ def send_email(to: str, subject: str, body: str, *, kind: MailKind = "generic") 
     return True
 
 
-def dispatch_email(to: str, subject: str, body: str, *, kind: MailKind = "generic") -> None:
-    """Fire-and-forget send from async routes; without a running loop it sends inline."""
-    if settings.mail_provider == "resend":
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            pass
-        else:
-            # ponytail: in-process executor, a restart mid-send drops the email;
-            # move to a queue with retries before production.
-            loop.run_in_executor(None, partial(send_email, to, subject, body, kind=kind))
-            return
-    send_email(to, subject, body, kind=kind)
-
-
-def _send_resend(to: str, subject: str, body: str, kind: MailKind) -> bool:
+async def _send_resend(to: str, subject: str, body: str, kind: MailKind) -> bool:
     if to.strip().lower().endswith(RESERVED_SUFFIXES):
         logger.info("Email skipped kind=%s reason=reserved_domain", kind)
         return False
@@ -82,7 +73,7 @@ def _send_resend(to: str, subject: str, body: str, kind: MailKind) -> bool:
         if api_key is None or sender is None:
             raise RuntimeError("Resend is not configured")
         resend.api_key = api_key.get_secret_value()
-        sent = resend.Emails.send(
+        sent = await resend.Emails.send_async(
             {
                 "from": sender,
                 "to": [to],

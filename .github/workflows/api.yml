@@ -21,6 +21,8 @@ jobs:
         options: >-
           --health-cmd pg_isready --health-interval 5s
           --health-timeout 5s --health-retries 10
+    env:
+      MOVON_TEST_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon
     defaults:
       run:
         working-directory: apps/api

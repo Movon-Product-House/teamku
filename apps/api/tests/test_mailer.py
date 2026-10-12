@@ -1,19 +1,17 @@
 import asyncio
 import logging
-import threading
 
 import pytest
-import requests
 import resend
 from fastapi.testclient import TestClient
 from pydantic import SecretStr, ValidationError
 
 from movon_hr.core import mailer
-from movon_hr.core.mailer import dispatch_email, outbox, send_email
+from movon_hr.core.mailer import outbox, send_email
 from movon_hr.core.settings import Settings, settings
 from movon_hr.main import app
 from movon_hr.modules import api
-from movon_hr.modules.api import reset_demo_store
+from movon_hr.modules.api import dispatch_email, reset_demo_store
 
 client = TestClient(app)
 
@@ -29,7 +27,12 @@ def resend_on(monkeypatch: pytest.MonkeyPatch) -> list[dict]:
     monkeypatch.setattr(settings, "resend_api_key", SecretStr("re_test"))
     monkeypatch.setattr(settings, "mail_from", "Teamku <noreply@movoncreative.dev>")
     sent: list[dict] = []
-    monkeypatch.setattr(resend.Emails, "send", lambda params: sent.append(params) or {"id": "x"})
+
+    async def send_async(params: dict) -> dict:
+        sent.append(params)
+        return {"id": "x"}
+
+    monkeypatch.setattr(resend.Emails, "send_async", send_async)
     return sent
 
 
@@ -42,9 +45,10 @@ def test_resend_provider_requires_key_and_from() -> None:
     assert "re_x" not in repr(ok)
 
 
-def test_resend_sends_plain_text_and_skips_outbox(resend_on: list[dict]) -> None:
+@pytest.mark.anyio
+async def test_resend_sends_plain_text_and_skips_outbox(resend_on: list[dict]) -> None:
     before = len(outbox)
-    assert send_email("sinta@gmail.com", "Halo", "isi", kind="invite") is True
+    assert await send_email("sinta@gmail.com", "Halo", "isi", kind="invite") is True
     assert resend_on == [
         {
             "from": "Teamku <noreply@movoncreative.dev>",
@@ -57,47 +61,51 @@ def test_resend_sends_plain_text_and_skips_outbox(resend_on: list[dict]) -> None
     assert len(outbox) == before
 
 
-def test_resend_skips_reserved_domains(
+@pytest.mark.anyio
+async def test_resend_skips_reserved_domains(
     resend_on: list[dict], caplog: pytest.LogCaptureFixture
 ) -> None:
     with caplog.at_level(logging.INFO):
-        assert send_email("maya@Movon.TEST", "Halo", "isi") is False
+        assert await send_email("maya@Movon.TEST", "Halo", "isi") is False
     assert "reserved_domain" in caplog.text
     assert resend_on == []
 
 
-def test_resend_failure_never_raises_or_logs_body(
+@pytest.mark.anyio
+async def test_resend_failure_never_raises_or_logs_body(
     resend_on: list[dict], monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    def boom(params: dict) -> dict:
+    async def boom(params: dict) -> dict:
         raise resend.exceptions.ResendError(
             code=403, error_type="validation_error", message="domain", suggested_action=""
         )
 
-    monkeypatch.setattr(resend.Emails, "send", boom)
+    monkeypatch.setattr(resend.Emails, "send_async", boom)
     with caplog.at_level(logging.INFO):
-        assert send_email("sinta@gmail.com", "Halo", "token=rahasia") is False
+        assert await send_email("sinta@gmail.com", "Halo", "token=rahasia") is False
     assert "error=validation_error code=403" in caplog.text
     assert "rahasia" not in caplog.text
 
 
-def test_resend_timeout_never_raises(
+@pytest.mark.anyio
+async def test_resend_timeout_never_raises(
     resend_on: list[dict], monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    def slow(params: dict) -> dict:
-        raise requests.Timeout()
+    async def slow(params: dict) -> dict:
+        raise TimeoutError()
 
-    monkeypatch.setattr(resend.Emails, "send", slow)
-    assert send_email("sinta@gmail.com", "Halo", "isi") is False
+    monkeypatch.setattr(resend.Emails, "send_async", slow)
+    assert await send_email("sinta@gmail.com", "Halo", "isi") is False
     assert "error=Timeout" in caplog.text
 
 
-def test_console_hides_body_outside_development(
+@pytest.mark.anyio
+async def test_console_hides_body_outside_development(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     monkeypatch.setattr(settings, "environment", "production")
     with caplog.at_level(logging.INFO):
-        assert send_email("a@movon.test", "Halo", "token=rahasia")
+        assert await send_email("a@movon.test", "Halo", "token=rahasia")
     assert "rahasia" not in caplog.text
     assert mailer.last_email_to("a@movon.test").body == "token=rahasia"
 
@@ -105,19 +113,25 @@ def test_console_hides_body_outside_development(
 def test_dispatch_does_not_wait_for_resend(
     resend_on: list[dict], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    release = threading.Event()
-    monkeypatch.setattr(resend.Emails, "send", lambda params: release.wait(5) and {"id": "x"})
+    async def slow(params: dict) -> dict:
+        await asyncio.sleep(5)
+        return {"id": "x"}
+
+    monkeypatch.setattr(resend.Emails, "send_async", slow)
 
     async def run() -> None:
         dispatch_email("sinta@gmail.com", "Halo", "isi")  # would block 5s if awaited inline
 
     asyncio.run(asyncio.wait_for(run(), timeout=1))
-    release.set()
 
 
 def test_invite_reports_failed_email_but_keeps_invitation(monkeypatch: pytest.MonkeyPatch) -> None:
     reset_demo_store()
-    monkeypatch.setattr(api, "send_email", lambda *a, **k: False)
+
+    async def failed_send(*args: object, **kwargs: object) -> bool:
+        return False
+
+    monkeypatch.setattr(api, "send_email", failed_send)
     response = client.post(
         "/api/v1/invites",
         headers=login("hr@movon.test"),

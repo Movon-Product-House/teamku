@@ -11,6 +11,8 @@ import re
 import secrets
 import string
 
+import anyio
+import anyio.to_thread
 from argon2 import PasswordHasher
 from argon2.exceptions import (
     InvalidHashError,
@@ -18,8 +20,10 @@ from argon2.exceptions import (
     VerifyMismatchError,
 )
 
-# Argon2id with library defaults (sensible time/memory cost for a web app).
+# Argon2id with library defaults (m=64 MiB, t=3, p=4; above the OWASP minimum).
 _hasher = PasswordHasher()
+# Each hash holds 64 MiB: cap concurrent hashes so a login burst cannot exhaust memory.
+_HASH_LIMITER = anyio.CapacityLimiter(4)
 
 # Password policy shared by login, employee creation, and password changes.
 MIN_PASSWORD_LENGTH = 8
@@ -43,6 +47,18 @@ def verify_password(password: str, password_hash: str | None) -> bool:
         return _hasher.verify(password_hash, password)
     except (VerifyMismatchError, VerificationError, InvalidHashError):
         return False
+
+
+async def hash_password_async(password: str) -> str:
+    """``hash_password`` in a worker thread, so the event loop keeps serving."""
+    return await anyio.to_thread.run_sync(hash_password, password, limiter=_HASH_LIMITER)
+
+
+async def verify_password_async(password: str, password_hash: str | None) -> bool:
+    """``verify_password`` in a worker thread, so the event loop keeps serving."""
+    return await anyio.to_thread.run_sync(
+        verify_password, password, password_hash, limiter=_HASH_LIMITER
+    )
 
 
 def needs_rehash(password_hash: str) -> bool:
@@ -80,7 +96,9 @@ __all__ = [
     "MIN_PASSWORD_LENGTH",
     "generate_temporary_password",
     "hash_password",
+    "hash_password_async",
     "needs_rehash",
     "password_policy_error",
     "verify_password",
+    "verify_password_async",
 ]

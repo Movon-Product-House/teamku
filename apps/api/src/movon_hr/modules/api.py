@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from dataclasses import asdict, dataclass, field
@@ -15,14 +16,13 @@ from urllib.parse import parse_qs, quote, unquote, urlencode, urlparse
 from urllib.request import Request as UrlRequest
 from urllib.request import urlopen
 from uuid import uuid4
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Header, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from starlette.concurrency import run_in_threadpool
 
-from movon_hr.core.mailer import dispatch_email, reset_outbox, send_email
+from movon_hr.core import mailer
+from movon_hr.core.mailer import MailKind, reset_outbox, send_email
 from movon_hr.core.policy_assistant import answer_question
 from movon_hr.core.security import (
     generate_temporary_password,
@@ -43,10 +43,26 @@ from movon_hr.core.tenancy import (
     put_store,
     store,
 )
+from movon_hr.core.time import JAKARTA, jakarta_date, working_days
 
 router = APIRouter()
 logger = logging.getLogger("movon_hr.calendar")
-JAKARTA = ZoneInfo("Asia/Jakarta")
+_mail_tasks: set[asyncio.Task] = set()
+
+
+def dispatch_email(to: str, subject: str, body: str, *, kind: MailKind = "generic") -> None:
+    """Legacy fire-and-forget send for the old sync helpers; deleted in U12."""
+    if settings.mail_provider != "resend":
+        mailer._queue_console(to, subject, body, kind)  # no I/O: inline, like before
+        return
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        asyncio.run(send_email(to, subject, body, kind=kind))
+        return
+    task = loop.create_task(send_email(to, subject, body, kind=kind))
+    _mail_tasks.add(task)
+    task.add_done_callback(_mail_tasks.discard)
 
 # Sessions expire after this idle-agnostic absolute lifetime.
 SESSION_TTL = timedelta(hours=12)
@@ -827,13 +843,6 @@ def parse_hhmm(value: str) -> time:
     return time(int(hour), int(minute))
 
 
-def jakarta_date(moment: datetime | None = None) -> date:
-    value = moment or datetime.now(JAKARTA)
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=UTC)
-    return value.astimezone(JAKARTA).date()
-
-
 def employee_sessions_on(employee_id: str, day: date) -> list[Attendance]:
     return [
         item
@@ -1069,14 +1078,6 @@ def resolve_maps_url(url: str) -> str:
     )
     with urlopen(request, timeout=8) as response:
         return str(response.geturl())
-
-
-def working_days(start: date, end: date) -> int:
-    return sum(
-        1
-        for offset in range((end - start).days + 1)
-        if (start + timedelta(days=offset)).weekday() < 5
-    )
 
 
 def visible_employees(user: Employee) -> list[Employee]:
@@ -1408,8 +1409,7 @@ async def create_invite(
     )
     store.invitations[invitation.token] = invitation
     invite_url = app_url(f"/invite?token={invitation.token}")
-    ok = await run_in_threadpool(
-        send_email,
+    ok = await send_email(
         email,
         f"Undangan Teamku — {get_store().tenant_name}",
         (
