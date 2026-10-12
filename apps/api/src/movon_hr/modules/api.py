@@ -11,8 +11,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from math import asin, cos, radians, sin, sqrt
 from random import uniform
 from secrets import token_urlsafe
-from urllib.error import URLError
-from urllib.parse import parse_qs, quote, unquote, urlencode, urlparse
+from urllib.parse import quote, urlencode
 from urllib.request import Request as UrlRequest
 from urllib.request import urlopen
 from uuid import uuid4
@@ -295,7 +294,6 @@ class DemoStore:
 # In-memory login throttle: email -> list of recent failed-attempt timestamps.
 # Not persisted; a best-effort brute-force guard within a single process.
 _login_attempts: dict[str, list[datetime]] = {}
-_google_oauth_states: dict[str, tuple[str, str]] = {}
 
 # Every demo account signs in with this password. Hashed once at import time so
 # seeding stays fast even though tests reset the store frequently.
@@ -685,13 +683,6 @@ def remove_leave_calendar(request: LeaveRequest) -> None:
     request.calendar_sync_status = "removed"
 
 
-GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar"
-
-
-def google_redirect_uri() -> str:
-    return settings.google_redirect_uri or f"{settings.app_base_url.rstrip('/')}/api/v1/settings/calendar/google/callback"
-
-
 def google_token_request(values: dict[str, str]) -> dict:
     request = UrlRequest(
         "https://oauth2.googleapis.com/token",
@@ -783,18 +774,6 @@ def office_payload(office: OfficeLocation | None = None) -> dict:
     }
 
 
-def calendar_payload() -> dict:
-    return {
-        "provider": store.calendar.provider,
-        "connected": store.calendar.connected,
-        "team_calendar_id": store.calendar.team_calendar_id,
-        "calendar_name": store.calendar.calendar_name,
-        "scope": store.calendar.scope,
-        "division": store.calendar.division,
-        "delivery_mode": store.calendar.delivery_mode,
-    }
-
-
 def office_distance_meters(latitude: float, longitude: float, employee: Employee | None = None) -> float:
     office = current_office(employee)
     return haversine_meters(latitude, longitude, office.latitude, office.longitude)
@@ -805,7 +784,6 @@ def allowed_check_in_radius_meters(accuracy_meters: float, employee: Employee | 
 
 
 REVERIFY_GRACE_MINUTES = 15
-TIME_PATTERN = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 ALERT_COPY = {
     "missed_clock_in": ("Belum clock-in", "Anda belum check-in hari ini."),
     "missed_clock_out": ("Sesi masih terbuka", "Sesi kehadiran Anda masih terbuka. Lakukan check-out."),
@@ -818,24 +796,6 @@ ALERT_COPY = {
         "Re-verifikasi lokasi tercatat di luar radius kantor.",
     ),
 }
-
-
-def validate_office_policy(data: dict) -> None:
-    count = data["reverify_count_per_day"]
-    if count not in {1, 2, 3}:
-        raise HTTPException(422, "Jumlah re-verifikasi per hari harus 1, 2, atau 3")
-    start = data["reverify_window_start_minutes"]
-    end = data["reverify_window_end_minutes"]
-    if not 0 <= start <= 1_440 or not 0 <= end <= 1_440:
-        raise HTTPException(422, "Jendela re-verifikasi harus antara 0 dan 1440 menit")
-    if end <= start:
-        raise HTTPException(422, "Jendela akhir harus lebih besar dari jendela mulai")
-    for key in ("clock_in_reminder_time", "clock_out_reminder_time"):
-        if not TIME_PATTERN.fullmatch(str(data[key])):
-            raise HTTPException(422, "Format jam pengingat harus HH:MM")
-    hours = data["max_open_hours"]
-    if hours < 1 or hours > 24:
-        raise HTTPException(422, "Batas sesi terbuka harus antara 1 dan 24 jam")
 
 
 def parse_hhmm(value: str) -> time:
@@ -1025,61 +985,6 @@ def evaluate_attendance_alerts() -> None:
             emit_attendance_alert("limit_geofence", employee, policy)
 
 
-def _valid_coordinates(latitude: float, longitude: float) -> tuple[float, float] | None:
-    if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
-        return None
-    return round(latitude, 6), round(longitude, 6)
-
-
-def parse_google_maps_location(text: str) -> tuple[float, float] | None:
-    value = text.strip()
-    if not value:
-        return None
-
-    raw = re.fullmatch(r"(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)", value)
-    if raw:
-        return _valid_coordinates(float(raw.group(1)), float(raw.group(2)))
-
-    pin = re.search(r"!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)", value)
-    if pin:
-        return _valid_coordinates(float(pin.group(1)), float(pin.group(2)))
-
-    at = re.search(r"@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)", value)
-    if at:
-        return _valid_coordinates(float(at.group(1)), float(at.group(2)))
-
-    try:
-        parsed = urlparse(value if "://" in value else f"https://{value}")
-        query = parse_qs(parsed.query)
-        for key in ("q", "query", "ll", "center", "destination", "daddr"):
-            if key not in query:
-                continue
-            match = re.search(
-                r"(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)",
-                unquote(query[key][0]),
-            )
-            if match:
-                return _valid_coordinates(float(match.group(1)), float(match.group(2)))
-    except ValueError:
-        pass
-
-    match = re.search(r"(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)", value)
-    if match:
-        return _valid_coordinates(float(match.group(1)), float(match.group(2)))
-    return None
-
-
-def resolve_maps_url(url: str) -> str:
-    """Follow short Google Maps redirects so coordinates can be parsed from the final URL."""
-    request = UrlRequest(
-        url,
-        headers={"User-Agent": "TeamkuOfficeSettings/1.0"},
-        method="GET",
-    )
-    with urlopen(request, timeout=8) as response:
-        return str(response.geturl())
-
-
 def visible_employees(user: Employee) -> list[Employee]:
     if user.role == "hr_admin":
         return list(store.employees.values())
@@ -1206,43 +1111,6 @@ class ReverifyInput(BaseModel):
     longitude: float = Field(ge=-180, le=180)
     accuracy_meters: float = Field(ge=0, le=10_000)
     selfie_captured: bool
-
-
-class OfficeSettingsInput(BaseModel):
-    name: str = Field(min_length=2, max_length=80)
-    latitude: float = Field(ge=-90, le=90)
-    longitude: float = Field(ge=-180, le=180)
-    radius_meters: float = Field(ge=50, le=5_000)
-    reverify_enabled: bool | None = None
-    reverify_count_per_day: int | None = Field(default=None, ge=1, le=3)
-    reverify_window_start_minutes: int | None = Field(default=None, ge=0, le=1_440)
-    reverify_window_end_minutes: int | None = Field(default=None, ge=0, le=1_440)
-    alerts_enabled: bool | None = None
-    clock_in_reminder_time: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
-    clock_out_reminder_time: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
-    max_open_hours: int | None = Field(default=None, ge=1, le=24)
-    alert_managers: bool | None = None
-
-
-class WorkLocationInput(BaseModel):
-    name: str = Field(min_length=2, max_length=80)
-    latitude: float = Field(ge=-90, le=90)
-    longitude: float = Field(ge=-180, le=180)
-    radius_meters: float = Field(default=300, ge=50, le=5_000)
-
-
-class CalendarSettingsInput(BaseModel):
-    provider: str = Field(pattern="^(google|microsoft)$")
-    team_calendar_id: str = Field(min_length=2, max_length=300)
-    connected: bool = False
-    calendar_name: str = Field(default="Kalender perusahaan", max_length=120)
-    scope: str = Field(default="company", pattern="^(company|division)$")
-    division: str = Field(default="", max_length=100)
-    delivery_mode: str = Field(default="shared_and_email", pattern="^(shared|shared_and_email)$")
-
-
-class MapsUrlInput(BaseModel):
-    url: str = Field(min_length=4, max_length=2_000)
 
 
 class LeaveInput(BaseModel):
@@ -1717,177 +1585,6 @@ async def update_employee(
         employee.is_remote = False
         audit("employee.location_changed", user, employee.id)
     return public_employee(employee)
-
-
-@router.get("/settings/locations")
-async def list_work_locations(x_demo_user: str | None = Header(default=None)) -> dict:
-    actor(x_demo_user)
-    if not store.office_locations:
-        store.office_locations = {store.office.id: store.office}
-    unique: dict[tuple[str, float, float], OfficeLocation] = {}
-    for item in store.office_locations.values():
-        key = (item.name.strip().casefold(), round(item.latitude, 6), round(item.longitude, 6))
-        unique.setdefault(key, item)
-    return {"items": [office_payload(item) for item in unique.values()]}
-
-
-@router.post("/settings/locations")
-async def create_work_location(payload: WorkLocationInput, x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    duplicate = next((item for item in store.office_locations.values() if item.name.strip().casefold() == payload.name.strip().casefold() or (abs(item.latitude - payload.latitude) < 0.000001 and abs(item.longitude - payload.longitude) < 0.000001)), None)
-    if duplicate:
-        raise HTTPException(409, f"Lokasi {duplicate.name} sudah terdaftar")
-    location = OfficeLocation(id=f"location-{uuid4().hex[:8]}", **payload.model_dump())
-    store.office_locations[location.id] = location
-    audit("settings.location_created", user, location.id)
-    return office_payload(location)
-
-
-@router.get("/settings/office")
-async def get_office_settings(x_demo_user: str | None = Header(default=None)) -> dict:
-    actor(x_demo_user)
-    return office_payload()
-
-
-@router.put("/settings/office")
-async def update_office_settings(
-    payload: OfficeSettingsInput, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    current = asdict(store.office)
-    current.update(payload.model_dump(exclude_unset=True))
-    validate_office_policy(current)
-    store.office = OfficeLocation(**current)
-    store.office_locations[store.office.id] = store.office
-    audit("settings.office_updated", user, store.office.name)
-    return office_payload()
-
-
-@router.get("/settings/calendar")
-async def get_calendar_settings(x_demo_user: str | None = Header(default=None)) -> dict:
-    actor(x_demo_user)
-    return calendar_payload()
-
-
-@router.put("/settings/calendar")
-async def update_calendar_settings(
-    payload: CalendarSettingsInput, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    current = store.calendar
-    store.calendar = CalendarSettings(
-        provider=payload.provider,
-        connected=payload.connected,
-        team_calendar_id=payload.team_calendar_id.strip(),
-        calendar_name=payload.calendar_name.strip() or "Kalender perusahaan",
-        scope=payload.scope,
-        division=payload.division.strip(),
-        delivery_mode=payload.delivery_mode,
-        refresh_token=current.refresh_token,
-        access_token=current.access_token,
-        token_expires_at=current.token_expires_at,
-    )
-    audit("settings.calendar_updated", user, store.calendar.team_calendar_id)
-    return calendar_payload()
-
-
-@router.get("/settings/calendar/google/start")
-async def start_google_calendar(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    if not settings.google_client_id:
-        raise HTTPException(503, "Google Calendar belum dikonfigurasi oleh administrator sistem")
-    state = token_urlsafe(32)
-    _google_oauth_states[state] = (store.tenant_id, user.id)
-    query = urlencode({
-        "client_id": settings.google_client_id,
-        "redirect_uri": google_redirect_uri(),
-        "response_type": "code",
-        "scope": GOOGLE_CALENDAR_SCOPE,
-        "access_type": "offline",
-        "prompt": "consent",
-        "state": state,
-    })
-    return {"authorization_url": f"https://accounts.google.com/o/oauth2/v2/auth?{query}"}
-
-
-@router.get("/settings/calendar/google/callback")
-async def google_calendar_callback(code: str | None = None, state: str | None = None, error: str | None = None) -> Response:
-    if error or not code or not state:
-        return Response("Google Calendar connection was cancelled.", status_code=400)
-    context = _google_oauth_states.pop(state, None)
-    if not context or not settings.google_client_id or not settings.google_client_secret:
-        return Response("Google Calendar connection expired or is not configured.", status_code=400)
-    tenant_id, _ = context
-    try:
-        tokens = google_token_request({
-            "code": code,
-            "client_id": settings.google_client_id,
-            "client_secret": settings.google_client_secret,
-            "redirect_uri": google_redirect_uri(),
-            "grant_type": "authorization_code",
-        })
-    except Exception:
-        return Response("Google Calendar token exchange failed.", status_code=502)
-    if not tokens.get("access_token"):
-        return Response("Google Calendar did not return an access token.", status_code=502)
-    tenant_store = get_store(tenant_id)
-    tenant_store.calendar.provider = "google"
-    tenant_store.calendar.connected = True
-    tenant_store.calendar.access_token = tokens["access_token"]
-    tenant_store.calendar.refresh_token = tokens.get("refresh_token") or tenant_store.calendar.refresh_token
-    tenant_store.calendar.token_expires_at = datetime.now(UTC) + timedelta(seconds=int(tokens.get("expires_in", 3600)))
-    return Response(status_code=302, headers={"Location": f"{settings.app_base_url.rstrip('/')}/app/settings?calendar=connected"})
-
-
-@router.get("/settings/calendar/google/calendars")
-async def google_calendars(x_demo_user: str | None = Header(default=None)) -> dict:
-    actor_user = actor(x_demo_user)
-    require(actor_user, "hr_admin")
-    calendar = store.calendar
-    if not calendar.access_token:
-        raise HTTPException(409, "Hubungkan akun Google terlebih dahulu")
-    try:
-        data = google_calendar_request("GET", "https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=writer")
-    except Exception as error:
-        raise HTTPException(502, "Daftar kalender Google tidak dapat diambil") from error
-    return {"items": [{"id": item["id"], "name": item.get("summary") or item["id"], "primary": item.get("primary", False)} for item in data.get("items", [])]}
-
-
-@router.post("/settings/office/from-maps-url")
-async def office_from_maps_url(
-    payload: MapsUrlInput, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    source = payload.url.strip()
-    resolved = source
-    host = urlparse(source if "://" in source else f"https://{source}").hostname or ""
-    if host.endswith(("goo.gl", "app.goo.gl")):
-        try:
-            resolved = resolve_maps_url(source if "://" in source else f"https://{source}")
-        except (URLError, TimeoutError, ValueError) as error:
-            raise HTTPException(
-                422,
-                "Tautan singkat Google Maps tidak dapat dibuka. Salin URL lengkap dari bilah alamat setelah membuka tautan.",
-            ) from error
-    coords = parse_google_maps_location(resolved) or parse_google_maps_location(source)
-    if not coords:
-        raise HTTPException(
-            422,
-            "Koordinat tidak ditemukan. Tempel tautan Google Maps (Share) atau teks seperti -6.2, 106.8166.",
-        )
-    latitude, longitude = coords
-    audit("settings.office_maps_parsed", user, f"{latitude},{longitude}")
-    return {
-        "latitude": latitude,
-        "longitude": longitude,
-        "resolved_url": resolved,
-        "maps_url": f"https://www.google.com/maps?q={latitude},{longitude}",
-    }
 
 
 def _policy_sections(payload: PolicyInput) -> list[PolicySection]:
