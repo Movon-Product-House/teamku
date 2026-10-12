@@ -4,6 +4,7 @@ import pytest
 from helpers import location_events, set_employee, set_office_policy
 from sqlalchemy import select, update
 
+from movon_hr.modules.attendance.alerts import evaluate_tenant
 from movon_hr.modules.attendance.models import LocationEvent
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
@@ -155,5 +156,8 @@ async def test_missed_deadline_creates_missed_reverify_anomaly(
         )
     ).json()
     assert today["pending_reverification"] is None
+    # GET is a pure read now; the attendance-alerts job writes the anomaly (plan R1).
+    await evaluate_tenant(db, datetime.now(UTC))
+    await db.commit()
     refreshed = await db.scalar(select(LocationEvent.anomaly).where(LocationEvent.id == slot.id))
     assert refreshed == "missed_reverify"

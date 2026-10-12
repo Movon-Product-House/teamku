@@ -11,8 +11,9 @@ from helpers import (
     set_office_policy,
 )
 
-from movon_hr.core.mailer import last_email_to
+from movon_hr.core.mailer import last_email_to, send_email
 from movon_hr.core.time import JAKARTA
+from movon_hr.modules.attendance.alerts import evaluate_tenant
 from movon_hr.modules.notifications.models import Notification
 
 pytestmark = pytest.mark.anyio
@@ -35,6 +36,14 @@ async def enable_alerts(db, **overrides: object) -> None:
     await set_office_policy(db, **(policy | overrides))
 
 
+async def run_alerts(db) -> None:
+    """What the attendance-alerts job does for the demo tenant (GETs no longer evaluate)."""
+    emails = await evaluate_tenant(db, datetime.now(UTC))
+    await db.commit()
+    for email in emails:
+        await send_email(email.to, email.subject, email.body, kind="attendance_alert")
+
+
 async def attendance_alerts_for(db, email: str) -> list:
     return [item for item in await notifications_for(db, email) if item.title in ALERT_TITLES]
 
@@ -43,6 +52,7 @@ async def test_disabled_policy_creates_no_attendance_alerts(client, db, login_he
     await set_office_policy(db, alerts_enabled=False)
     before = await count(db, Notification)
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
     assert await count(db, Notification) == before
@@ -52,9 +62,11 @@ async def test_disabled_policy_creates_no_attendance_alerts(client, db, login_he
 async def test_missed_clock_in_notifies_employee_once_per_day(client, db, login_headers) -> None:
     await enable_alerts(db)
 
+    await run_alerts(db)
     first = await client.get(
         "/api/v1/notifications", headers=await login_headers("fresh@movon.test")
     )
+    await run_alerts(db)
     second = await client.get(
         "/api/v1/notifications", headers=await login_headers("fresh@movon.test")
     )
@@ -70,6 +82,7 @@ async def test_approved_leave_skips_missed_clock_in(client, db, login_headers) -
     today = datetime.now(JAKARTA).date()
     await add_leave(db, "fresh@movon.test", today, today, "Cuti hari ini", status="approved")
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
     assert await attendance_alerts_for(db, "fresh@movon.test") == []
@@ -84,6 +97,7 @@ async def test_open_session_past_max_hours_notifies_employee(client, db, login_h
         agenda=[{"title": "Sesi panjang"}],
     )
 
+    await run_alerts(db)
     await client.get("/api/v1/attendance/today", headers=await login_headers("fresh@movon.test"))
 
     titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
@@ -93,6 +107,7 @@ async def test_open_session_past_max_hours_notifies_employee(client, db, login_h
 async def test_alert_managers_notifies_department_manager_and_hr(client, db, login_headers) -> None:
     await enable_alerts(db, alert_managers=True)
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
     assert any(
@@ -134,6 +149,7 @@ async def test_remote_employee_gets_clock_in_reminder_but_not_geofence_alert(
         anomaly="outside_geofence",
     )
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
     titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
@@ -162,6 +178,7 @@ async def test_outside_geofence_creates_accountability_alert_for_office_worker(
         anomaly="outside_geofence",
     )
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
     titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
@@ -174,8 +191,11 @@ async def test_repeated_notifications_poll_does_not_duplicate_kind_day(
 ) -> None:
     await enable_alerts(db)
 
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
+    await run_alerts(db)
     await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
+    await run_alerts(db)
     await client.get("/api/v1/attendance/today", headers=await login_headers("fresh@movon.test"))
 
     assert len(await attendance_alerts_for(db, "fresh@movon.test")) == 1

@@ -8,6 +8,7 @@ from movon_hr.core import persistence
 from movon_hr.core.settings import settings
 from movon_hr.core.tenancy import iter_stores
 from movon_hr.modules.api import bind_from_token, reset_demo_store, router
+from movon_hr.modules.attendance.router import router as attendance_router
 from movon_hr.modules.audit.router import router as audit_router
 from movon_hr.modules.auth.router import router as auth_router
 from movon_hr.modules.employees.router import router as employees_router
@@ -102,6 +103,7 @@ async def persist_after_mutation(request: Request, call_next):
     return response
 
 
+app.include_router(attendance_router, prefix="/api/v1")
 app.include_router(audit_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(employees_router, prefix="/api/v1")

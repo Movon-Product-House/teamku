@@ -1,11 +1,5 @@
-from movon_hr.modules.api import (
-    OFFICE_LATITUDE,
-    OFFICE_LONGITUDE,
-    OFFICE_RADIUS_METERS,
-    allowed_check_in_radius_meters,
-    haversine_meters,
-    reset_demo_store,
-)
+from movon_hr.modules.attendance.rules import allowed_check_in_radius_meters, haversine_meters
+from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
 
 def test_haversine_returns_zero_at_same_point() -> None:
@@ -19,6 +13,5 @@ def test_haversine_finds_nearby_point() -> None:
 
 
 def test_accuracy_credit_is_capped_to_prevent_home_check_in() -> None:
-    reset_demo_store()
-    assert allowed_check_in_radius_meters(10) == OFFICE_RADIUS_METERS + 10
-    assert allowed_check_in_radius_meters(500) == OFFICE_RADIUS_METERS + 50
+    assert allowed_check_in_radius_meters(OFFICE_RADIUS_METERS, 10) == OFFICE_RADIUS_METERS + 10
+    assert allowed_check_in_radius_meters(OFFICE_RADIUS_METERS, 500) == OFFICE_RADIUS_METERS + 50
