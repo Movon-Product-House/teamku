@@ -51,7 +51,7 @@ async def test_hr_publishes_policy_and_employee_gets_grounded_citation(
     assert body["confidence"] == "supported"
     assert body["citations"] == [{**body["citations"][0]}]
     assert body["citations"][0]["policy_id"] == policy["id"]
-    assert body["citations"][0]["section_id"] == "medical-certificate"
+    assert body["citations"][0]["section_id"] == policy["sections"][0]["id"]
     assert await count(db, PolicyAnswerAudit)
 
 
