@@ -1,7 +1,7 @@
 """Add multiple work locations and employee assignments."""
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 revision = "0004_multi_work_locations"
 down_revision = "0003_policy_assistant"
@@ -10,7 +10,10 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("employees", sa.Column("work_location_id", sa.String(), nullable=True, server_default="office-default"))
+    op.add_column(
+        "employees",
+        sa.Column("work_location_id", sa.String(), nullable=True, server_default="office-default"),
+    )
     op.add_column("invitations", sa.Column("work_location_id", sa.String(), nullable=True))
     op.create_table(
         "office_locations",

@@ -38,7 +38,13 @@ def attendance_alerts_for(user_id: str) -> list:
         item
         for item in store.notifications.values()
         if item.user_id == user_id
-        and item.title in {"Belum clock-in", "Sesi masih terbuka", "Re-verifikasi terlewat", "Lokasi di luar area kantor"}
+        and item.title
+        in {
+            "Belum clock-in",
+            "Sesi masih terbuka",
+            "Re-verifikasi terlewat",
+            "Lokasi di luar area kantor",
+        }
     ]
 
 
@@ -70,7 +76,9 @@ def test_approved_leave_skips_missed_clock_in() -> None:
     reset_demo_store()
     enable_alerts()
     today = datetime.now(JAKARTA).date()
-    request = LeaveRequest("leave-today", "e-fresh", today, today, "Cuti hari ini", status="approved")
+    request = LeaveRequest(
+        "leave-today", "e-fresh", today, today, "Cuti hari ini", status="approved"
+    )
     store.requests[request.id] = request
 
     client.get("/api/v1/notifications", headers=login("fresh@movon.test"))

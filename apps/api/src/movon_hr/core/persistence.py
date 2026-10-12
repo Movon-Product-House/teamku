@@ -78,7 +78,8 @@ employees_table = Table(
 )
 
 office_locations_table = Table(
-    "office_locations", metadata,
+    "office_locations",
+    metadata,
     Column("id", String, primary_key=True),
     Column("tenant_id", String, nullable=False, index=True),
     Column("name", String, nullable=False),
@@ -122,7 +123,8 @@ leave_requests_table = Table(
 )
 
 calendar_settings_table = Table(
-    "calendar_settings", metadata,
+    "calendar_settings",
+    metadata,
     Column("tenant_id", String, primary_key=True),
     Column("provider", String, nullable=False, server_default=""),
     Column("connected", Boolean, nullable=False, server_default="false"),
@@ -267,24 +269,42 @@ alert_receipts_table = Table(
 )
 
 policies_table = Table(
-    "policies", metadata,
-    Column("id", String, primary_key=True), Column("tenant_id", String, nullable=False, index=True),
-    Column("title", String, nullable=False), Column("category", String, nullable=False), Column("language", String, nullable=False),
-    Column("effective_date", Date, nullable=False), Column("expiry_date", Date, nullable=True), Column("state", String, nullable=False),
-    Column("created_at", DateTime(timezone=True), nullable=False), Column("updated_at", DateTime(timezone=True), nullable=False),
-    Column("created_by", String, nullable=False), Column("updated_by", String, nullable=False),
+    "policies",
+    metadata,
+    Column("id", String, primary_key=True),
+    Column("tenant_id", String, nullable=False, index=True),
+    Column("title", String, nullable=False),
+    Column("category", String, nullable=False),
+    Column("language", String, nullable=False),
+    Column("effective_date", Date, nullable=False),
+    Column("expiry_date", Date, nullable=True),
+    Column("state", String, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+    Column("created_by", String, nullable=False),
+    Column("updated_by", String, nullable=False),
 )
 policy_sections_table = Table(
-    "policy_sections", metadata,
-    Column("id", String, primary_key=True), Column("tenant_id", String, nullable=False, index=True),
-    Column("policy_id", String, nullable=False, index=True), Column("heading", String, nullable=False),
-    Column("body", Text, nullable=False), Column("position", Integer, nullable=False),
+    "policy_sections",
+    metadata,
+    Column("id", String, primary_key=True),
+    Column("tenant_id", String, nullable=False, index=True),
+    Column("policy_id", String, nullable=False, index=True),
+    Column("heading", String, nullable=False),
+    Column("body", Text, nullable=False),
+    Column("position", Integer, nullable=False),
 )
 policy_answer_audit_table = Table(
-    "policy_answer_audit", metadata,
-    Column("id", String, primary_key=True), Column("tenant_id", String, nullable=False, index=True),
-    Column("actor_id", String, nullable=False), Column("question", Text, nullable=False), Column("cited_sections", JSONB, nullable=False),
-    Column("provider", String, nullable=False), Column("outcome", String, nullable=False), Column("suggested_action", String, nullable=False),
+    "policy_answer_audit",
+    metadata,
+    Column("id", String, primary_key=True),
+    Column("tenant_id", String, nullable=False, index=True),
+    Column("actor_id", String, nullable=False),
+    Column("question", Text, nullable=False),
+    Column("cited_sections", JSONB, nullable=False),
+    Column("provider", String, nullable=False),
+    Column("outcome", String, nullable=False),
+    Column("suggested_action", String, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
 )
 
@@ -489,8 +509,10 @@ async def load_store(store: DemoStore | None = None) -> bool:
                 ).mappings()
             ]
             office_row = (
-                await conn.execute(select(office_table).where(office_table.c.tenant_id == tid))
-            ).mappings().first()
+                (await conn.execute(select(office_table).where(office_table.c.tenant_id == tid)))
+                .mappings()
+                .first()
+            )
             if office_row:
                 item.office = OfficeLocation(
                     name=office_row["name"],
@@ -511,14 +533,42 @@ async def load_store(store: DemoStore | None = None) -> bool:
                     max_open_hours=int(office_row.get("max_open_hours") or 10),
                     alert_managers=bool(office_row.get("alert_managers") or False),
                 )
-            location_rows = (await conn.execute(select(office_locations_table).where(office_locations_table.c.tenant_id == tid))).mappings().all()
+            location_rows = (
+                (
+                    await conn.execute(
+                        select(office_locations_table).where(
+                            office_locations_table.c.tenant_id == tid
+                        )
+                    )
+                )
+                .mappings()
+                .all()
+            )
             item.office_locations = {
-                row["id"]: OfficeLocation(id=row["id"], name=row["name"], latitude=row["latitude"], longitude=row["longitude"], radius_meters=row["radius_meters"])
+                row["id"]: OfficeLocation(
+                    id=row["id"],
+                    name=row["name"],
+                    latitude=row["latitude"],
+                    longitude=row["longitude"],
+                    radius_meters=row["radius_meters"],
+                )
                 for row in location_rows
             } or {item.office.id: item.office}
-            calendar_row = (await conn.execute(select(calendar_settings_table).where(calendar_settings_table.c.tenant_id == tid))).mappings().first()
+            calendar_row = (
+                (
+                    await conn.execute(
+                        select(calendar_settings_table).where(
+                            calendar_settings_table.c.tenant_id == tid
+                        )
+                    )
+                )
+                .mappings()
+                .first()
+            )
             if calendar_row:
-                item.calendar = CalendarSettings(**{key: calendar_row.get(key) for key in CalendarSettings.__dataclass_fields__})
+                item.calendar = CalendarSettings(
+                    **{key: calendar_row.get(key) for key in CalendarSettings.__dataclass_fields__}
+                )
             item.invitations = {
                 row["token"]: Invitation(
                     token=row["token"],
@@ -551,7 +601,9 @@ async def load_store(store: DemoStore | None = None) -> bool:
                 )
                 for row in (
                     await conn.execute(
-                        select(password_resets_table).where(password_resets_table.c.tenant_id == tid)
+                        select(password_resets_table).where(
+                            password_resets_table.c.tenant_id == tid
+                        )
                     )
                 ).mappings()
             }
@@ -572,7 +624,9 @@ async def load_store(store: DemoStore | None = None) -> bool:
                 )
                 for row in (
                     await conn.execute(
-                        select(location_events_table).where(location_events_table.c.tenant_id == tid)
+                        select(location_events_table).where(
+                            location_events_table.c.tenant_id == tid
+                        )
                     )
                 ).mappings()
             }
@@ -590,23 +644,55 @@ async def load_store(store: DemoStore | None = None) -> bool:
                 ).mappings()
             }
             sections_by_policy: dict[str, list[PolicySection]] = {}
-            for row in (await conn.execute(select(policy_sections_table).where(policy_sections_table.c.tenant_id == tid))).mappings():
-                sections_by_policy.setdefault(row["policy_id"], []).append(PolicySection(row["id"], row["heading"], row["body"], row["position"]))
+            for row in (
+                await conn.execute(
+                    select(policy_sections_table).where(policy_sections_table.c.tenant_id == tid)
+                )
+            ).mappings():
+                sections_by_policy.setdefault(row["policy_id"], []).append(
+                    PolicySection(row["id"], row["heading"], row["body"], row["position"])
+                )
             item.policies = {
                 row["id"]: PolicyDocument(
-                    id=row["id"], title=row["title"], category=row["category"], language=row["language"],
-                    effective_date=row["effective_date"], expiry_date=row["expiry_date"], state=row["state"],
-                    sections=sorted(sections_by_policy.get(row["id"], []), key=lambda section: section.position),
-                    created_at=row["created_at"], updated_at=row["updated_at"], created_by=row["created_by"], updated_by=row["updated_by"],
+                    id=row["id"],
+                    title=row["title"],
+                    category=row["category"],
+                    language=row["language"],
+                    effective_date=row["effective_date"],
+                    expiry_date=row["expiry_date"],
+                    state=row["state"],
+                    sections=sorted(
+                        sections_by_policy.get(row["id"], []), key=lambda section: section.position
+                    ),
+                    created_at=row["created_at"],
+                    updated_at=row["updated_at"],
+                    created_by=row["created_by"],
+                    updated_by=row["updated_by"],
                 )
-                for row in (await conn.execute(select(policies_table).where(policies_table.c.tenant_id == tid))).mappings()
+                for row in (
+                    await conn.execute(
+                        select(policies_table).where(policies_table.c.tenant_id == tid)
+                    )
+                ).mappings()
             }
             item.policy_answer_audit = {
                 row["id"]: PolicyAnswerAudit(
-                    id=row["id"], actor_id=row["actor_id"], question=row["question"], cited_sections=row["cited_sections"],
-                    provider=row["provider"], outcome=row["outcome"], suggested_action=row["suggested_action"], created_at=row["created_at"],
+                    id=row["id"],
+                    actor_id=row["actor_id"],
+                    question=row["question"],
+                    cited_sections=row["cited_sections"],
+                    provider=row["provider"],
+                    outcome=row["outcome"],
+                    suggested_action=row["suggested_action"],
+                    created_at=row["created_at"],
                 )
-                for row in (await conn.execute(select(policy_answer_audit_table).where(policy_answer_audit_table.c.tenant_id == tid))).mappings()
+                for row in (
+                    await conn.execute(
+                        select(policy_answer_audit_table).where(
+                            policy_answer_audit_table.c.tenant_id == tid
+                        )
+                    )
+                ).mappings()
             }
             put_store(item)
 
@@ -622,22 +708,40 @@ async def save_store(store: DemoStore) -> None:
     async with engine.begin() as conn:
         await conn.execute(delete(employees_table).where(employees_table.c.tenant_id == tid))
         await conn.execute(delete(attendance_table).where(attendance_table.c.tenant_id == tid))
-        await conn.execute(delete(leave_requests_table).where(leave_requests_table.c.tenant_id == tid))
-        await conn.execute(delete(calendar_settings_table).where(calendar_settings_table.c.tenant_id == tid))
+        await conn.execute(
+            delete(leave_requests_table).where(leave_requests_table.c.tenant_id == tid)
+        )
+        await conn.execute(
+            delete(calendar_settings_table).where(calendar_settings_table.c.tenant_id == tid)
+        )
         await conn.execute(delete(payroll_runs_table).where(payroll_runs_table.c.tenant_id == tid))
-        await conn.execute(delete(notifications_table).where(notifications_table.c.tenant_id == tid))
+        await conn.execute(
+            delete(notifications_table).where(notifications_table.c.tenant_id == tid)
+        )
         await conn.execute(delete(sessions_table).where(sessions_table.c.tenant_id == tid))
         await conn.execute(delete(idempotency_table).where(idempotency_table.c.tenant_id == tid))
         await conn.execute(delete(audit_table).where(audit_table.c.tenant_id == tid))
         await conn.execute(delete(office_table).where(office_table.c.tenant_id == tid))
-        await conn.execute(delete(office_locations_table).where(office_locations_table.c.tenant_id == tid))
+        await conn.execute(
+            delete(office_locations_table).where(office_locations_table.c.tenant_id == tid)
+        )
         await conn.execute(delete(invitations_table).where(invitations_table.c.tenant_id == tid))
-        await conn.execute(delete(password_resets_table).where(password_resets_table.c.tenant_id == tid))
-        await conn.execute(delete(location_events_table).where(location_events_table.c.tenant_id == tid))
-        await conn.execute(delete(alert_receipts_table).where(alert_receipts_table.c.tenant_id == tid))
-        await conn.execute(delete(policy_sections_table).where(policy_sections_table.c.tenant_id == tid))
+        await conn.execute(
+            delete(password_resets_table).where(password_resets_table.c.tenant_id == tid)
+        )
+        await conn.execute(
+            delete(location_events_table).where(location_events_table.c.tenant_id == tid)
+        )
+        await conn.execute(
+            delete(alert_receipts_table).where(alert_receipts_table.c.tenant_id == tid)
+        )
+        await conn.execute(
+            delete(policy_sections_table).where(policy_sections_table.c.tenant_id == tid)
+        )
         await conn.execute(delete(policies_table).where(policies_table.c.tenant_id == tid))
-        await conn.execute(delete(policy_answer_audit_table).where(policy_answer_audit_table.c.tenant_id == tid))
+        await conn.execute(
+            delete(policy_answer_audit_table).where(policy_answer_audit_table.c.tenant_id == tid)
+        )
         await conn.execute(delete(tenants_table).where(tenants_table.c.id == tid))
 
         await conn.execute(
@@ -699,14 +803,31 @@ async def save_store(store: DemoStore) -> None:
             )
         await conn.execute(
             office_table.insert(),
-            [{"tenant_id": tid, **{key: value for key, value in asdict(store.office).items() if key != "id"}}],
+            [
+                {
+                    "tenant_id": tid,
+                    **{key: value for key, value in asdict(store.office).items() if key != "id"},
+                }
+            ],
         )
         if store.office_locations:
-            await conn.execute(office_locations_table.insert(), [
-                _with_tenant({key: value for key, value in asdict(item).items() if key in {"id", "name", "latitude", "longitude", "radius_meters"}}, tid)
-                for item in store.office_locations.values()
-            ])
-        await conn.execute(calendar_settings_table.insert(), [{"tenant_id": tid, **asdict(store.calendar)}])
+            await conn.execute(
+                office_locations_table.insert(),
+                [
+                    _with_tenant(
+                        {
+                            key: value
+                            for key, value in asdict(item).items()
+                            if key in {"id", "name", "latitude", "longitude", "radius_meters"}
+                        },
+                        tid,
+                    )
+                    for item in store.office_locations.values()
+                ],
+            )
+        await conn.execute(
+            calendar_settings_table.insert(), [{"tenant_id": tid, **asdict(store.calendar)}]
+        )
         if store.invitations:
             await conn.execute(
                 invitations_table.insert(),
@@ -728,10 +849,29 @@ async def save_store(store: DemoStore) -> None:
                 [_with_tenant(asdict(item), tid) for item in store.alert_receipts.values()],
             )
         if store.policies:
-            await conn.execute(policies_table.insert(), [_with_tenant({key: value for key, value in asdict(item).items() if key != "sections"}, tid) for item in store.policies.values()])
-            await conn.execute(policy_sections_table.insert(), [_with_tenant({**asdict(section), "policy_id": item.id}, tid) for item in store.policies.values() for section in item.sections])
+            await conn.execute(
+                policies_table.insert(),
+                [
+                    _with_tenant(
+                        {key: value for key, value in asdict(item).items() if key != "sections"},
+                        tid,
+                    )
+                    for item in store.policies.values()
+                ],
+            )
+            await conn.execute(
+                policy_sections_table.insert(),
+                [
+                    _with_tenant({**asdict(section), "policy_id": item.id}, tid)
+                    for item in store.policies.values()
+                    for section in item.sections
+                ],
+            )
         if store.policy_answer_audit:
-            await conn.execute(policy_answer_audit_table.insert(), [_with_tenant(asdict(item), tid) for item in store.policy_answer_audit.values()])
+            await conn.execute(
+                policy_answer_audit_table.insert(),
+                [_with_tenant(asdict(item), tid) for item in store.policy_answer_audit.values()],
+            )
 
 
 __all__ = [

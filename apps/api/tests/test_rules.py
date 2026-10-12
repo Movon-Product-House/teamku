@@ -9,7 +9,9 @@ from movon_hr.modules.api import (
 
 
 def test_haversine_returns_zero_at_same_point() -> None:
-    assert haversine_meters(OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_LATITUDE, OFFICE_LONGITUDE) == 0
+    assert (
+        haversine_meters(OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_LATITUDE, OFFICE_LONGITUDE) == 0
+    )
 
 
 def test_haversine_finds_nearby_point() -> None:

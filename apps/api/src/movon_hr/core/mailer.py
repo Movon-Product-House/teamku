@@ -78,10 +78,13 @@ def _send_resend(to: str, subject: str, body: str, kind: MailKind) -> bool:
         logger.info("Email skipped kind=%s reason=reserved_domain", kind)
         return False
     try:
-        resend.api_key = settings.resend_api_key.get_secret_value()
+        api_key, sender = settings.resend_api_key, settings.mail_from
+        if api_key is None or sender is None:
+            raise RuntimeError("Resend is not configured")
+        resend.api_key = api_key.get_secret_value()
         sent = resend.Emails.send(
             {
-                "from": settings.mail_from,
+                "from": sender,
                 "to": [to],
                 "subject": subject,
                 "text": body,

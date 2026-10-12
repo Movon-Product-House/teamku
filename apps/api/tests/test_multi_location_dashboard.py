@@ -16,19 +16,36 @@ def login(email: str) -> dict[str, str]:
 def test_hr_can_add_location_and_assign_employee_to_its_geofence() -> None:
     reset_demo_store()
     hr = login("hr@movon.test")
-    created = client.post("/api/v1/settings/locations", headers=hr, json={
-        "name": "Bandung Site", "latitude": -6.9175, "longitude": 107.6191, "radius_meters": 250,
-    })
+    created = client.post(
+        "/api/v1/settings/locations",
+        headers=hr,
+        json={
+            "name": "Bandung Site",
+            "latitude": -6.9175,
+            "longitude": 107.6191,
+            "radius_meters": 250,
+        },
+    )
     assert created.status_code == 200
     location_id = created.json()["id"]
-    assigned = client.patch("/api/v1/employees/e-fresh", headers=hr, json={"work_location_id": location_id})
+    assigned = client.patch(
+        "/api/v1/employees/e-fresh", headers=hr, json={"work_location_id": location_id}
+    )
     assert assigned.status_code == 200
     assert assigned.json()["work_location"]["name"] == "Bandung Site"
 
-    checked_in = client.post("/api/v1/attendance/check-in", headers=login("fresh@movon.test") | {"Idempotency-Key": "bandung"}, json={
-        "latitude": -6.9175, "longitude": 107.6191, "accuracy_meters": 10,
-        "selfie_captured": True, "location_share_approved": True, "agenda": [{"title": "Site visit"}],
-    })
+    checked_in = client.post(
+        "/api/v1/attendance/check-in",
+        headers=login("fresh@movon.test") | {"Idempotency-Key": "bandung"},
+        json={
+            "latitude": -6.9175,
+            "longitude": 107.6191,
+            "accuracy_meters": 10,
+            "selfie_captured": True,
+            "location_share_approved": True,
+            "agenda": [{"title": "Site visit"}],
+        },
+    )
     assert checked_in.status_code == 200
     assert checked_in.json()["distance_meters"] == 0
 
@@ -36,9 +53,16 @@ def test_hr_can_add_location_and_assign_employee_to_its_geofence() -> None:
 def test_duplicate_location_is_rejected_and_hidden_from_list() -> None:
     reset_demo_store()
     hr = login("hr@movon.test")
-    duplicate = client.post("/api/v1/settings/locations", headers=hr, json={
-        "name": "jakarta hq", "latitude": -6.2, "longitude": 106.8166, "radius_meters": 300,
-    })
+    duplicate = client.post(
+        "/api/v1/settings/locations",
+        headers=hr,
+        json={
+            "name": "jakarta hq",
+            "latitude": -6.2,
+            "longitude": 106.8166,
+            "radius_meters": 300,
+        },
+    )
     assert duplicate.status_code == 409
 
     store.office_locations["legacy-copy"] = store.office
@@ -50,20 +74,44 @@ def test_field_employee_checkout_records_location_and_dashboard_summarizes_today
     reset_demo_store()
     store.employees["e-fresh"].is_remote = True
     employee = login("fresh@movon.test")
-    client.post("/api/v1/attendance/check-in", headers=employee | {"Idempotency-Key": "field"}, json={
-        "latitude": -6.9, "longitude": 107.6, "accuracy_meters": 12,
-        "selfie_captured": True, "location_share_approved": True, "agenda": [{"title": "Visit customer"}],
-    })
-    checked_out = client.post("/api/v1/attendance/check-out", headers=employee, json={
-        "summary": "Customer visit complete", "latitude": -6.91, "longitude": 107.61, "accuracy_meters": 15,
-    })
+    client.post(
+        "/api/v1/attendance/check-in",
+        headers=employee | {"Idempotency-Key": "field"},
+        json={
+            "latitude": -6.9,
+            "longitude": 107.6,
+            "accuracy_meters": 12,
+            "selfie_captured": True,
+            "location_share_approved": True,
+            "agenda": [{"title": "Visit customer"}],
+        },
+    )
+    checked_out = client.post(
+        "/api/v1/attendance/check-out",
+        headers=employee,
+        json={
+            "summary": "Customer visit complete",
+            "latitude": -6.91,
+            "longitude": 107.61,
+            "accuracy_meters": 15,
+        },
+    )
     assert checked_out.status_code == 200
     events = [event for event in store.location_events.values() if event.employee_id == "e-fresh"]
     assert [event.kind for event in events] == ["check_in", "check_out"]
     assert events[-1].lat == -6.91
 
     today = datetime.now(UTC).astimezone().date()
-    store.requests["leave-today"] = LeaveRequest("leave-today", "e-018", today, today, "Cuti", status="approved")
+    store.requests["leave-today"] = LeaveRequest(
+        "leave-today", "e-018", today, today, "Cuti", status="approved"
+    )
     dashboard = client.get("/api/v1/dashboard", headers=login("hr@movon.test")).json()
-    assert {"headcount", "present", "absent", "on_leave", "late", "attendance_rate"} <= dashboard.keys()
+    assert {
+        "headcount",
+        "present",
+        "absent",
+        "on_leave",
+        "late",
+        "attendance_rate",
+    } <= dashboard.keys()
     assert dashboard["on_leave"] == 1

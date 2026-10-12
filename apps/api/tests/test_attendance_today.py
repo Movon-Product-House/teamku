@@ -64,7 +64,9 @@ def test_check_in_requires_location_sharing_approval() -> None:
     response = client.post(
         "/api/v1/attendance/check-in",
         headers=fresh_employee_headers() | {"Idempotency-Key": "location-consent-test"},
-        json=check_in_payload(location_share_approved=False, agenda=[{"title": "Konfirmasi lokasi"}]),
+        json=check_in_payload(
+            location_share_approved=False, agenda=[{"title": "Konfirmasi lokasi"}]
+        ),
     )
 
     assert response.status_code == 422

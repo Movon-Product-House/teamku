@@ -19,7 +19,7 @@ def _cookie_token(cookie_header: str) -> str | None:
     for part in cookie_header.split(";"):
         item = part.strip()
         if item.startswith(prefix):
-            return item[len(prefix):]
+            return item[len(prefix) :]
     return None
 
 

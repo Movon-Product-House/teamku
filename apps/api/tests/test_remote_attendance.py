@@ -98,5 +98,7 @@ def test_create_and_invite_remote_employee_persists_flag() -> None:
         },
     )
     assert invited.status_code == 200
-    invitation = next(item for item in store.invitations.values() if item.email == "remote.invite@movon.test")
+    invitation = next(
+        item for item in store.invitations.values() if item.email == "remote.invite@movon.test"
+    )
     assert invitation.is_remote is True

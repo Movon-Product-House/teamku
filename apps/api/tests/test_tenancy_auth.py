@@ -132,14 +132,20 @@ def test_password_reset_rotates_credentials() -> None:
         json={"token": token, "password": "BaruSekali1"},
     )
     assert reset.status_code == 200
-    assert client.post(
-        "/api/v1/auth/login",
-        json={"email": "employee@movon.test", "password": DEMO_PASSWORD},
-    ).status_code == 401
-    assert client.post(
-        "/api/v1/auth/login",
-        json={"email": "employee@movon.test", "password": "BaruSekali1"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/auth/login",
+            json={"email": "employee@movon.test", "password": DEMO_PASSWORD},
+        ).status_code
+        == 401
+    )
+    assert (
+        client.post(
+            "/api/v1/auth/login",
+            json={"email": "employee@movon.test", "password": "BaruSekali1"},
+        ).status_code
+        == 200
+    )
 
 
 def test_forgot_password_does_not_reveal_unknown_email() -> None:

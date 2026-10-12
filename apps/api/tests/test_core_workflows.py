@@ -78,24 +78,16 @@ def test_payroll_requires_valid_state_transitions_before_publish() -> None:
     assert created.status_code == 200
     run_id = created.json()["id"]
 
-    too_early = client.post(
-        f"/api/v1/payroll/runs/{run_id}/publish", headers=headers("e-hr")
-    )
+    too_early = client.post(f"/api/v1/payroll/runs/{run_id}/publish", headers=headers("e-hr"))
     assert too_early.status_code == 409
 
-    finalized = client.post(
-        f"/api/v1/payroll/runs/{run_id}/finalize", headers=headers("e-hr")
-    )
+    finalized = client.post(f"/api/v1/payroll/runs/{run_id}/finalize", headers=headers("e-hr"))
     assert finalized.json()["status"] == "finalized"
 
-    published = client.post(
-        f"/api/v1/payroll/runs/{run_id}/publish", headers=headers("e-hr")
-    )
+    published = client.post(f"/api/v1/payroll/runs/{run_id}/publish", headers=headers("e-hr"))
     assert published.json()["status"] == "published"
 
-    employee_payslips = client.get(
-        "/api/v1/payroll/payslips", headers=headers("e-employee")
-    )
+    employee_payslips = client.get("/api/v1/payroll/payslips", headers=headers("e-employee"))
     assert employee_payslips.status_code == 200
     assert employee_payslips.json()["items"][0]["employee"] == "Sinta Lestari"
 
