@@ -8,26 +8,11 @@ import {
   isGoogleMapsShortUrl,
   parseGoogleMapsLocation,
 } from "@/features/settings/google-maps";
+import type { AttendanceSettings } from "@/features/settings/types";
 import { api } from "@/shared/api/client";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type AttendanceSettings = {
-  id?: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  radius_meters: number;
-  reverify_enabled: boolean;
-  reverify_count_per_day: number;
-  reverify_window_start_minutes: number;
-  reverify_window_end_minutes: number;
-  alerts_enabled: boolean;
-  clock_in_reminder_time: string;
-  clock_out_reminder_time: string;
-  max_open_hours: number;
-  alert_managers: boolean;
-};
 type User = { role: string };
 type MapsParseResult = {
   latitude: number;
@@ -744,7 +729,7 @@ export default function SettingsPage() {
                         </small>
                         <small>Radius check-in {location.radius_meters} m</small>
                       </span>
-                      {location.id === "office-default" && <em>Utama</em>}
+                      {location.is_primary && <em>Utama</em>}
                       <i>›</i>
                     </button>
                   ))}
@@ -800,7 +785,7 @@ export default function SettingsPage() {
               </div>
               <div className="carousel-title">
                 <h2>{form.name || "Lokasi kantor"}</h2>
-                {form.id === "office-default" && <em>Lokasi utama</em>}
+                {form.is_primary && <em>Lokasi utama</em>}
               </div>
               <div className="maps-frame" key={`${form.latitude}-${form.longitude}`}>
                 <iframe

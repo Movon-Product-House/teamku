@@ -20,7 +20,7 @@ type Employee = {
   work_location?: { id: string; name: string } | null;
 };
 type User = { id: string; role: string };
-type WorkLocation = { id: string; name: string };
+type WorkLocation = { id: string; name: string; is_primary: boolean };
 type LocationEvent = {
   id: string;
   kind: string;
@@ -235,7 +235,11 @@ export default function EmployeeDetail() {
                 <select
                   aria-label="Tetapkan lokasi kerja"
                   disabled={busy}
-                  value={employee.work_location_id || "office-default"}
+                  value={
+                    employee.work_location_id ||
+                    locations.find((location) => location.is_primary)?.id ||
+                    ""
+                  }
                   onChange={(event) => assignLocation(event.target.value)}
                 >
                   {locations.map((location) => (

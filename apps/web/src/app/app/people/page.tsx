@@ -20,8 +20,8 @@ type Employee = {
   work_location_id?: string | null;
   work_location?: { name: string } | null;
 };
-type User = { role: string };
-type WorkLocation = { id: string; name: string };
+type User = { id: string; role: string };
+type WorkLocation = { id: string; name: string; is_primary: boolean };
 
 const emptyForm = {
   name: "",
@@ -31,7 +31,7 @@ const emptyForm = {
   role: "employee",
   salary: "8000000",
   is_remote: false,
-  work_location_id: "office-default",
+  work_location_id: "",
 };
 
 export default function People() {
@@ -44,6 +44,7 @@ export default function People() {
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [role, setRole] = useState("");
+  const [userId, setUserId] = useState("");
   const [locations, setLocations] = useState<WorkLocation[]>([]);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
@@ -56,6 +57,7 @@ export default function People() {
       .then(([people, profile, locationResult]) => {
         setItems(people.items);
         setRole(profile.user.role);
+        setUserId(profile.user.id);
         setLocations(locationResult.items);
       })
       .catch((reason) =>
@@ -84,8 +86,15 @@ export default function People() {
     [items, department, query],
   );
 
+  const primaryLocationId = locations.find((location) => location.is_primary)?.id ?? "";
+
   function payload() {
-    return { ...form, salary: Number(form.salary), is_remote: form.is_remote };
+    return {
+      ...form,
+      salary: Number(form.salary),
+      is_remote: form.is_remote,
+      work_location_id: form.work_location_id || primaryLocationId,
+    };
   }
 
   async function create() {
@@ -262,7 +271,7 @@ export default function People() {
                     {employee.salary != null ? formatMoney(employee.salary) : "Tidak berwenang"}
                   </td>
                   <td>
-                    {role === "hr_admin" && employee.id !== "e-hr" ? (
+                    {role === "hr_admin" && employee.id !== userId ? (
                       <button
                         className="text-button"
                         disabled={busy}
@@ -367,7 +376,7 @@ export default function People() {
                 <label>
                   Lokasi kerja
                   <select
-                    value={form.work_location_id}
+                    value={form.work_location_id || primaryLocationId}
                     onChange={(event) => setForm({ ...form, work_location_id: event.target.value })}
                   >
                     {locations.map((location) => (
