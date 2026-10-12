@@ -9,23 +9,6 @@ from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
 
-class Invitation(TenantScoped, Base):
-    __tablename__ = "invitations"
-
-    token: Mapped[str] = mapped_column(primary_key=True)
-    email: Mapped[str]
-    name: Mapped[str]
-    role: Mapped[str]
-    department: Mapped[str]
-    title: Mapped[str]
-    salary: Mapped[int]
-    invited_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("employees.id"))
-    expires_at: Mapped[datetime]
-    accepted_at: Mapped[datetime | None]
-    is_remote: Mapped[bool] = mapped_column(default=False, server_default="false")
-    work_location_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("work_locations.id"))
-
-
 class PasswordReset(TenantScoped, Base):
     __tablename__ = "password_resets"
 

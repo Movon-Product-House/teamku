@@ -1,4 +1,5 @@
 import re
+import uuid
 from datetime import UTC, datetime, timedelta
 from secrets import token_urlsafe
 from typing import Any
@@ -76,6 +77,11 @@ async def create_location(
 
 async def primary_location(db: AsyncSession) -> WorkLocation:
     return (await db.scalars(select(WorkLocation).where(WorkLocation.is_primary))).one()
+
+
+async def locations_by_id(db: AsyncSession) -> dict[uuid.UUID, WorkLocation]:
+    """Every location of the tenant, duplicates included (employees may point at any)."""
+    return {item.id: item for item in await db.scalars(select(WorkLocation))}
 
 
 def validate_office_policy(data: dict[str, Any]) -> None:

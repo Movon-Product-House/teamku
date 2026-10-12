@@ -24,7 +24,6 @@ from movon_hr.core import mailer
 from movon_hr.core.mailer import MailKind, reset_outbox, send_email
 from movon_hr.core.policy_assistant import answer_question
 from movon_hr.core.security import (
-    generate_temporary_password,
     hash_password,
     needs_rehash,
     password_policy_error,
@@ -1128,25 +1127,6 @@ class PayrollInput(BaseModel):
     month: str = Field(pattern=r"^\d{4}-\d{2}$")
 
 
-class EmployeeInput(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
-    email: str = Field(min_length=5, max_length=150)
-    department: str = Field(min_length=2, max_length=100)
-    role: str = Field(pattern="^(employee|manager|hr_admin)$")
-    title: str = Field(default="Staff", min_length=2, max_length=100)
-    salary: int = Field(ge=0, le=10_000_000_000)
-    # Optional initial password; when omitted a temporary one is generated.
-    password: str | None = Field(default=None, min_length=8, max_length=128)
-    is_remote: bool = False
-    work_location_id: str | None = None
-
-
-class EmployeeUpdate(BaseModel):
-    status: str | None = Field(default=None, pattern="^(active|suspended|terminated)$")
-    is_remote: bool | None = None
-    work_location_id: str | None = None
-
-
 class PolicySectionInput(BaseModel):
     id: str | None = Field(default=None, max_length=80)
     heading: str = Field(min_length=1, max_length=160)
@@ -1486,26 +1466,6 @@ async def dashboard(x_demo_user: str | None = Header(default=None)) -> dict:
     }
 
 
-@router.get("/employees")
-async def employees(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin", "manager")
-    visible = visible_employees(user)
-    hide_salary = user.role == "manager"
-    items = [public_employee(employee, hide_salary=hide_salary) for employee in visible]
-    return {"items": items, "total": len(items)}
-
-
-@router.get("/employees/{employee_id}")
-async def get_employee(
-    employee_id: str, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    employee = visible_or_404(user, employee_id)
-    hide_salary = user.role == "manager"
-    return public_employee(employee, hide_salary=hide_salary)
-
-
 @router.get("/employees/{employee_id}/location-history")
 async def employee_location_history(
     employee_id: str, x_demo_user: str | None = Header(default=None)
@@ -1521,70 +1481,6 @@ async def employee_location_history(
         "employee_id": employee.id,
         "items": [location_event_payload(item) for item in events],
     }
-
-
-@router.post("/employees")
-async def create_employee(
-    payload: EmployeeInput, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    if email_taken(payload.email):
-        raise HTTPException(409, "Email kerja sudah digunakan")
-    data = payload.model_dump()
-    raw_password = data.pop("password", None)
-    temporary_password: str | None = None
-    if raw_password is None:
-        raw_password = temporary_password = generate_temporary_password()
-    else:
-        policy_error = password_policy_error(raw_password)
-        if policy_error:
-            raise HTTPException(422, policy_error)
-    employee = Employee(
-        id=f"e-{uuid4().hex[:8]}",
-        **data,
-        password_hash=hash_password(raw_password),
-        tenant_id=get_store().tenant_id,
-    )
-    store.employees[employee.id] = employee
-    audit("employee.created", user, employee.id)
-    notify(employee.id, "Akun Anda siap", "Profil dibuat oleh HR.", "/app/overview")
-    response = public_employee(employee)
-    # Returned once so HR can share it; never stored in plain text.
-    if temporary_password is not None:
-        response["temporary_password"] = temporary_password
-    return response
-
-
-@router.patch("/employees/{employee_id}")
-async def update_employee(
-    employee_id: str,
-    payload: EmployeeUpdate,
-    x_demo_user: str | None = Header(default=None),
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    employee = store.employees.get(employee_id)
-    if not employee:
-        raise HTTPException(404, "Karyawan tidak ditemukan")
-    if payload.status is not None:
-        if employee.id == user.id and payload.status != "active":
-            raise HTTPException(409, "Anda tidak dapat menonaktifkan akun sendiri")
-        employee.status = payload.status
-        # Deactivated accounts must lose any active sessions immediately.
-        if payload.status != "active":
-            revoke_employee_sessions(employee.id)
-        audit("employee.status_changed", user, employee.id)
-    if payload.is_remote is not None:
-        employee.is_remote = payload.is_remote
-        audit("employee.remote_changed", user, employee.id)
-    if payload.work_location_id is not None:
-        if payload.work_location_id not in store.office_locations:
-            raise HTTPException(422, "Lokasi kerja tidak ditemukan")
-        employee.work_location_id = payload.work_location_id
-        employee.is_remote = False
-        audit("employee.location_changed", user, employee.id)
-    return public_employee(employee)
 
 
 def _policy_sections(payload: PolicyInput) -> list[PolicySection]:

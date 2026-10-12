@@ -2,7 +2,7 @@ import pytest
 from helpers import set_employee
 from sqlalchemy import select
 
-from movon_hr.modules.auth.models import Invitation
+from movon_hr.modules.employees.models import Invitation
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
 pytestmark = pytest.mark.anyio

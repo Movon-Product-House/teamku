@@ -8,6 +8,7 @@ import movon_hr.core.identity
 import movon_hr.modules.attendance.models
 import movon_hr.modules.audit.models
 import movon_hr.modules.auth.models
+import movon_hr.modules.employees.models
 import movon_hr.modules.leave.models
 import movon_hr.modules.notifications.models
 import movon_hr.modules.payroll.models
