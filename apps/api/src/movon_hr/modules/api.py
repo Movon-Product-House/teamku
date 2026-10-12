@@ -4,31 +4,23 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from math import asin, cos, radians, sin, sqrt
 from random import uniform
-from secrets import token_urlsafe
 from urllib.parse import quote, urlencode
 from urllib.request import Request as UrlRequest
 from urllib.request import urlopen
 from uuid import uuid4
 
-from fastapi import APIRouter, Header, HTTPException, Request, Response, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
 from movon_hr.core import mailer
 from movon_hr.core.mailer import MailKind, reset_outbox, send_email
 from movon_hr.core.policy_assistant import answer_question
-from movon_hr.core.security import (
-    hash_password,
-    needs_rehash,
-    password_policy_error,
-    verify_password,
-)
+from movon_hr.core.security import hash_password
 from movon_hr.core.settings import settings
 from movon_hr.core.tenancy import (
     DEMO_TENANT_ID,
@@ -36,7 +28,6 @@ from movon_hr.core.tenancy import (
     DEMO_TENANT_SLUG,
     bind_tenant,
     clear_registry,
-    get_store,
     iter_stores,
     put_store,
     store,
@@ -62,11 +53,6 @@ def dispatch_email(to: str, subject: str, body: str, *, kind: MailKind = "generi
     _mail_tasks.add(task)
     task.add_done_callback(_mail_tasks.discard)
 
-# Sessions expire after this idle-agnostic absolute lifetime.
-SESSION_TTL = timedelta(hours=12)
-# Login throttling: block an email after too many failures inside the window.
-LOGIN_MAX_ATTEMPTS = 5
-LOGIN_ATTEMPT_WINDOW = timedelta(minutes=15)
 # Fields that must never be serialized to API clients.
 SENSITIVE_EMPLOYEE_FIELDS = frozenset({"password_hash", "tenant_id"})
 
@@ -290,10 +276,6 @@ class DemoStore:
     policies: dict[str, PolicyDocument] = field(default_factory=dict)
     policy_answer_audit: dict[str, PolicyAnswerAudit] = field(default_factory=dict)
 
-# In-memory login throttle: email -> list of recent failed-attempt timestamps.
-# Not persisted; a best-effort brute-force guard within a single process.
-_login_attempts: dict[str, list[datetime]] = {}
-
 # Every demo account signs in with this password. Hashed once at import time so
 # seeding stays fast even though tests reset the store frequently.
 DEMO_PASSWORD = "Demo123!"
@@ -412,14 +394,9 @@ def reset_demo_store() -> None:
     store.alert_receipts = {}
     store.policies = {}
     store.policy_answer_audit = {}
-    _login_attempts.clear()
 
 
 reset_demo_store()
-
-
-def session_token_from(request: Request, header_token: str | None) -> str | None:
-    return header_token or request.cookies.get(settings.session_cookie_name)
 
 
 def actor(
@@ -459,97 +436,8 @@ def bind_from_token(token: str | None) -> None:
     bind_tenant(DEMO_TENANT_ID)
 
 
-def current_user(
-    request: Request, x_demo_user: str | None = Header(default=None)
-) -> Employee:
-    return actor(session_token_from(request, x_demo_user))
-
-
-def attach_session_cookie(response: Response, token: str) -> None:
-    response.set_cookie(
-        settings.session_cookie_name,
-        token,
-        httponly=True,
-        samesite="lax",
-        secure=settings.session_cookie_secure or settings.environment == "production",
-        max_age=int(SESSION_TTL.total_seconds()),
-        path="/",
-    )
-
-
-def clear_session_cookie(response: Response) -> None:
-    response.delete_cookie(settings.session_cookie_name, path="/")
-
-
-def tenant_payload(tenant_store: DemoStore | None = None, user: Employee | None = None) -> dict:
-    if tenant_store is None and user and user.tenant_id:
-        tenant_store = get_store(user.tenant_id)
-    item = tenant_store or get_store()
-    return {"id": item.tenant_id, "name": item.tenant_name, "slug": item.tenant_slug}
-
-
-def find_employee_by_email(email: str) -> tuple[DemoStore, Employee] | None:
-    needle = email.strip().lower()
-    for tenant_store in iter_stores():
-        for employee in tenant_store.employees.values():
-            if employee.email.lower() == needle:
-                return tenant_store, employee
-    return None
-
-
-def email_taken(email: str) -> bool:
-    needle = email.strip().lower()
-    if find_employee_by_email(needle):
-        return True
-    now = datetime.now(UTC)
-    for tenant_store in iter_stores():
-        for invitation in tenant_store.invitations.values():
-            if (
-                invitation.email.lower() == needle
-                and invitation.accepted_at is None
-                and invitation.expires_at > now
-            ):
-                return True
-    return False
-
-
-def slugify_company(value: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower()).strip("-")
-    return slug[:40] or f"perusahaan-{uuid4().hex[:8]}"
-
-
-def find_invitation(token: str) -> tuple[DemoStore, Invitation] | None:
-    for tenant_store in iter_stores():
-        invitation = tenant_store.invitations.get(token)
-        if invitation:
-            return tenant_store, invitation
-    return None
-
-
-def find_password_reset(token: str) -> tuple[DemoStore, PasswordReset] | None:
-    for tenant_store in iter_stores():
-        reset = tenant_store.password_resets.get(token)
-        if reset:
-            return tenant_store, reset
-    return None
-
-
 def app_url(path: str) -> str:
     return f"{settings.app_base_url.rstrip('/')}{path}"
-
-
-def auth_payload(user: Employee, token: str) -> dict:
-    return {
-        "user": public_employee(user),
-        "access_token": token,
-        "tenant": tenant_payload(user=user),
-    }
-
-
-def auth_response(user: Employee, token: str) -> JSONResponse:
-    response = JSONResponse(auth_payload(user, token))
-    attach_session_cookie(response, token)
-    return response
 
 
 def require(user: Employee, *roles: str) -> None:
@@ -570,44 +458,6 @@ def public_employee(employee: Employee, *, hide_salary: bool = False) -> dict:
     data["work_mode"] = "field" if employee.is_remote else "office"
     data["work_location"] = office_payload(location) if location else None
     return data
-
-
-def create_session(employee: Employee) -> Session:
-    now = datetime.now(UTC)
-    session = Session(
-        token=token_urlsafe(32),
-        employee_id=employee.id,
-        created_at=now,
-        expires_at=now + SESSION_TTL,
-        tenant_id=get_store().tenant_id,
-    )
-    store.sessions[session.token] = session
-    return session
-
-
-def revoke_employee_sessions(employee_id: str, *, keep_token: str | None = None) -> None:
-    """Invalidate every active session for an employee (optionally keep one)."""
-    for token in [
-        token
-        for token, session in store.sessions.items()
-        if session.employee_id == employee_id and token != keep_token
-    ]:
-        store.sessions.pop(token, None)
-
-
-def register_failed_login(email: str) -> None:
-    attempts = _login_attempts.setdefault(email, [])
-    attempts.append(datetime.now(UTC))
-
-
-def is_login_locked(email: str) -> bool:
-    cutoff = datetime.now(UTC) - LOGIN_ATTEMPT_WINDOW
-    attempts = [ts for ts in _login_attempts.get(email, []) if ts > cutoff]
-    if attempts:
-        _login_attempts[email] = attempts
-    else:
-        _login_attempts.pop(email, None)
-    return len(attempts) >= LOGIN_MAX_ATTEMPTS
 
 
 def audit(action: str, user: Employee, target: str) -> None:
@@ -1045,50 +895,6 @@ def validate_policy(title: str, sections: list[PolicySection]) -> None:
         raise HTTPException(422, "Kebijakan memerlukan judul dan setidaknya satu bagian yang terisi")
 
 
-class Login(BaseModel):
-    email: str
-    password: str = Field(min_length=8, max_length=128)
-
-
-class Signup(BaseModel):
-    company_name: str = Field(min_length=2, max_length=120)
-    slug: str | None = Field(default=None, min_length=3, max_length=40)
-    admin_name: str = Field(min_length=2, max_length=100)
-    email: str = Field(min_length=5, max_length=150)
-    password: str = Field(min_length=8, max_length=128)
-
-
-class InviteInput(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
-    email: str = Field(min_length=5, max_length=150)
-    department: str = Field(min_length=2, max_length=100)
-    role: str = Field(pattern="^(employee|manager|hr_admin)$")
-    title: str = Field(default="Staff", min_length=2, max_length=100)
-    salary: int = Field(default=8_000_000, ge=0, le=10_000_000_000)
-    is_remote: bool = False
-    work_location_id: str | None = None
-
-
-class AcceptInvite(BaseModel):
-    token: str = Field(min_length=8, max_length=200)
-    password: str = Field(min_length=8, max_length=128)
-    name: str | None = Field(default=None, min_length=2, max_length=100)
-
-
-class ForgotPassword(BaseModel):
-    email: str = Field(min_length=5, max_length=150)
-
-
-class ResetPassword(BaseModel):
-    token: str = Field(min_length=8, max_length=200)
-    password: str = Field(min_length=8, max_length=128)
-
-
-class ChangePassword(BaseModel):
-    current_password: str = Field(min_length=8, max_length=128)
-    new_password: str = Field(min_length=8, max_length=128)
-
-
 class CheckIn(BaseModel):
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -1144,274 +950,6 @@ class PolicyInput(BaseModel):
 
 class PolicyQuestion(BaseModel):
     question: str = Field(min_length=3, max_length=800)
-
-
-@router.post("/auth/signup")
-async def signup(payload: Signup) -> JSONResponse:
-    email = payload.email.strip().lower()
-    policy_error = password_policy_error(payload.password)
-    if policy_error:
-        raise HTTPException(422, policy_error)
-    if email_taken(email):
-        raise HTTPException(409, "Email kerja sudah digunakan")
-    requested_slug = payload.slug.strip().lower() if payload.slug else slugify_company(payload.company_name)
-    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", requested_slug):
-        raise HTTPException(422, "Slug perusahaan hanya boleh huruf, angka, dan tanda hubung")
-    if any(item.tenant_slug == requested_slug for item in iter_stores()):
-        raise HTTPException(409, "Slug perusahaan sudah digunakan")
-    tenant_id = f"t-{uuid4().hex[:12]}"
-    company = DemoStore(
-        tenant_id=tenant_id,
-        tenant_name=payload.company_name.strip(),
-        tenant_slug=requested_slug,
-        office=OfficeLocation(name="Kantor Pusat"),
-    )
-    put_store(company)
-    bind_tenant(tenant_id)
-    admin = Employee(
-        id=f"e-{uuid4().hex[:8]}",
-        name=payload.admin_name.strip(),
-        email=email,
-        role="hr_admin",
-        department="Human Resources",
-        title="HR Admin",
-        status="active",
-        salary=0,
-        password_hash=hash_password(payload.password),
-        tenant_id=tenant_id,
-    )
-    store.employees[admin.id] = admin
-    session = create_session(admin)
-    audit("auth.signup", admin, company.tenant_id)
-    return auth_response(admin, session.token)
-
-
-@router.post("/auth/login")
-async def login(payload: Login) -> JSONResponse:
-    email = payload.email.strip().lower()
-    if is_login_locked(email):
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS,
-            "Terlalu banyak percobaan masuk. Coba lagi dalam beberapa menit.",
-        )
-    found = find_employee_by_email(email)
-    user = found[1] if found else None
-    if found:
-        bind_tenant(found[0].tenant_id)
-    # Always run verification against a real-looking hash to reduce timing/user
-    # enumeration signals, then apply the same generic error to every failure.
-    reference_hash = user.password_hash if user else DEMO_PASSWORD_HASH
-    password_ok = verify_password(payload.password, reference_hash)
-    if not user or not password_ok or user.status != "active":
-        register_failed_login(email)
-        raise HTTPException(401, "Email atau kata sandi salah")
-
-    _login_attempts.pop(email, None)
-    # Transparently upgrade legacy/weak hashes on successful login.
-    if needs_rehash(user.password_hash):
-        user.password_hash = hash_password(payload.password)
-    session = create_session(user)
-    audit("auth.login", user, user.id)
-    return auth_response(user, session.token)
-
-
-@router.post("/auth/logout")
-async def logout(
-    request: Request,
-    response: Response,
-    x_demo_user: str | None = Header(default=None),
-) -> dict:
-    token = session_token_from(request, x_demo_user)
-    user = actor(token)
-    store.sessions.pop(token or "", None)
-    audit("auth.logout", user, user.id)
-    clear_session_cookie(response)
-    return {"ok": True}
-
-
-@router.post("/invites")
-async def create_invite(
-    payload: InviteInput,
-    request: Request,
-    x_demo_user: str | None = Header(default=None),
-) -> dict:
-    user = current_user(request, x_demo_user)
-    require(user, "hr_admin")
-    bind_tenant(user.tenant_id or get_store().tenant_id)
-    email = payload.email.strip().lower()
-    if email_taken(email):
-        raise HTTPException(409, "Email kerja sudah digunakan")
-    invitation = Invitation(
-        token=token_urlsafe(24),
-        tenant_id=get_store().tenant_id,
-        email=email,
-        name=payload.name.strip(),
-        role=payload.role,
-        department=payload.department.strip(),
-        title=payload.title.strip(),
-        salary=payload.salary,
-        invited_by=user.id,
-        expires_at=datetime.now(UTC) + timedelta(days=7),
-        is_remote=payload.is_remote,
-        work_location_id=payload.work_location_id,
-    )
-    store.invitations[invitation.token] = invitation
-    invite_url = app_url(f"/invite?token={invitation.token}")
-    ok = await send_email(
-        email,
-        f"Undangan Teamku — {get_store().tenant_name}",
-        (
-            f"Halo {invitation.name},\n\n"
-            f"{user.name} mengundang Anda bergabung di {get_store().tenant_name}.\n"
-            f"Aktifkan akun: {invite_url}\n"
-            "Undangan berlaku 7 hari.\n"
-        ),
-        kind="invite",
-    )
-    audit("invite.created", user, invitation.email)
-    if not ok:
-        audit("invite.email_failed", user, invitation.email)
-    return {
-        "email": invitation.email,
-        "expires_at": invitation.expires_at,
-        "invite_url": invite_url,
-        "email_status": "sent" if ok else "failed",
-    }
-
-
-@router.get("/invites/{token}")
-async def preview_invite(token: str) -> dict:
-    found = find_invitation(token)
-    if not found:
-        raise HTTPException(404, "Undangan tidak ditemukan")
-    tenant_store, invitation = found
-    if invitation.accepted_at or invitation.expires_at <= datetime.now(UTC):
-        raise HTTPException(410, "Undangan sudah tidak berlaku")
-    return {
-        "email": invitation.email,
-        "name": invitation.name,
-        "company": tenant_store.tenant_name,
-        "role": invitation.role,
-        "department": invitation.department,
-        "title": invitation.title,
-    }
-
-
-@router.post("/auth/accept-invite")
-async def accept_invite(payload: AcceptInvite) -> JSONResponse:
-    found = find_invitation(payload.token)
-    if not found:
-        raise HTTPException(404, "Undangan tidak ditemukan")
-    tenant_store, invitation = found
-    if invitation.accepted_at or invitation.expires_at <= datetime.now(UTC):
-        raise HTTPException(410, "Undangan sudah tidak berlaku")
-    policy_error = password_policy_error(payload.password)
-    if policy_error:
-        raise HTTPException(422, policy_error)
-    if find_employee_by_email(invitation.email):
-        raise HTTPException(409, "Email kerja sudah digunakan")
-    bind_tenant(tenant_store.tenant_id)
-    employee = Employee(
-        id=f"e-{uuid4().hex[:8]}",
-        name=(payload.name or invitation.name).strip(),
-        email=invitation.email,
-        role=invitation.role,
-        department=invitation.department,
-        title=invitation.title,
-        status="active",
-        salary=invitation.salary,
-        password_hash=hash_password(payload.password),
-        tenant_id=tenant_store.tenant_id,
-        is_remote=invitation.is_remote,
-        work_location_id=invitation.work_location_id,
-    )
-    store.employees[employee.id] = employee
-    invitation.accepted_at = datetime.now(UTC)
-    session = create_session(employee)
-    notify(employee.id, "Akun Anda aktif", "Undangan sudah diterima. Selamat datang.", "/app/overview")
-    audit("invite.accepted", employee, invitation.email)
-    return auth_response(employee, session.token)
-
-
-@router.post("/auth/forgot-password")
-async def forgot_password(payload: ForgotPassword) -> dict:
-    email = payload.email.strip().lower()
-    found = find_employee_by_email(email)
-    if found and found[1].status == "active":
-        tenant_store, user = found
-        bind_tenant(tenant_store.tenant_id)
-        reset = PasswordReset(
-            token=token_urlsafe(24),
-            tenant_id=tenant_store.tenant_id,
-            employee_id=user.id,
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
-        )
-        store.password_resets[reset.token] = reset
-        reset_url = app_url(f"/reset-password?token={reset.token}")
-        # Don't wait on the network: response time must not reveal the account exists.
-        dispatch_email(
-            email,
-            "Atur ulang kata sandi Teamku",
-            (
-                f"Halo {user.name},\n\n"
-                f"Gunakan tautan ini untuk mengatur ulang kata sandi: {reset_url}\n"
-                "Tautan berlaku 1 jam. Abaikan email ini jika Anda tidak memintanya.\n"
-            ),
-            kind="password_reset",
-        )
-        audit("auth.password_reset_requested", user, user.id)
-    return {"ok": True}
-
-
-@router.post("/auth/reset-password")
-async def reset_password(payload: ResetPassword) -> JSONResponse:
-    found = find_password_reset(payload.token)
-    if not found:
-        raise HTTPException(404, "Tautan atur ulang tidak valid")
-    tenant_store, reset = found
-    if reset.used_at or reset.expires_at <= datetime.now(UTC):
-        raise HTTPException(410, "Tautan atur ulang sudah tidak berlaku")
-    policy_error = password_policy_error(payload.password)
-    if policy_error:
-        raise HTTPException(422, policy_error)
-    bind_tenant(tenant_store.tenant_id)
-    user = store.employees.get(reset.employee_id)
-    if not user or user.status != "active":
-        raise HTTPException(404, "Tautan atur ulang tidak valid")
-    user.password_hash = hash_password(payload.password)
-    reset.used_at = datetime.now(UTC)
-    revoke_employee_sessions(user.id)
-    session = create_session(user)
-    audit("auth.password_reset", user, user.id)
-    return auth_response(user, session.token)
-
-
-@router.post("/auth/change-password")
-async def change_password(
-    payload: ChangePassword,
-    request: Request,
-    x_demo_user: str | None = Header(default=None),
-) -> dict:
-    token = session_token_from(request, x_demo_user)
-    user = actor(token)
-    if not verify_password(payload.current_password, user.password_hash):
-        raise HTTPException(401, "Kata sandi saat ini salah")
-    if payload.new_password == payload.current_password:
-        raise HTTPException(422, "Kata sandi baru harus berbeda dari kata sandi lama")
-    policy_error = password_policy_error(payload.new_password)
-    if policy_error:
-        raise HTTPException(422, policy_error)
-    user.password_hash = hash_password(payload.new_password)
-    # Force re-login on other devices; keep the current session active.
-    revoke_employee_sessions(user.id, keep_token=token)
-    audit("auth.password_changed", user, user.id)
-    return {"ok": True}
-
-
-@router.get("/me")
-async def me(request: Request, x_demo_user: str | None = Header(default=None)) -> dict:
-    user = current_user(request, x_demo_user)
-    return {"user": public_employee(user), "tenant": tenant_payload(user=user)}
 
 
 @router.get("/dashboard")

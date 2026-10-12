@@ -3,15 +3,16 @@ import logging
 
 import pytest
 import resend
+from fastapi import BackgroundTasks
 from pydantic import SecretStr, ValidationError
 from sqlalchemy import select
 
 from movon_hr.core import mailer
 from movon_hr.core.mailer import outbox, send_email
 from movon_hr.core.settings import Settings, settings
-from movon_hr.modules import api
 from movon_hr.modules.api import dispatch_email
 from movon_hr.modules.audit.models import AuditLog
+from movon_hr.modules.auth import service as auth_service
 
 
 @pytest.fixture
@@ -125,7 +126,7 @@ async def test_invite_reports_failed_email_but_keeps_invitation(
     async def failed_send(*args: object, **kwargs: object) -> bool:
         return False
 
-    monkeypatch.setattr(api, "send_email", failed_send)
+    monkeypatch.setattr(auth_service, "send_email", failed_send)
     response = await client.post(
         "/api/v1/invites",
         headers=await login_headers("hr@movon.test"),
@@ -150,9 +151,12 @@ async def test_forgot_password_does_not_wait_on_send(
     monkeypatch: pytest.MonkeyPatch, client
 ) -> None:
     queued: list[str] = []
-    monkeypatch.setattr(api, "dispatch_email", lambda to, *a, **k: queued.append(to))
+    # The send is only scheduled (BackgroundTasks); record it instead of running it.
     monkeypatch.setattr(
-        api, "send_email", lambda *a, **k: pytest.fail("forgot-password waited on send")
+        BackgroundTasks, "add_task", lambda self, func, to, *a, **k: queued.append(to)
+    )
+    monkeypatch.setattr(
+        auth_service, "send_email", lambda *a, **k: pytest.fail("forgot-password waited on send")
     )
     response = await client.post(
         "/api/v1/auth/forgot-password", json={"email": "employee@movon.test"}

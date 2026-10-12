@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import select, update
 
 from movon_hr.core.identity import AuthSession
-from movon_hr.modules.api import LOGIN_MAX_ATTEMPTS
+from movon_hr.modules.auth.service import LOGIN_MAX_ATTEMPTS
 from movon_hr.seed import DEMO_PASSWORD
 
 pytestmark = pytest.mark.anyio

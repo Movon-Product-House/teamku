@@ -110,8 +110,14 @@ async def email_taken(db: AsyncSession, email: str) -> bool:
     return invitation is not None
 
 
-async def revoke_sessions(db: AsyncSession, employee_id: uuid.UUID) -> None:
-    await db.execute(delete(AuthSession).where(AuthSession.employee_id == employee_id))
+async def revoke_sessions(
+    db: AsyncSession, employee_id: uuid.UUID, *, keep_token: str | None = None
+) -> None:
+    """Invalidate every session of an employee, optionally keeping one."""
+    query = delete(AuthSession).where(AuthSession.employee_id == employee_id)
+    if keep_token is not None:
+        query = query.where(AuthSession.token != keep_token)
+    await db.execute(query)
 
 
 async def create_employee(
