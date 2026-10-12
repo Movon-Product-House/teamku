@@ -2403,31 +2403,3 @@ async def payslips(x_demo_user: str | None = Header(default=None)) -> dict:
             )
     items.sort(key=lambda item: item["period"], reverse=True)
     return {"items": items}
-
-
-@router.get("/notifications")
-async def notifications(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    evaluate_attendance_alerts()
-    items = [item for item in store.notifications.values() if item.user_id == user.id]
-    items.sort(key=lambda entry: entry.created_at, reverse=True)
-    return {
-        "items": [asdict(item) for item in items],
-        "unread": sum(1 for item in items if not item.read),
-    }
-
-
-@router.post("/notifications/read-all")
-async def read_notifications(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    for item in store.notifications.values():
-        if item.user_id == user.id:
-            item.read = True
-    return {"ok": True}
-
-
-@router.get("/audit-logs")
-async def audit_logs(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    require(user, "hr_admin")
-    return {"items": list(reversed(store.audit))}
