@@ -1,70 +1,63 @@
 from datetime import UTC, datetime, timedelta
 
-from fastapi.testclient import TestClient
-
-from movon_hr.core.mailer import last_email_to
-from movon_hr.main import app
-from movon_hr.modules.api import (
-    JAKARTA,
-    OFFICE_LATITUDE,
-    OFFICE_LONGITUDE,
-    Attendance,
-    LeaveRequest,
-    LocationEvent,
-    reset_demo_store,
-    store,
+import pytest
+from helpers import (
+    add_attendance,
+    add_leave,
+    add_location_event,
+    count,
+    notifications_for,
+    set_employee,
+    set_office_policy,
 )
 
-client = TestClient(app)
+from movon_hr.core.mailer import last_email_to
+from movon_hr.core.time import JAKARTA
+from movon_hr.modules.notifications.models import Notification
+
+pytestmark = pytest.mark.anyio
+ALERT_TITLES = {
+    "Belum clock-in",
+    "Sesi masih terbuka",
+    "Re-verifikasi terlewat",
+    "Lokasi di luar area kantor",
+}
 
 
-def login(email: str) -> dict[str, str]:
-    response = client.post("/api/v1/auth/login", json={"email": email, "password": "Demo123!"})
-    return {"X-Demo-User": response.json()["access_token"]}
+async def enable_alerts(db, **overrides: object) -> None:
+    policy = {
+        "alerts_enabled": True,
+        "clock_in_reminder_time": "00:00",
+        "clock_out_reminder_time": "23:59",
+        "max_open_hours": 10,
+        "alert_managers": False,
+    }
+    await set_office_policy(db, **(policy | overrides))
 
 
-def enable_alerts(**overrides: object) -> None:
-    store.office.alerts_enabled = True
-    store.office.clock_in_reminder_time = "00:00"
-    store.office.clock_out_reminder_time = "23:59"
-    store.office.max_open_hours = 10
-    store.office.alert_managers = False
-    for key, value in overrides.items():
-        setattr(store.office, key, value)
+async def attendance_alerts_for(db, email: str) -> list:
+    return [item for item in await notifications_for(db, email) if item.title in ALERT_TITLES]
 
 
-def attendance_alerts_for(user_id: str) -> list:
-    return [
-        item
-        for item in store.notifications.values()
-        if item.user_id == user_id
-        and item.title
-        in {
-            "Belum clock-in",
-            "Sesi masih terbuka",
-            "Re-verifikasi terlewat",
-            "Lokasi di luar area kantor",
-        }
-    ]
+async def test_disabled_policy_creates_no_attendance_alerts(client, db, login_headers) -> None:
+    await set_office_policy(db, alerts_enabled=False)
+    before = await count(db, Notification)
+
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
+
+    assert await count(db, Notification) == before
+    assert await attendance_alerts_for(db, "fresh@movon.test") == []
 
 
-def test_disabled_policy_creates_no_attendance_alerts() -> None:
-    reset_demo_store()
-    store.office.alerts_enabled = False
-    before = len(store.notifications)
+async def test_missed_clock_in_notifies_employee_once_per_day(client, db, login_headers) -> None:
+    await enable_alerts(db)
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
-
-    assert len(store.notifications) == before
-    assert attendance_alerts_for("e-fresh") == []
-
-
-def test_missed_clock_in_notifies_employee_once_per_day() -> None:
-    reset_demo_store()
-    enable_alerts()
-
-    first = client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
-    second = client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
+    first = await client.get(
+        "/api/v1/notifications", headers=await login_headers("fresh@movon.test")
+    )
+    second = await client.get(
+        "/api/v1/notifications", headers=await login_headers("fresh@movon.test")
+    )
 
     titles = [item["title"] for item in first.json()["items"]]
     assert titles.count("Belum clock-in") == 1
@@ -72,66 +65,68 @@ def test_missed_clock_in_notifies_employee_once_per_day() -> None:
     assert last_email_to("fresh@movon.test") is not None
 
 
-def test_approved_leave_skips_missed_clock_in() -> None:
-    reset_demo_store()
-    enable_alerts()
+async def test_approved_leave_skips_missed_clock_in(client, db, login_headers) -> None:
+    await enable_alerts(db)
     today = datetime.now(JAKARTA).date()
-    request = LeaveRequest(
-        "leave-today", "e-fresh", today, today, "Cuti hari ini", status="approved"
-    )
-    store.requests[request.id] = request
+    await add_leave(db, "fresh@movon.test", today, today, "Cuti hari ini", status="approved")
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
-    assert attendance_alerts_for("e-fresh") == []
+    assert await attendance_alerts_for(db, "fresh@movon.test") == []
 
 
-def test_open_session_past_max_hours_notifies_employee() -> None:
-    reset_demo_store()
-    enable_alerts(max_open_hours=1)
-    store.attendance["open-long"] = Attendance(
-        id="open-long",
-        employee_id="e-fresh",
+async def test_open_session_past_max_hours_notifies_employee(client, db, login_headers) -> None:
+    await enable_alerts(db, max_open_hours=1)
+    await add_attendance(
+        db,
+        "fresh@movon.test",
         checked_in_at=datetime.now(UTC) - timedelta(hours=3),
-        latitude=OFFICE_LATITUDE,
-        longitude=OFFICE_LONGITUDE,
-        accuracy_meters=10,
         agenda=[{"title": "Sesi panjang"}],
     )
 
-    client.get("/api/v1/attendance/today", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/attendance/today", headers=await login_headers("fresh@movon.test"))
 
-    titles = [item.title for item in attendance_alerts_for("e-fresh")]
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
     assert "Sesi masih terbuka" in titles
 
 
-def test_alert_managers_notifies_department_manager_and_hr() -> None:
-    reset_demo_store()
-    enable_alerts(alert_managers=True)
+async def test_alert_managers_notifies_department_manager_and_hr(client, db, login_headers) -> None:
+    await enable_alerts(db, alert_managers=True)
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
-    assert any(item.title == "Belum clock-in" for item in attendance_alerts_for("e-fresh"))
     assert any(
-        item.title == "Belum clock-in" and "Rani" in item.detail
-        for item in store.notifications.values()
-        if item.user_id == "e-manager"
+        item.title == "Belum clock-in"
+        for item in await attendance_alerts_for(db, "fresh@movon.test")
     )
     assert any(
         item.title == "Belum clock-in" and "Rani" in item.detail
-        for item in store.notifications.values()
-        if item.user_id == "e-hr"
+        for item in await notifications_for(db, "manager@movon.test")
+    )
+    assert any(
+        item.title == "Belum clock-in" and "Rani" in item.detail
+        for item in await notifications_for(db, "hr@movon.test")
     )
 
 
-def test_remote_employee_gets_clock_in_reminder_but_not_geofence_alert() -> None:
-    reset_demo_store()
-    enable_alerts()
-    store.employees["e-fresh"].is_remote = True
-    store.location_events["geo-remote"] = LocationEvent(
-        id="geo-remote",
-        employee_id="e-fresh",
-        attendance_id="none",
+async def test_remote_employee_gets_clock_in_reminder_but_not_geofence_alert(
+    client, db, login_headers
+) -> None:
+    await enable_alerts(db)
+    await set_employee(db, "fresh@movon.test", is_remote=True)
+    # location_events.attendance_id is a FK now: hang the event on yesterday's closed session.
+    yesterday = datetime.now(UTC) - timedelta(days=1)
+    earlier = await add_attendance(
+        db,
+        "fresh@movon.test",
+        checked_in_at=yesterday,
+        checked_out_at=yesterday + timedelta(hours=1),
+        agenda=[{"title": "Kemarin"}],
+    )
+    await add_location_event(
+        db,
+        "fresh@movon.test",
+        earlier.id,
         kind="reverify",
         at=datetime.now(UTC),
         lat=-6.3,
@@ -139,29 +134,27 @@ def test_remote_employee_gets_clock_in_reminder_but_not_geofence_alert() -> None
         anomaly="outside_geofence",
     )
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
-    titles = [item.title for item in attendance_alerts_for("e-fresh")]
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
     assert "Belum clock-in" in titles
     assert "Lokasi di luar area kantor" not in titles
 
 
-def test_outside_geofence_creates_accountability_alert_for_office_worker() -> None:
-    reset_demo_store()
-    enable_alerts()
-    store.attendance["today-office"] = Attendance(
-        id="today-office",
-        employee_id="e-fresh",
+async def test_outside_geofence_creates_accountability_alert_for_office_worker(
+    client, db, login_headers
+) -> None:
+    await enable_alerts(db)
+    record = await add_attendance(
+        db,
+        "fresh@movon.test",
         checked_in_at=datetime.now(UTC),
-        latitude=OFFICE_LATITUDE,
-        longitude=OFFICE_LONGITUDE,
-        accuracy_meters=10,
         agenda=[{"title": "Di kantor"}],
     )
-    store.location_events["geo-office"] = LocationEvent(
-        id="geo-office",
-        employee_id="e-fresh",
-        attendance_id="today-office",
+    await add_location_event(
+        db,
+        "fresh@movon.test",
+        record.id,
         kind="reverify",
         at=datetime.now(UTC),
         lat=-6.3,
@@ -169,19 +162,20 @@ def test_outside_geofence_creates_accountability_alert_for_office_worker() -> No
         anomaly="outside_geofence",
     )
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
 
-    titles = [item.title for item in attendance_alerts_for("e-fresh")]
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
     assert "Lokasi di luar area kantor" in titles
     assert "Belum clock-in" not in titles
 
 
-def test_repeated_notifications_poll_does_not_duplicate_kind_day() -> None:
-    reset_demo_store()
-    enable_alerts()
+async def test_repeated_notifications_poll_does_not_duplicate_kind_day(
+    client, db, login_headers
+) -> None:
+    await enable_alerts(db)
 
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
-    client.get("/api/v1/notifications", headers=login("fresh@movon.test"))
-    client.get("/api/v1/attendance/today", headers=login("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
+    await client.get("/api/v1/notifications", headers=await login_headers("fresh@movon.test"))
+    await client.get("/api/v1/attendance/today", headers=await login_headers("fresh@movon.test"))
 
-    assert len(attendance_alerts_for("e-fresh")) == 1
+    assert len(await attendance_alerts_for(db, "fresh@movon.test")) == 1

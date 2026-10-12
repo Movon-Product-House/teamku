@@ -1,8 +1,6 @@
 """U2: per-request transaction, background tasks, tenant isolation and CurrentUser on real PG."""
 
-import os
 import uuid
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -10,25 +8,19 @@ import httpx
 import pytest
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 from sqlalchemy import delete, func, select, update
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Mapped, aliased, mapped_column
 
-from movon_hr.core import db as core_db
 from movon_hr.core.auth import CurrentUser, require_role
 from movon_hr.core.db import DB, Base
 from movon_hr.core.identity import AuthSession, Employee, Tenant
-from movon_hr.core.tenancy import TenantNotBoundError, TenantScoped, TenantSession
-from movon_hr.modules.settings.models import WorkLocation
+from movon_hr.core.tenancy import TenantNotBoundError, TenantScoped
 
 pytestmark = pytest.mark.anyio
 
-TEST_DATABASE_URL = os.environ.get(
-    "MOVON_TEST_DATABASE_URL", "postgresql+psycopg://movon:movon@localhost:5432/movon_test"
-)
-
 
 class Widget(TenantScoped, Base):
-    """Test-only tenant-scoped table."""
+    """Test-only tenant-scoped table, created inside each test's transaction."""
 
     __tablename__ = "test_widgets"
 
@@ -36,28 +28,10 @@ class Widget(TenantScoped, Base):
     name: Mapped[str]
 
 
-TABLES = [
-    Tenant.__table__,
-    WorkLocation.__table__,  # employees.work_location_id references it
-    Employee.__table__,
-    AuthSession.__table__,
-    Widget.__table__,
-]
-
-
-@pytest.fixture
-async def sessions(monkeypatch: pytest.MonkeyPatch) -> AsyncIterator[async_sessionmaker]:
-    # Schema comes from Alembic from U3 on; until then create only what these tests need.
-    engine = create_async_engine(TEST_DATABASE_URL)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all, tables=TABLES)
-        await conn.run_sync(Base.metadata.create_all, tables=TABLES)
-    factory = async_sessionmaker(engine, expire_on_commit=False, sync_session_class=TenantSession)
-    monkeypatch.setattr(core_db, "SessionLocal", factory)
-    yield factory
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all, tables=TABLES)
-    await engine.dispose()
+@pytest.fixture(autouse=True)
+async def widgets_table(conn: AsyncConnection) -> None:
+    # `sessions` (conftest) joins this connection and is what get_db hands out here.
+    await conn.run_sync(Widget.__table__.create)
 
 
 def client(app: FastAPI) -> httpx.AsyncClient:

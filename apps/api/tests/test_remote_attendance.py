@@ -1,27 +1,11 @@
-from fastapi.testclient import TestClient
+import pytest
+from helpers import set_employee
+from sqlalchemy import select
 
-from movon_hr.main import app
-from movon_hr.modules.api import (
-    OFFICE_LATITUDE,
-    OFFICE_LONGITUDE,
-    reset_demo_store,
-    store,
-)
+from movon_hr.modules.auth.models import Invitation
+from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
-client = TestClient(app)
-
-
-def login(email: str) -> dict[str, str]:
-    response = client.post("/api/v1/auth/login", json={"email": email, "password": "Demo123!"})
-    return {"X-Demo-User": response.json()["access_token"]}
-
-
-def hr_headers() -> dict[str, str]:
-    return login("hr@movon.test")
-
-
-def fresh_headers() -> dict[str, str]:
-    return login("fresh@movon.test")
+pytestmark = pytest.mark.anyio
 
 
 def check_in_payload(**overrides: object) -> dict:
@@ -37,13 +21,12 @@ def check_in_payload(**overrides: object) -> dict:
     return payload
 
 
-def test_remote_employee_can_check_in_far_from_office() -> None:
-    reset_demo_store()
-    store.employees["e-fresh"].is_remote = True
+async def test_remote_employee_can_check_in_far_from_office(client, db, login_headers) -> None:
+    await set_employee(db, "fresh@movon.test", is_remote=True)
 
-    response = client.post(
+    response = await client.post(
         "/api/v1/attendance/check-in",
-        headers=fresh_headers() | {"Idempotency-Key": "remote-far"},
+        headers=await login_headers("fresh@movon.test") | {"Idempotency-Key": "remote-far"},
         json=check_in_payload(latitude=-6.3, longitude=106.8166),
     )
 
@@ -51,12 +34,10 @@ def test_remote_employee_can_check_in_far_from_office() -> None:
     assert response.json()["id"]
 
 
-def test_office_employee_far_from_office_is_still_rejected() -> None:
-    reset_demo_store()
-
-    response = client.post(
+async def test_office_employee_far_from_office_is_still_rejected(client, login_headers) -> None:
+    response = await client.post(
         "/api/v1/attendance/check-in",
-        headers=fresh_headers() | {"Idempotency-Key": "office-far"},
+        headers=await login_headers("fresh@movon.test") | {"Idempotency-Key": "office-far"},
         json=check_in_payload(latitude=-6.3, longitude=106.8166),
     )
 
@@ -64,11 +45,11 @@ def test_office_employee_far_from_office_is_still_rejected() -> None:
     assert "ditolak" in response.json()["detail"].lower()
 
 
-def test_create_and_invite_remote_employee_persists_flag() -> None:
-    reset_demo_store()
-    created = client.post(
+async def test_create_and_invite_remote_employee_persists_flag(client, db, login_headers) -> None:
+    hr = await login_headers("hr@movon.test")
+    created = await client.post(
         "/api/v1/employees",
-        headers=hr_headers(),
+        headers=hr,
         json={
             "name": "Remote Staff",
             "email": "remote.staff@movon.test",
@@ -81,13 +62,13 @@ def test_create_and_invite_remote_employee_persists_flag() -> None:
     assert created.status_code == 200
     assert created.json()["is_remote"] is True
 
-    listed = client.get("/api/v1/employees", headers=hr_headers()).json()["items"]
+    listed = (await client.get("/api/v1/employees", headers=hr)).json()["items"]
     remote = next(item for item in listed if item["email"] == "remote.staff@movon.test")
     assert remote["is_remote"] is True
 
-    invited = client.post(
+    invited = await client.post(
         "/api/v1/invites",
-        headers=hr_headers(),
+        headers=hr,
         json={
             "name": "Remote Invite",
             "email": "remote.invite@movon.test",
@@ -98,7 +79,8 @@ def test_create_and_invite_remote_employee_persists_flag() -> None:
         },
     )
     assert invited.status_code == 200
-    invitation = next(
-        item for item in store.invitations.values() if item.email == "remote.invite@movon.test"
+    invitation = await db.scalar(
+        select(Invitation).where(Invitation.email == "remote.invite@movon.test")
     )
+    assert invitation is not None
     assert invitation.is_remote is True

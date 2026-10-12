@@ -1,65 +1,63 @@
 from datetime import UTC, datetime, timedelta
 
-from fastapi.testclient import TestClient
+import pytest
+from helpers import add_attendance, add_location_event
 
-from movon_hr.main import app
-from movon_hr.modules.api import (
-    OFFICE_LATITUDE,
-    OFFICE_LONGITUDE,
-    LocationEvent,
-    reset_demo_store,
-    store,
-)
+from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
-client = TestClient(app)
+pytestmark = pytest.mark.anyio
 
 
-def login(email: str) -> dict[str, str]:
-    response = client.post("/api/v1/auth/login", json={"email": email, "password": "Demo123!"})
-    return {"X-Demo-User": response.json()["access_token"]}
-
-
-def test_manager_cannot_read_other_department_history() -> None:
-    reset_demo_store()
-
-    response = client.get(
-        "/api/v1/employees/e-005/location-history",
-        headers=login("manager@movon.test"),
+async def test_manager_cannot_read_other_department_history(
+    client, login_headers, employee_id
+) -> None:
+    response = await client.get(
+        f"/api/v1/employees/{await employee_id('rizky@movon.test')}/location-history",
+        headers=await login_headers("manager@movon.test"),
     )
 
     assert response.status_code == 404
 
 
-def test_hr_can_list_location_events_for_any_tenant_employee() -> None:
-    reset_demo_store()
-
-    response = client.get(
-        "/api/v1/employees/e-employee/location-history",
-        headers=login("hr@movon.test"),
+async def test_hr_can_list_location_events_for_any_tenant_employee(
+    client, login_headers, employee_id
+) -> None:
+    target = await employee_id("employee@movon.test")
+    response = await client.get(
+        f"/api/v1/employees/{target}/location-history",
+        headers=await login_headers("hr@movon.test"),
     )
 
     assert response.status_code == 200
-    assert response.json()["employee_id"] == "e-employee"
+    assert response.json()["employee_id"] == target
 
 
-def test_employee_cannot_fetch_another_employee_location_history() -> None:
-    reset_demo_store()
-
-    response = client.get(
-        "/api/v1/employees/e-004/location-history",
-        headers=login("employee@movon.test"),
+async def test_employee_cannot_fetch_another_employee_location_history(
+    client, login_headers, employee_id
+) -> None:
+    response = await client.get(
+        f"/api/v1/employees/{await employee_id('andi@movon.test')}/location-history",
+        headers=await login_headers("employee@movon.test"),
     )
 
     assert response.status_code == 403
 
 
-def test_detail_history_is_chronological_check_in_and_reverify() -> None:
-    reset_demo_store()
+async def test_detail_history_is_chronological_check_in_and_reverify(
+    client, db, login_headers, employee_id
+) -> None:
     earlier = datetime.now(UTC).replace(microsecond=0)
-    store.location_events["loc-a"] = LocationEvent(
-        id="loc-a",
-        employee_id="e-employee",
-        attendance_id="attendance-a",
+    # location_events.attendance_id is a FK now, so the events need a real session.
+    session = await add_attendance(
+        db,
+        "employee@movon.test",
+        checked_in_at=earlier - timedelta(hours=1),
+        agenda=[{"title": "Riwayat lokasi"}],
+    )
+    await add_location_event(
+        db,
+        "employee@movon.test",
+        session.id,
         kind="reverify",
         at=earlier,
         lat=OFFICE_LATITUDE,
@@ -68,10 +66,10 @@ def test_detail_history_is_chronological_check_in_and_reverify() -> None:
         distance_meters=0,
         inside_geofence=True,
     )
-    store.location_events["loc-b"] = LocationEvent(
-        id="loc-b",
-        employee_id="e-employee",
-        attendance_id="attendance-a",
+    await add_location_event(
+        db,
+        "employee@movon.test",
+        session.id,
         kind="check_in",
         at=earlier - timedelta(hours=1),
         lat=OFFICE_LATITUDE,
@@ -80,10 +78,11 @@ def test_detail_history_is_chronological_check_in_and_reverify() -> None:
         distance_meters=0,
         inside_geofence=True,
     )
+    target = await employee_id("employee@movon.test")
 
-    response = client.get(
-        "/api/v1/employees/e-employee/location-history",
-        headers=login("manager@movon.test"),
+    response = await client.get(
+        f"/api/v1/employees/{target}/location-history",
+        headers=await login_headers("manager@movon.test"),
     )
 
     assert response.status_code == 200
@@ -91,6 +90,8 @@ def test_detail_history_is_chronological_check_in_and_reverify() -> None:
     assert kinds == ["check_in", "reverify"]
     assert response.json()["items"][0]["at"] <= response.json()["items"][-1]["at"]
 
-    profile = client.get("/api/v1/employees/e-employee", headers=login("manager@movon.test"))
+    profile = await client.get(
+        f"/api/v1/employees/{target}", headers=await login_headers("manager@movon.test")
+    )
     assert profile.status_code == 200
-    assert profile.json()["id"] == "e-employee"
+    assert profile.json()["id"] == target

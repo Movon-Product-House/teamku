@@ -3,22 +3,15 @@ import logging
 
 import pytest
 import resend
-from fastapi.testclient import TestClient
 from pydantic import SecretStr, ValidationError
+from sqlalchemy import select
 
 from movon_hr.core import mailer
 from movon_hr.core.mailer import outbox, send_email
 from movon_hr.core.settings import Settings, settings
-from movon_hr.main import app
 from movon_hr.modules import api
-from movon_hr.modules.api import dispatch_email, reset_demo_store
-
-client = TestClient(app)
-
-
-def login(email: str) -> dict[str, str]:
-    response = client.post("/api/v1/auth/login", json={"email": email, "password": "Demo123!"})
-    return {"X-Demo-User": response.json()["access_token"]}
+from movon_hr.modules.api import dispatch_email
+from movon_hr.modules.audit.models import AuditLog
 
 
 @pytest.fixture
@@ -125,16 +118,17 @@ def test_dispatch_does_not_wait_for_resend(
     asyncio.run(asyncio.wait_for(run(), timeout=1))
 
 
-def test_invite_reports_failed_email_but_keeps_invitation(monkeypatch: pytest.MonkeyPatch) -> None:
-    reset_demo_store()
-
+@pytest.mark.anyio
+async def test_invite_reports_failed_email_but_keeps_invitation(
+    monkeypatch: pytest.MonkeyPatch, client, db, login_headers
+) -> None:
     async def failed_send(*args: object, **kwargs: object) -> bool:
         return False
 
     monkeypatch.setattr(api, "send_email", failed_send)
-    response = client.post(
+    response = await client.post(
         "/api/v1/invites",
-        headers=login("hr@movon.test"),
+        headers=await login_headers("hr@movon.test"),
         json={
             "name": "Sinta",
             "email": "sinta@gmail.com",
@@ -147,17 +141,21 @@ def test_invite_reports_failed_email_but_keeps_invitation(monkeypatch: pytest.Mo
     assert response.status_code == 200
     assert response.json()["email_status"] == "failed"
     token = response.json()["invite_url"].split("token=")[1]
-    assert client.get(f"/api/v1/invites/{token}").status_code == 200
-    assert "invite.email_failed" in [item["action"] for item in api.store.audit]
+    assert (await client.get(f"/api/v1/invites/{token}")).status_code == 200
+    assert "invite.email_failed" in (await db.scalars(select(AuditLog.action))).all()
 
 
-def test_forgot_password_does_not_wait_on_send(monkeypatch: pytest.MonkeyPatch) -> None:
-    reset_demo_store()
+@pytest.mark.anyio
+async def test_forgot_password_does_not_wait_on_send(
+    monkeypatch: pytest.MonkeyPatch, client
+) -> None:
     queued: list[str] = []
     monkeypatch.setattr(api, "dispatch_email", lambda to, *a, **k: queued.append(to))
     monkeypatch.setattr(
         api, "send_email", lambda *a, **k: pytest.fail("forgot-password waited on send")
     )
-    response = client.post("/api/v1/auth/forgot-password", json={"email": "employee@movon.test"})
+    response = await client.post(
+        "/api/v1/auth/forgot-password", json={"email": "employee@movon.test"}
+    )
     assert response.status_code == 200
     assert queued == ["employee@movon.test"]

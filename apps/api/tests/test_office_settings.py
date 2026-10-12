@@ -1,37 +1,15 @@
-from fastapi.testclient import TestClient
+import pytest
+from helpers import office, set_office_policy
 
-from movon_hr.main import app
-from movon_hr.modules.api import (
-    OFFICE_LATITUDE,
-    OFFICE_LONGITUDE,
-    OFFICE_RADIUS_METERS,
-    reset_demo_store,
-    store,
-)
+from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
-client = TestClient(app)
+pytestmark = pytest.mark.anyio
 
 
-def hr_headers() -> dict[str, str]:
-    response = client.post(
-        "/api/v1/auth/login",
-        json={"email": "hr@movon.test", "password": "Demo123!"},
+async def test_any_user_can_read_office_settings(client, login_headers) -> None:
+    response = await client.get(
+        "/api/v1/settings/office", headers=await login_headers("fresh@movon.test")
     )
-    return {"X-Demo-User": response.json()["access_token"]}
-
-
-def employee_headers() -> dict[str, str]:
-    response = client.post(
-        "/api/v1/auth/login",
-        json={"email": "fresh@movon.test", "password": "Demo123!"},
-    )
-    return {"X-Demo-User": response.json()["access_token"]}
-
-
-def test_any_user_can_read_office_settings() -> None:
-    reset_demo_store()
-
-    response = client.get("/api/v1/settings/office", headers=employee_headers())
 
     assert response.status_code == 200
     body = response.json()
@@ -43,12 +21,10 @@ def test_any_user_can_read_office_settings() -> None:
     assert body["alerts_enabled"] is False
 
 
-def test_employee_cannot_update_office_settings() -> None:
-    reset_demo_store()
-
-    response = client.put(
+async def test_employee_cannot_update_office_settings(client, db, login_headers) -> None:
+    response = await client.put(
         "/api/v1/settings/office",
-        headers=employee_headers(),
+        headers=await login_headers("fresh@movon.test"),
         json={
             "name": "Rumah",
             "latitude": -6.3,
@@ -58,15 +34,13 @@ def test_employee_cannot_update_office_settings() -> None:
     )
 
     assert response.status_code == 403
-    assert store.office.name == "Jakarta HQ"
+    assert (await office(db)).name == "Jakarta HQ"
 
 
-def test_hr_admin_can_update_office_settings() -> None:
-    reset_demo_store()
-
-    response = client.put(
+async def test_hr_admin_can_update_office_settings(client, db, login_headers) -> None:
+    response = await client.put(
         "/api/v1/settings/office",
-        headers=hr_headers(),
+        headers=await login_headers("hr@movon.test"),
         json={
             "name": "Bandung Hub",
             "latitude": -6.9175,
@@ -77,20 +51,19 @@ def test_hr_admin_can_update_office_settings() -> None:
 
     assert response.status_code == 200
     assert response.json()["name"] == "Bandung Hub"
-    assert store.office.latitude == -6.9175
-    assert store.office.radius_meters == 200
+    updated = await office(db)
+    assert updated.latitude == -6.9175
+    assert updated.radius_meters == 200
 
 
-def test_check_in_uses_configured_office_location() -> None:
-    reset_demo_store()
-    store.office.name = "Bandung Hub"
-    store.office.latitude = -6.9175
-    store.office.longitude = 107.6191
-    store.office.radius_meters = 200
+async def test_check_in_uses_configured_office_location(client, db, login_headers) -> None:
+    await set_office_policy(
+        db, name="Bandung Hub", latitude=-6.9175, longitude=107.6191, radius_meters=200
+    )
 
-    rejected = client.post(
+    rejected = await client.post(
         "/api/v1/attendance/check-in",
-        headers=employee_headers() | {"Idempotency-Key": "old-hq"},
+        headers=await login_headers("fresh@movon.test") | {"Idempotency-Key": "old-hq"},
         json={
             "latitude": OFFICE_LATITUDE,
             "longitude": OFFICE_LONGITUDE,
@@ -103,9 +76,9 @@ def test_check_in_uses_configured_office_location() -> None:
     assert rejected.status_code == 403
     assert "bandung hub" in rejected.json()["detail"].lower()
 
-    accepted = client.post(
+    accepted = await client.post(
         "/api/v1/attendance/check-in",
-        headers=employee_headers() | {"Idempotency-Key": "new-hub"},
+        headers=await login_headers("fresh@movon.test") | {"Idempotency-Key": "new-hub"},
         json={
             "latitude": -6.9175,
             "longitude": 107.6191,
@@ -119,12 +92,10 @@ def test_check_in_uses_configured_office_location() -> None:
     assert accepted.json()["distance_meters"] == 0
 
 
-def test_hr_admin_can_parse_google_maps_share_link() -> None:
-    reset_demo_store()
-
-    response = client.post(
+async def test_hr_admin_can_parse_google_maps_share_link(client, login_headers) -> None:
+    response = await client.post(
         "/api/v1/settings/office/from-maps-url",
-        headers=hr_headers(),
+        headers=await login_headers("hr@movon.test"),
         json={"url": "https://www.google.com/maps/place/Monas/@-6.175392,106.827153,17z"},
     )
 
@@ -135,12 +106,10 @@ def test_hr_admin_can_parse_google_maps_share_link() -> None:
     assert "google.com/maps" in body["maps_url"]
 
 
-def test_hr_admin_can_parse_raw_coordinates() -> None:
-    reset_demo_store()
-
-    response = client.post(
+async def test_hr_admin_can_parse_raw_coordinates(client, login_headers) -> None:
+    response = await client.post(
         "/api/v1/settings/office/from-maps-url",
-        headers=hr_headers(),
+        headers=await login_headers("hr@movon.test"),
         json={"url": "-6.200000, 106.816600"},
     )
 
@@ -149,12 +118,10 @@ def test_hr_admin_can_parse_raw_coordinates() -> None:
     assert response.json()["longitude"] == 106.8166
 
 
-def test_employee_cannot_parse_maps_url() -> None:
-    reset_demo_store()
-
-    response = client.post(
+async def test_employee_cannot_parse_maps_url(client, login_headers) -> None:
+    response = await client.post(
         "/api/v1/settings/office/from-maps-url",
-        headers=employee_headers(),
+        headers=await login_headers("fresh@movon.test"),
         json={"url": "https://www.google.com/maps?q=-6.2,106.8166"},
     )
 
