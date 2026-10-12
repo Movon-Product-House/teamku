@@ -22,7 +22,9 @@ jobs:
           --health-cmd pg_isready --health-interval 5s
           --health-timeout 5s --health-retries 10
     env:
-      MOVON_TEST_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon
+      # Alembic runs against the service DB; tests use their own database.
+      MOVON_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon
+      MOVON_TEST_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon_test
     defaults:
       run:
         working-directory: apps/api
@@ -33,4 +35,11 @@ jobs:
           working-directory: apps/api
           enable-cache: true
       - run: uv sync --locked
+      - run: createdb -h localhost -U movon movon_test
+        env:
+          PGPASSWORD: movon
+      - run: uv run alembic upgrade head
+      - run: uv run alembic check
+      - name: alembic heads (exactly one)
+        run: test "$(uv run alembic heads | wc -l)" -eq 1
       - run: ./scripts/check.sh

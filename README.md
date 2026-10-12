@@ -5,7 +5,7 @@ Teamku, powered by movon digital house, is a modular, API-first HRIS MVP for Ind
 ## Local start
 
 1. Copy `.env.example` to `.env`.
-2. Run `docker compose -f infra/compose/docker-compose.yml up --build`.
+2. Run `docker compose -f infra/compose/docker-compose.yml up --build`. Compose now runs PostgreSQL 18; the old `postgres_data` volume holds PG16 data, so run `docker compose -f infra/compose/docker-compose.yml down -v` once before the first PG18 start.
 3. Open `http://localhost:3000`; API documentation is at `http://localhost:8000/docs`.
 
 For a quick API-only setup, install from `apps/api` with `uv sync --all-groups`, then run `uv run uvicorn movon_hr.main:app --reload`.

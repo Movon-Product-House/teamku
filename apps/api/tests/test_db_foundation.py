@@ -18,6 +18,7 @@ from movon_hr.core.auth import CurrentUser, require_role
 from movon_hr.core.db import DB, Base
 from movon_hr.core.identity import AuthSession, Employee, Tenant
 from movon_hr.core.tenancy import TenantNotBoundError, TenantScoped, TenantSession
+from movon_hr.modules.settings.models import WorkLocation
 
 pytestmark = pytest.mark.anyio
 
@@ -35,7 +36,13 @@ class Widget(TenantScoped, Base):
     name: Mapped[str]
 
 
-TABLES = [Tenant.__table__, Employee.__table__, AuthSession.__table__, Widget.__table__]
+TABLES = [
+    Tenant.__table__,
+    WorkLocation.__table__,  # employees.work_location_id references it
+    Employee.__table__,
+    AuthSession.__table__,
+    Widget.__table__,
+]
 
 
 @pytest.fixture

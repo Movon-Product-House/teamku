@@ -34,8 +34,8 @@ class Employee(TenantScoped, Base):
     salary: Mapped[int] = mapped_column(default=8_000_000)
     password_hash: Mapped[str] = mapped_column(default="", server_default="")
     is_remote: Mapped[bool] = mapped_column(default=False, server_default="false")
-    # ForeignKey("work_locations.id") is added in U3, once work_locations exists.
-    work_location_id: Mapped[uuid.UUID | None]
+    # work_locations is defined in modules/settings/models.py (core must not import modules).
+    work_location_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("work_locations.id"))
 
 
 # Work email stays unique across companies, like today.

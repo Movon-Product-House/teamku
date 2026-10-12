@@ -1,24 +1,22 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     environment: {POSTGRES_DB: movon, POSTGRES_USER: movon, POSTGRES_PASSWORD: movon}
-    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    # PG18 images keep PGDATA under /var/lib/postgresql/18/docker; mount the parent.
+    volumes: ["postgres_data:/var/lib/postgresql"]
     healthcheck: {test: ["CMD-SHELL", "pg_isready -U movon -d movon"], interval: 5s, timeout: 3s, retries: 10}
-  redis:
-    image: redis:7-alpine
-    healthcheck: {test: ["CMD", "redis-cli", "ping"], interval: 5s, timeout: 3s, retries: 10}
   api:
     build: ../../apps/api
-    command: uvicorn movon_hr.main:app --host 0.0.0.0 --port 8000
     ports: ["8000:8000"]
     environment:
       MOVON_CORS_ORIGINS: '["http://localhost:3000"]'
-      MOVON_DATABASE_URL: postgresql+asyncpg://movon:movon@postgres:5432/movon
-    depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_healthy}}
+      MOVON_DATABASE_URL: postgresql+psycopg://movon:movon@postgres:5432/movon
+    depends_on: {postgres: {condition: service_healthy}}
   web:
-    build: ../../apps/web
+    build:
+      context: ../../apps/web
+      args: {MOVON_API_ORIGIN: http://api:8000}
     ports: ["3000:3000"]
-    environment: {NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1}
     depends_on: [api]
 
 volumes:
