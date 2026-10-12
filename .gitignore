@@ -8,8 +8,6 @@ __pycache__/
 .ruff_cache/
 coverage/
 *.tsbuildinfo
-.service-pids/
-.service-logs/
 .vercel/
 
 .claude/settings.local.json

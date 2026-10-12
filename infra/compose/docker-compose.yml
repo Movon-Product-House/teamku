@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:18-alpine
     environment: {POSTGRES_DB: movon, POSTGRES_USER: movon, POSTGRES_PASSWORD: movon}
+    ports: ["5432:5432"]  # for the API run outside compose (uv run uvicorn --reload)
     # PG18 images keep PGDATA under /var/lib/postgresql/18/docker; mount the parent.
     volumes: ["postgres_data:/var/lib/postgresql"]
     healthcheck: {test: ["CMD-SHELL", "pg_isready -U movon -d movon"], interval: 5s, timeout: 3s, retries: 10}

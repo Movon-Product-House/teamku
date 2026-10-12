@@ -9,7 +9,6 @@ dependencies = [
     "pydantic-settings>=2.15.0,<3",
     "argon2-cffi>=25.1.0",
     "sqlalchemy[asyncio]>=2.0.54,<2.1",
-    "asyncpg>=0.29,<1",  # removed in U12 together with core/persistence.py
     "psycopg[binary]>=3.3.6,<4",
     "alembic>=1.20.0,<2",
     "resend[async]>=2.49.1,<3",
@@ -24,18 +23,20 @@ dev = [
     "import-linter>=2.15,<3",
 ]
 
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13"]
+build-backend = "uv_build"
+
 [tool.uv]
 # Supply-chain cooldown: only resolve files uploaded to PyPI at least 7 days ago.
 exclude-newer = "7 days"
 
-[tool.pytest.ini_options]
-pythonpath = ["src"]
+[tool.uv.build-backend]
+module-name = "movon_hr"  # the distribution is teamku-api, the import package movon_hr
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-# Temporary: legacy file deleted in U12.
-extend-exclude = ["src/movon_hr/modules/api.py"]
 
 [tool.ruff.lint]
 extend-select = [
@@ -48,9 +49,7 @@ extend-select = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "S106"]
 "alembic/versions/*" = ["N999"]  # date-prefixed revision file names
-# Temporary: legacy complexity, deleted in U12.
-"src/movon_hr/core/persistence.py" = ["C901", "PLR0912", "PLR0915"]
-# Temporary: old-API demo flow replay, rewritten in U4.
+# The frozen contract flow (one long scripted replay that produced shapes.json); kept as is.
 "tests/contract/shape_capture.py" = ["C901", "PLR0911", "PLR0915"]
 
 [tool.ruff.lint.isort]
@@ -59,9 +58,18 @@ known-third-party = ["alembic"]  # the local alembic/ folder would otherwise cou
 [tool.pyrefly]
 project-includes = ["src"]
 preset = "default"
-# Temporary: legacy files deleted in U12.
-project-excludes = ["src/movon_hr/modules/api.py", "src/movon_hr/core/persistence.py"]
 
 [tool.importlinter]
 root_package = "movon_hr"
-# Contracts are added in U12.
+
+[[tool.importlinter.contracts]]
+name = "core does not import modules"
+type = "forbidden"
+source_modules = ["movon_hr.core"]
+forbidden_modules = ["movon_hr.modules"]
+
+[[tool.importlinter.contracts]]
+name = "no import cycles between modules"
+type = "acyclic_siblings"
+ancestors = ["movon_hr.modules"]
+depth = 0  # only the domain modules themselves, not files inside one module

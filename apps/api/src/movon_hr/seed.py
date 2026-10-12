@@ -1,4 +1,4 @@
-"""Demo company seed, ported from the old in-memory ``reset_demo_store()``.
+"""Demo company seed: the demo tenant, its 19 employees and today's sample activity.
 
 ``python -m movon_hr.seed [--if-empty]``; ``--if-empty`` seeds only when there are no tenants.
 """

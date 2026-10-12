@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 import pytest
@@ -10,7 +9,6 @@ from sqlalchemy import select
 from movon_hr.core import mailer
 from movon_hr.core.mailer import outbox, send_email
 from movon_hr.core.settings import Settings, settings
-from movon_hr.modules.api import dispatch_email
 from movon_hr.modules.audit.models import AuditLog
 from movon_hr.modules.auth import service as auth_service
 
@@ -102,21 +100,6 @@ async def test_console_hides_body_outside_development(
         assert await send_email("a@movon.test", "Halo", "token=rahasia")
     assert "rahasia" not in caplog.text
     assert mailer.last_email_to("a@movon.test").body == "token=rahasia"
-
-
-def test_dispatch_does_not_wait_for_resend(
-    resend_on: list[dict], monkeypatch: pytest.MonkeyPatch
-) -> None:
-    async def slow(params: dict) -> dict:
-        await asyncio.sleep(5)
-        return {"id": "x"}
-
-    monkeypatch.setattr(resend.Emails, "send_async", slow)
-
-    async def run() -> None:
-        dispatch_email("sinta@gmail.com", "Halo", "isi")  # would block 5s if awaited inline
-
-    asyncio.run(asyncio.wait_for(run(), timeout=1))
 
 
 @pytest.mark.anyio

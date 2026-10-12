@@ -18,7 +18,7 @@ Aturan kode ada di `apps/web/README.md` dan dipaksa CI; baca bagian **Aturan** s
 
 ## 2. Kontrak data
 
-Untuk setiap angka/teks dinamis di layar, temukan endpoint dan field-nya di `apps/api/src/movon_hr/modules/api.py` (atau type yang sudah ada di `features/*/types.ts`).
+Untuk setiap angka/teks dinamis di layar, temukan endpoint dan field-nya di `apps/api/src/movon_hr/modules/<domain>/router.py` dan `schemas.py` (atau type yang sudah ada di `features/*/types.ts`).
 
 Fitur berlabel **BARU** di brief, atau data yang tidak punya endpoint, adalah **celah backend**: berhenti dan laporkan daftarnya ke user (layar, data, endpoint yang dibutuhkan). Jangan mengarang data, jangan memakai mock permanen.
 

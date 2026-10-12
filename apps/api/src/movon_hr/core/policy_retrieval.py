@@ -27,7 +27,7 @@ def retrieve(policies: list[Any], question: str, today: date) -> list[PolicyEvid
     """Return effective published sections matching at least one meaningful term.
 
     The objects are deliberately duck-typed so this deterministic interface stays
-    independent of the in-memory and PostgreSQL adapters.
+    independent of the ORM models.
     """
     terms = _terms(question)
     matches: list[PolicyEvidence] = []
