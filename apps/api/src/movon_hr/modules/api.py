@@ -3,15 +3,11 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from math import asin, cos, radians, sin, sqrt
 from random import uniform
-from urllib.parse import quote, urlencode
-from urllib.request import Request as UrlRequest
-from urllib.request import urlopen
 from uuid import uuid4
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
@@ -35,7 +31,6 @@ from movon_hr.core.tenancy import (
 from movon_hr.core.time import JAKARTA, jakarta_date, working_days
 
 router = APIRouter()
-logger = logging.getLogger("movon_hr.calendar")
 _mail_tasks: set[asyncio.Task] = set()
 
 
@@ -477,104 +472,6 @@ def notify(user_id: str, title: str, detail: str, target: str) -> None:
     store.notifications[item.id] = item
 
 
-def leave_recipients(request: LeaveRequest) -> list[Employee]:
-    employee = store.employees[request.employee_id]
-    recipients = [person for person in store.employees.values() if person.role == "manager" and person.department == employee.department]
-    recipients.extend(person for person in store.employees.values() if person.role == "hr_admin" and person.status == "active")
-    unique: dict[str, Employee] = {person.id: person for person in recipients}
-    return list(unique.values())
-
-
-def email_leave(recipients: list[Employee], subject: str, body: str) -> None:
-    for recipient in recipients:
-        if recipient.email:
-            dispatch_email(recipient.email, subject, body, kind="leave")
-
-
-def sync_leave_calendar(request: LeaveRequest, employee: Employee) -> None:
-    if store.calendar.provider != "google" or not store.calendar.connected or not store.calendar.team_calendar_id:
-        request.calendar_sync_status = "skipped"
-        return
-    try:
-        end_exclusive = request.end + timedelta(days=1)
-        event = google_calendar_request(
-            "POST",
-            f"https://www.googleapis.com/calendar/v3/calendars/{quote(store.calendar.team_calendar_id, safe='')}/events?sendUpdates=all",
-            {
-                "summary": f"Cuti · {employee.name}",
-                "description": f"Permohonan cuti Teamku {request.id}.",
-                "start": {"date": request.start.isoformat()},
-                "end": {"date": end_exclusive.isoformat()},
-                "attendees": [{"email": employee.email}],
-                "transparency": "opaque",
-            },
-        )
-        request.team_calendar_event_id = event.get("id")
-        request.employee_calendar_event_id = None
-        request.calendar_sync_status = "ok" if request.team_calendar_event_id else "failed"
-    except Exception:
-        logger.exception("Google Calendar event creation failed request_id=%s", request.id)
-        request.calendar_sync_status = "failed"
-
-
-def remove_leave_calendar(request: LeaveRequest) -> None:
-    if request.team_calendar_event_id and store.calendar.provider == "google" and store.calendar.connected:
-        try:
-            google_calendar_request(
-                "DELETE",
-                f"https://www.googleapis.com/calendar/v3/calendars/{quote(store.calendar.team_calendar_id, safe='')}/events/{quote(request.team_calendar_event_id, safe='')}",
-            )
-            request.calendar_sync_status = "removed"
-        except Exception:
-            logger.exception("Google Calendar event deletion failed request_id=%s", request.id)
-            request.calendar_sync_status = "failed"
-        return
-    request.calendar_sync_status = "removed"
-
-
-def google_token_request(values: dict[str, str]) -> dict:
-    request = UrlRequest(
-        "https://oauth2.googleapis.com/token",
-        data=urlencode(values).encode(),
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        method="POST",
-    )
-    with urlopen(request, timeout=15) as response:
-        import json
-        return json.loads(response.read())
-
-
-def google_access_token() -> str:
-    calendar = store.calendar
-    if calendar.access_token and calendar.token_expires_at and datetime.now(UTC) < calendar.token_expires_at - timedelta(minutes=1):
-        return calendar.access_token
-    if not calendar.refresh_token or not settings.google_client_id or not settings.google_client_secret:
-        raise ValueError("Google Calendar is not connected")
-    tokens = google_token_request({
-        "client_id": settings.google_client_id,
-        "client_secret": settings.google_client_secret,
-        "refresh_token": calendar.refresh_token,
-        "grant_type": "refresh_token",
-    })
-    calendar.access_token = tokens["access_token"]
-    calendar.token_expires_at = datetime.now(UTC) + timedelta(seconds=int(tokens.get("expires_in", 3600)))
-    return calendar.access_token
-
-
-def google_calendar_request(method: str, url: str, body: dict | None = None) -> dict:
-    import json
-    access_token = google_access_token()
-    request = UrlRequest(
-        url,
-        data=json.dumps(body).encode() if body is not None else None,
-        headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
-        method=method,
-    )
-    with urlopen(request, timeout=15) as response:
-        payload = response.read()
-        return json.loads(payload) if payload else {}
-
-
 DEFAULT_OFFICE_LATITUDE = -6.2
 DEFAULT_OFFICE_LONGITUDE = 106.8166
 DEFAULT_OFFICE_RADIUS_METERS = 300
@@ -916,17 +813,6 @@ class ReverifyInput(BaseModel):
     longitude: float = Field(ge=-180, le=180)
     accuracy_meters: float = Field(ge=0, le=10_000)
     selfie_captured: bool
-
-
-class LeaveInput(BaseModel):
-    start: date
-    end: date
-    reason: str = Field(min_length=4, max_length=500)
-
-
-class ApprovalInput(BaseModel):
-    decision: str = Field(pattern="^(approved|rejected|revision_requested)$")
-    comment: str = Field(min_length=3, max_length=500)
 
 
 class PayrollInput(BaseModel):
@@ -1305,138 +1191,6 @@ async def reverify(
     pending.anomaly = None if inside else "outside_geofence"
     audit("attendance.reverify", user, pending.id)
     return location_event_payload(pending)
-
-
-@router.get("/leave-requests")
-async def list_leave_requests(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    items = [item for item in store.requests.values() if item.employee_id == user.id]
-    return {
-        "items": [
-            asdict(item) | {"days": working_days(item.start, item.end)}
-            for item in sorted(items, key=lambda entry: entry.created_at, reverse=True)
-        ],
-        "balance": leave_balance(user.id),
-    }
-
-
-@router.post("/leave-requests")
-async def submit_leave(
-    payload: LeaveInput, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    if payload.end < payload.start:
-        raise HTTPException(422, "Tanggal selesai harus setelah tanggal mulai")
-    if working_days(payload.start, payload.end) == 0:
-        raise HTTPException(422, "Rentang cuti tidak memiliki hari kerja")
-    if any(
-        item.employee_id == user.id
-        and item.status in {"pending", "approved"}
-        and payload.start <= item.end
-        and payload.end >= item.start
-        for item in store.requests.values()
-    ):
-        raise HTTPException(409, "Permohonan tumpang tindih")
-    request = LeaveRequest(str(uuid4()), user.id, payload.start, payload.end, payload.reason)
-    store.requests[request.id] = request
-    audit("leave.submitted", user, request.id)
-    for manager in store.employees.values():
-        if manager.role == "manager" and manager.department == user.department:
-            notify(
-                manager.id,
-                "Permohonan cuti baru",
-                f"{user.name} menunggu persetujuan Anda.",
-                "/app/approvals",
-            )
-    email_leave(
-        leave_recipients(request),
-        "Permohonan cuti baru — Teamku",
-        f"{user.name} mengajukan cuti {request.start} sampai {request.end} ({working_days(request.start, request.end)} hari kerja).\n\nBuka Teamku: /app/approvals",
-    )
-    return asdict(request) | {"days": working_days(request.start, request.end)}
-
-
-@router.post("/leave-requests/{request_id}/cancel")
-async def cancel_leave(
-    request_id: str, x_demo_user: str | None = Header(default=None)
-) -> dict:
-    user = actor(x_demo_user)
-    request = store.requests.get(request_id)
-    if not request or request.employee_id != user.id:
-        raise HTTPException(404, "Permohonan tidak ditemukan")
-    if request.status not in {"pending", "approved"}:
-        raise HTTPException(409, "Permohonan ini tidak dapat dibatalkan")
-    request.status = "cancelled"
-    if request.status == "cancelled" and request.calendar_sync_status in {"ok", "failed"}:
-        remove_leave_calendar(request)
-    audit("leave.cancelled", user, request.id)
-    cancel_recipients = leave_recipients(request)
-    if request.employee_id not in {person.id for person in cancel_recipients}:
-        cancel_recipients.append(user)
-    email_leave(cancel_recipients, "Permohonan cuti dibatalkan — Teamku", f"{user.name} membatalkan permohonan cuti {request.start} sampai {request.end}.\n\nBuka Teamku: /app/time/time-off")
-    return asdict(request)
-
-
-@router.get("/approvals")
-async def approvals(x_demo_user: str | None = Header(default=None)) -> dict:
-    user = actor(x_demo_user)
-    require(user, "manager", "hr_admin")
-    items = list(store.requests.values())
-    if user.role == "manager":
-        items = [
-            item
-            for item in items
-            if store.employees[item.employee_id].department == user.department
-        ]
-    return {
-        "items": [
-            asdict(item)
-            | {
-                "employee_name": store.employees[item.employee_id].name,
-                "department": store.employees[item.employee_id].department,
-                "days": working_days(item.start, item.end),
-            }
-            for item in sorted(items, key=lambda entry: entry.created_at, reverse=True)
-        ],
-        "pending": sum(1 for item in items if item.status == "pending"),
-    }
-
-
-@router.post("/approvals/{request_id}")
-async def decide(
-    request_id: str,
-    payload: ApprovalInput,
-    x_demo_user: str | None = Header(default=None),
-) -> dict:
-    user = actor(x_demo_user)
-    require(user, "manager", "hr_admin")
-    request = store.requests.get(request_id)
-    if not request:
-        raise HTTPException(404, "Permohonan tidak ditemukan")
-    employee = store.employees[request.employee_id]
-    if user.role == "manager" and employee.department != user.department:
-        raise HTTPException(403, "Permohonan berada di luar cakupan tim Anda")
-    if request.employee_id == user.id:
-        raise HTTPException(403, "Persetujuan diri sendiri tidak diperbolehkan")
-    if request.status != "pending":
-        raise HTTPException(409, "Permohonan sudah diproses")
-    request.status = payload.decision
-    request.approver_comment = payload.comment
-    audit("request." + payload.decision, user, request.id)
-    notify(
-        request.employee_id,
-        "Status permohonan diperbarui",
-        f"Permohonan Anda {payload.decision}.",
-        "/app/time/time-off",
-    )
-    email_leave(
-        [employee],
-        f"Permohonan cuti {payload.decision} — Teamku",
-        f"Permohonan cuti Anda ({request.start} sampai {request.end}) telah {payload.decision}.\nCatatan: {payload.comment}\n\nBuka Teamku: /app/time/time-off",
-    )
-    if payload.decision == "approved":
-        sync_leave_calendar(request, employee)
-    return asdict(request)
 
 
 @router.get("/payroll/runs")
