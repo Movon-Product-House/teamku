@@ -5,10 +5,14 @@
     },
     "ponytail": {
       "source": { "source": "github", "repo": "DietrichGebert/ponytail" }
+    },
+    "supabase-agent-skills": {
+      "source": { "source": "github", "repo": "supabase/agent-skills" }
     }
   },
   "enabledPlugins": {
     "mattpocock-skills@mattpocock": true,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "postgres-best-practices@supabase-agent-skills": true
   }
 }

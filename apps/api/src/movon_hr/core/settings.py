@@ -12,10 +12,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(
         default_factory=lambda: ["http://localhost:3000", "http://127.0.0.1:3000"]
     )
-    # When set (e.g. postgresql+asyncpg://user:pass@host:5432/db) every input is
-    # persisted to PostgreSQL and reloaded on startup. When unset the API falls
-    # back to the ephemeral in-memory demo store.
-    database_url: str | None = None
+    database_url: str = "postgresql+psycopg://movon:movon@localhost:5432/movon"
     app_base_url: str = "http://localhost:3000"
     session_cookie_name: str = "teamku_session"
     session_cookie_secure: bool = False
@@ -38,16 +35,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-
-def postgres_sync_url(url: str) -> str:
-    """Convert an API database URL to the sync driver Alembic needs.
-
-    The API uses asyncpg. Alembic's default online migrations are synchronous,
-    and a bare postgresql:// URL would load psycopg2, which is not installed.
-    """
-    if url.startswith("postgresql+asyncpg://"):
-        return "postgresql+psycopg://" + url.removeprefix("postgresql+asyncpg://")
-    if url.startswith("postgresql://"):
-        return "postgresql+psycopg://" + url.removeprefix("postgresql://")
-    return url

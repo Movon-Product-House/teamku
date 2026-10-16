@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from movon_hr.core.policy_retrieval import PolicyEvidence
 
 
 class ProviderError(Exception):
@@ -23,12 +27,20 @@ class FakePolicyProvider:
 
     identifier = "fake-policy-provider-v1"
 
-    def answer(self, question: str, evidence: list[object], facts: list[dict]) -> GeneratedAnswer:
+    def answer(
+        self, question: str, evidence: list[PolicyEvidence], facts: list[dict]
+    ) -> GeneratedAnswer:
         if not evidence:
             raise ProviderError("No evidence supplied")
         first = evidence[0]
-        language = "id" if any(token in question.lower() for token in ("apa", "cuti", "saya", "dan", "yang")) else "en"
-        prefix = "Menurut kebijakan perusahaan" if language == "id" else "According to company policy"
+        language = (
+            "id"
+            if any(token in question.lower() for token in ("apa", "cuti", "saya", "dan", "yang"))
+            else "en"
+        )
+        prefix = (
+            "Menurut kebijakan perusahaan" if language == "id" else "According to company policy"
+        )
         fact_text = ""
         if facts:
             fact_text = " " + facts[0]["label"] + ": " + str(facts[0]["value"]) + "."
@@ -37,5 +49,7 @@ class FakePolicyProvider:
             citations=[{"policy_id": first.policy_id, "section_id": first.section_id}],
             language=language,
             confidence="supported",
-            suggested_action="open_leave_request" if "leave" in first.policy_title.lower() or "cuti" in question.lower() else "contact_hr",
+            suggested_action="open_leave_request"
+            if "leave" in first.policy_title.lower() or "cuti" in question.lower()
+            else "contact_hr",
         )

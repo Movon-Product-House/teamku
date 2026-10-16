@@ -1,0 +1,46 @@
+name: api
+
+on:
+  pull_request:
+    paths: ["apps/api/**", ".github/workflows/api.yml"]
+  push:
+    branches: [main]
+    paths: ["apps/api/**", ".github/workflows/api.yml"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: movon
+          POSTGRES_PASSWORD: movon
+          POSTGRES_DB: movon
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      # Alembic runs against the service DB; tests use their own database.
+      MOVON_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon
+      MOVON_TEST_DATABASE_URL: postgresql+psycopg://movon:movon@localhost:5432/movon_test
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "0.12.23"  # keep in step with the Dockerfile and the uv_build pin
+          working-directory: apps/api
+          enable-cache: true
+      - run: uv sync --locked
+      - run: createdb -h localhost -U movon movon_test
+        env:
+          PGPASSWORD: movon
+      - run: uv run alembic upgrade head
+      - run: uv run alembic check
+      - name: alembic heads (exactly one)
+        run: test "$(uv run alembic heads | wc -l)" -eq 1
+      - run: ./scripts/check.sh

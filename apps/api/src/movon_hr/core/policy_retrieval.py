@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from datetime import date
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -22,11 +23,11 @@ def _terms(value: str) -> set[str]:
     return {term for term in re.findall(r"[\w-]{2,}", value.lower()) if len(term) > 2}
 
 
-def retrieve(policies: list[object], question: str, today: date) -> list[PolicyEvidence]:
+def retrieve(policies: list[Any], question: str, today: date) -> list[PolicyEvidence]:
     """Return effective published sections matching at least one meaningful term.
 
     The objects are deliberately duck-typed so this deterministic interface stays
-    independent of the in-memory and PostgreSQL adapters.
+    independent of the ORM models.
     """
     terms = _terms(question)
     matches: list[PolicyEvidence] = []
@@ -53,4 +54,6 @@ def retrieve(policies: list[object], question: str, today: date) -> list[PolicyE
                         score,
                     )
                 )
-    return sorted(matches, key=lambda item: (-item.score, item.policy_title, item.section_heading))[:5]
+    return sorted(matches, key=lambda item: (-item.score, item.policy_title, item.section_heading))[
+        :5
+    ]
