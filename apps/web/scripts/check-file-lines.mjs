@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const MAX_LINES = 600;
 const LEGACY_CAPS = {
-  "src/app/app/settings/page.tsx": 1273,
+  "src/app/app/settings/page.tsx": 1258,
   "src/app/app/attendance/today/page.tsx": 659,
 };
 
