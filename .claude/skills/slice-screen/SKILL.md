@@ -8,6 +8,12 @@ description: Slice one Teamku v2 revamp screen (kode seperti D3, M6, HM4, P2a) d
 Satu run = satu kode layar beserta varian STATE-nya = satu branch = satu PR.
 Aturan kode ada di `apps/web/README.md` dan dipaksa CI; baca bagian **Aturan** sebelum mulai. Pola acuan: `apps/web/src/features/leave/`.
 
+## 0. Ambil tiket
+
+Cari issue `revamp-v2` yang memuat kode layar (`gh issue list --label revamp-v2 --search "<kode>"`), lalu jalankan langkah **Ambil** di "Siklus tiket" (`docs/agents/issue-tracker.md`). Scope FE dan BE di issue itu adalah sumber kebenaran; baris "Blocked by" menandai bagian yang belum boleh dikerjakan.
+
+**Selesai bila:** issue ter-assign ke engineer ini dan berstatus In Progress di board.
+
 ## 1. Spesifikasi layar
 
 - Cari kode layar di `docs/revamp/2026-09-29-role-flows.md` (§8 inventaris, §10 tabel per fase): nama layar, isi inti, role yang melihatnya (§2 matriks akses), dan semua varian `<kode>-*` / STATE.
@@ -57,4 +63,6 @@ Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + 
 
 ## 6. PR
 
-Branch `feat/screen-<kode>`, satu PR per layar. Badan PR berisi: kode layar, tabel inventaris dari langkah 3, screenshot desktop + mobile, dan daftar celah backend atau selisih parity yang disengaja.
+Branch `feat/<n>-<kode>` (`<n>` = nomor issue), satu PR per layar. Badan PR berisi: `Closes #<n>` bila ini layar terakhir issue itu (selain itu `Refs #<n>`), kode layar, tabel inventaris dari langkah 3, screenshot desktop + mobile, dan daftar celah backend atau selisih parity yang disengaja.
+
+Setelah PR dibuka: centang item checklist issue yang selesai dan set status board ke In Review (lihat "Siklus tiket").

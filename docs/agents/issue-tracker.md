@@ -14,6 +14,26 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+## Siklus tiket (wajib setiap mengerjakan issue)
+
+Dua engineer bekerja paralel; status issue adalah satu-satunya cara tahu siapa mengerjakan apa. GitHub dan agent **tidak** memperbarui status sendiri, kecuali yang ditandai _otomatis_.
+
+Board: [Teamku Revamp v2](https://github.com/orgs/Movon-Product-House/projects/1), kolom Status `Todo → In Progress → In Review → Done`. Ubah status dengan `scripts/issue-status.sh <n> "<Status>"` (butuh scope `project`: `gh auth refresh -h github.com -s project`).
+
+1. **Ambil**, sebelum menulis kode:
+   - Cek `gh issue view <n> --json assignees`. Sudah ada assignee lain → jangan diambil, tanya user.
+   - `gh issue edit <n> --add-assignee @me`
+   - `scripts/issue-status.sh <n> "In Progress"`
+   - `gh issue comment <n> --body "Mulai. Branch \`<branch>\`. Scope: <FE/BE/semua>."`
+2. **Selama dikerjakan:**
+   - Centang item checklist FE/BE di body issue begitu selesai (`gh issue edit <n> --body-file`), jangan menunggu PR.
+   - Celah backend baru, blocker, atau keputusan scope → komentar di issue, bukan hanya di chat.
+3. **PR:** branch `feat/<n>-<slug>`. Satu issue boleh beberapa PR (mis. per layar): PR terakhir memakai `Closes #<n>`, PR sebelumnya `Refs #<n>`. Body PR menyebut item checklist yang selesai dan yang sengaja ditunda; item yang ditunda dijadikan issue baru. Setelah PR dibuka: `scripts/issue-status.sh <n> "In Review"`.
+4. **Selesai:** _otomatis_. PR dengan `Closes #<n>` menutup issue saat merge, dan board memindahkannya ke Done.
+5. **Berhenti di tengah** (sesi habis, pindah tugas): komentar status singkat (sudah apa, sisa apa, branch), biarkan assignee. Melepas tiket: `gh issue edit <n> --remove-assignee @me` + `scripts/issue-status.sh <n> Todo`.
+
+Sebelum melaporkan pekerjaan selesai ke user, cek ulang: assignee, status board, checklist, dan `Closes`/`Refs` di PR sudah sesuai.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
