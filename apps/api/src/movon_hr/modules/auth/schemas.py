@@ -82,3 +82,9 @@ class InvitePreview(BaseModel):
     role: str
     department: str
     title: str
+    invited_by: str | None
+    expires_at: datetime
+
+
+class ResetPreview(BaseModel):
+    email: str
