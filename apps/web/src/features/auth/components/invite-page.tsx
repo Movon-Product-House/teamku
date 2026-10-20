@@ -96,7 +96,7 @@ function InviteCard({ invite }: { invite: InvitePreview }) {
       </span>
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="font-bold text-body">{invite.company}</span>
-        <span className="text-faint-foreground text-xs">
+        <span className="text-caption text-faint-foreground">
           {inviteMeta(invite.invited_by, invite.expires_at)}
         </span>
       </span>

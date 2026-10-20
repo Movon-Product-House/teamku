@@ -77,7 +77,7 @@ export function LoginPage() {
         </Field>
         <Link
           href="/forgot-password"
-          className="self-end rounded-control font-bold text-sm outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+          className="self-end rounded-control font-bold text-caption outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
         >
           Lupa kata sandi?
         </Link>
@@ -101,7 +101,7 @@ export function LoginPage() {
 
       <div className="flex items-center gap-3">
         <Separator className="flex-1" />
-        <span className="font-semibold text-faint-foreground text-xs">Admin HR?</span>
+        <span className="font-semibold text-caption text-faint-foreground">Admin HR?</span>
         <Separator className="flex-1" />
       </div>
       <div className="flex flex-col gap-3">

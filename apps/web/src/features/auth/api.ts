@@ -30,10 +30,9 @@ export function useForgotPassword() {
   });
 }
 
-// Dead links (404/410) are final, so token previews never retry. They also never refetch in the
-// background: a refetch would swap the page under a half-filled form.
+// Token previews never refetch in the background: a refetch would swap the page under a
+// half-filled form. The global retry already skips dead links (4xx).
 const PREVIEW_OPTIONS = {
-  retry: false,
   staleTime: Number.POSITIVE_INFINITY,
   refetchOnWindowFocus: false,
 } as const;
