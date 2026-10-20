@@ -157,6 +157,8 @@ async def test_reset_token_works_once(client) -> None:
         "/api/v1/auth/reset-password/preview", json={"token": "not-a-token"}
     )
     assert missing.status_code == 404
+    cut_off = await client.post("/api/v1/auth/reset-password/preview", json={"token": "abc"})
+    assert cut_off.status_code == 404
     unknown = await client.post(
         "/api/v1/auth/reset-password", json={"token": "not-a-token", "password": "BaruLagi12"}
     )

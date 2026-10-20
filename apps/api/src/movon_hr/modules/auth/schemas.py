@@ -48,7 +48,8 @@ class ResetPassword(BaseModel):
 
 
 class ResetPreviewInput(BaseModel):
-    token: str = Field(min_length=8, max_length=200)
+    # No min_length: a cut-off link must 404 (dead link), not 422.
+    token: str = Field(max_length=200)
 
 
 class ChangePassword(BaseModel):
