@@ -49,6 +49,12 @@ async def test_failed_logins_are_stored_and_lock_the_email(db, login) -> None:
     assert await count(db, LoginAttempt) == LOGIN_MAX_ATTEMPTS + 1
 
 
+async def test_short_wrong_password_is_a_401_and_counts(db, login) -> None:
+    assert (await login(EMPLOYEE, "abc")).status_code == 401
+    assert (await login("ghost@unknown.test", "x")).status_code == 401
+    assert await count(db, LoginAttempt) == 2
+
+
 async def test_failures_outside_the_window_do_not_lock(db, login) -> None:
     old = datetime.now(UTC) - LOGIN_ATTEMPT_WINDOW - timedelta(seconds=1)
     db.add_all(LoginAttempt(email=EMPLOYEE, attempted_at=old) for _ in range(LOGIN_MAX_ATTEMPTS))
@@ -133,7 +139,7 @@ async def test_reset_token_works_once(client) -> None:
     assert message is not None
     token = next(part for part in message.body.split() if "token=" in part).split("token=")[1]
 
-    preview = await client.get(f"/api/v1/auth/reset-password/{token}")
+    preview = await client.post("/api/v1/auth/reset-password/preview", json={"token": token})
     assert preview.status_code == 200
     assert preview.json() == {"email": EMPLOYEE}
 
@@ -145,8 +151,12 @@ async def test_reset_token_works_once(client) -> None:
         "/api/v1/auth/reset-password", json={"token": token, "password": "BaruLagi12"}
     )
     assert second.status_code == 410
-    assert (await client.get(f"/api/v1/auth/reset-password/{token}")).status_code == 410
-    assert (await client.get("/api/v1/auth/reset-password/not-a-token")).status_code == 404
+    gone = await client.post("/api/v1/auth/reset-password/preview", json={"token": token})
+    assert gone.status_code == 410
+    missing = await client.post(
+        "/api/v1/auth/reset-password/preview", json={"token": "not-a-token"}
+    )
+    assert missing.status_code == 404
     unknown = await client.post(
         "/api/v1/auth/reset-password", json={"token": "not-a-token", "password": "BaruLagi12"}
     )

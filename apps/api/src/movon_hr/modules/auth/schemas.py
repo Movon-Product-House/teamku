@@ -8,7 +8,8 @@ from movon_hr.modules.employees.schemas import EmployeeOut
 
 class Login(BaseModel):
     email: str
-    password: str = Field(min_length=8, max_length=128)
+    # No min_length: a short wrong password must be a 401 that counts toward the lockout.
+    password: str = Field(max_length=128)
 
 
 class Signup(BaseModel):
@@ -44,6 +45,10 @@ class ForgotPassword(BaseModel):
 class ResetPassword(BaseModel):
     token: str = Field(min_length=8, max_length=200)
     password: str = Field(min_length=8, max_length=128)
+
+
+class ResetPreviewInput(BaseModel):
+    token: str = Field(min_length=8, max_length=200)
 
 
 class ChangePassword(BaseModel):

@@ -506,7 +506,12 @@ async def _flow(r: _Recorder) -> None:
     message = last_email_to("andi@movon.test")
     assert message is not None, "forgot-password sent no email"
     reset_token = next(part for part in message.body.split() if "token=" in part)
-    await call("GET", "/auth/reset-password/{token}", "anon", token=reset_token.split("token=")[1])
+    await call(
+        "POST",
+        "/auth/reset-password/preview",
+        "anon",
+        json={"token": reset_token.split("token=")[1]},
+    )
     await call(
         "POST",
         "/auth/reset-password",

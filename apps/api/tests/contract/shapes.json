@@ -166,9 +166,6 @@
       }
     ]
   },
-  "GET /api/v1/auth/reset-password/{token} | anon": {
-    "email": "string"
-  },
   "GET /api/v1/dashboard | employee | after_flow": {
     "absent": "number",
     "agenda_completed": "number",
@@ -1763,6 +1760,9 @@
       "work_location_id": "string",
       "work_mode": "string"
     }
+  },
+  "POST /api/v1/auth/reset-password/preview | anon": {
+    "email": "string"
   },
   "POST /api/v1/auth/signup | anon": {
     "access_token": "string",
