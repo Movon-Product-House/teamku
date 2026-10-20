@@ -1,18 +1,18 @@
 "use client";
 
 import { CircleAlert } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
 import { useAcceptInvite, useInvitePreview } from "../api";
 import { companyInitials, inviteMeta, isDeadLink } from "../auth";
-import { waitForAuthTransition } from "../transition";
 import type { InvitePreview } from "../types";
+import { useEnterApp } from "../use-enter-app";
 import { AuthChecking, AuthLayout } from "./auth-layout";
 import { AuthTransition } from "./auth-transition";
-import { DeadLink } from "./dead-link";
+import { DeadLink, PreviewFailed } from "./dead-link";
 import { NewPasswordFields, useNewPassword } from "./new-password-fields";
 
 const TO_LOGIN = { href: "/login", label: "Ke halaman masuk" };
@@ -23,8 +23,7 @@ export function InvitePage() {
   const preview = useInvitePreview(token);
   const accept = useAcceptInvite();
   const fields = useNewPassword();
-  const [entering, setEntering] = useState(false);
-  const router = useRouter();
+  const { entering, enterApp } = useEnterApp();
 
   const dead = !token
     ? "Tautan undangan tidak lengkap. Buka lagi tautan dari email undangan."
@@ -37,16 +36,11 @@ export function InvitePage() {
   if (preview.isPending) return <AuthChecking message="Memeriksa undangan…" />;
   if (preview.isError)
     return (
-      <AuthLayout title="Undangan belum bisa diperiksa">
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden />
-          <AlertTitle>Gagal memuat</AlertTitle>
-          <AlertDescription>{errorMessage(preview.error, "Coba lagi sebentar.")}</AlertDescription>
-        </Alert>
-        <Button size="lg" variant="outline" onClick={() => preview.refetch()}>
-          Coba lagi
-        </Button>
-      </AuthLayout>
+      <PreviewFailed
+        title="Undangan belum bisa diperiksa"
+        error={preview.error}
+        onRetry={() => preview.refetch()}
+      />
     );
 
   function submit(event: FormEvent) {
@@ -55,11 +49,7 @@ export function InvitePage() {
     accept.mutate(
       { token, password: fields.password },
       {
-        onSuccess: async () => {
-          setEntering(true);
-          await waitForAuthTransition(startedAt);
-          router.replace("/app/overview");
-        },
+        onSuccess: () => enterApp(startedAt),
       },
     );
   }

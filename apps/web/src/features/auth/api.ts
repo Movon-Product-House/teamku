@@ -30,13 +30,21 @@ export function useForgotPassword() {
   });
 }
 
-// Dead links (404/410) are final, so token previews never retry.
+// Dead links (404/410) are final, so token previews never retry. They also never refetch in the
+// background: a refetch would swap the page under a half-filled form.
+const PREVIEW_OPTIONS = {
+  retry: false,
+  staleTime: Number.POSITIVE_INFINITY,
+  refetchOnWindowFocus: false,
+} as const;
+
+// POST keeps the reset token out of the URL, and so out of access logs.
 export function useResetPreview(token: string) {
   return useQuery({
     queryKey: authKeys.reset(token),
-    queryFn: () => api<ResetPreview>(`/auth/reset-password/${encodeURIComponent(token)}`),
+    queryFn: () => post<ResetPreview>("/auth/reset-password/preview", { token }),
     enabled: token !== "",
-    retry: false,
+    ...PREVIEW_OPTIONS,
   });
 }
 
@@ -53,7 +61,7 @@ export function useInvitePreview(token: string) {
     queryKey: authKeys.invite(token),
     queryFn: () => api<InvitePreview>(`/invites/${encodeURIComponent(token)}`),
     enabled: token !== "",
-    retry: false,
+    ...PREVIEW_OPTIONS,
   });
 }
 

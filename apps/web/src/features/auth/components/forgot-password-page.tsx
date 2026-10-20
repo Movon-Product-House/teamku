@@ -58,7 +58,7 @@ export function ForgotPasswordPage() {
         <ul className="flex flex-col gap-2.5 rounded-card bg-card p-4 text-muted-foreground text-sm">
           {[
             { icon: Inbox, text: "Periksa folder Spam atau Promosi" },
-            { icon: ShieldCheck, text: "Email dikirim dari noreply@teamku.id" },
+            { icon: ShieldCheck, text: "Email berasal dari Teamku" },
             { icon: Clock, text: "Tidak ada email dalam 5 menit? Hubungi HR" },
           ].map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-center gap-2.5">

@@ -1,17 +1,17 @@
 "use client";
 
 import { CircleAlert } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
 import { useResetPassword, useResetPreview } from "../api";
 import { isDeadLink } from "../auth";
-import { waitForAuthTransition } from "../transition";
+import { useEnterApp } from "../use-enter-app";
 import { AuthChecking, AuthLayout } from "./auth-layout";
 import { AuthTransition } from "./auth-transition";
-import { DeadLink } from "./dead-link";
+import { DeadLink, PreviewFailed } from "./dead-link";
 import { NewPasswordFields, useNewPassword } from "./new-password-fields";
 
 const NEW_LINK = { href: "/forgot-password", label: "Minta tautan baru" };
@@ -22,8 +22,7 @@ export function ResetPasswordPage() {
   const preview = useResetPreview(token);
   const reset = useResetPassword();
   const fields = useNewPassword();
-  const [entering, setEntering] = useState(false);
-  const router = useRouter();
+  const { entering, enterApp } = useEnterApp();
 
   if (!token || (preview.isError && isDeadLink(preview.error)))
     return (
@@ -36,16 +35,11 @@ export function ResetPasswordPage() {
   if (preview.isPending) return <AuthChecking message="Memeriksa tautan…" />;
   if (preview.isError)
     return (
-      <AuthLayout title="Tautan belum bisa diperiksa">
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden />
-          <AlertTitle>Gagal memuat</AlertTitle>
-          <AlertDescription>{errorMessage(preview.error, "Coba lagi sebentar.")}</AlertDescription>
-        </Alert>
-        <Button size="lg" variant="outline" onClick={() => preview.refetch()}>
-          Coba lagi
-        </Button>
-      </AuthLayout>
+      <PreviewFailed
+        title="Tautan belum bisa diperiksa"
+        error={preview.error}
+        onRetry={() => preview.refetch()}
+      />
     );
 
   function submit(event: FormEvent) {
@@ -54,11 +48,7 @@ export function ResetPasswordPage() {
     reset.mutate(
       { token, password: fields.password },
       {
-        onSuccess: async () => {
-          setEntering(true);
-          await waitForAuthTransition(startedAt);
-          router.replace("/app/overview");
-        },
+        onSuccess: () => enterApp(startedAt),
       },
     );
   }

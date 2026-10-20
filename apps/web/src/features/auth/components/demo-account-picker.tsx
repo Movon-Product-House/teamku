@@ -10,8 +10,8 @@ const accounts = [
   { label: "Fresh check-in", email: "fresh@movon.test" },
 ];
 
-/** A1 tanpa akun demo di produksi: picker hanya tampil di lokal dan preview Vercel. */
-export const showDemoAccounts = process.env.NEXT_PUBLIC_VERCEL_ENV !== "production";
+/** Opt-in: picker hanya tampil bila NEXT_PUBLIC_DEMO_ACCOUNTS=1 (lokal, preview Vercel). Tanpa env ini mati. */
+export const showDemoAccounts = process.env.NEXT_PUBLIC_DEMO_ACCOUNTS === "1";
 
 export const demoCredentials = showDemoAccounts
   ? { email: "employee@movon.test", password: DEMO_PASSWORD }

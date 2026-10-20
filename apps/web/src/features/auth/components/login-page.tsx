@@ -2,7 +2,6 @@
 
 import { Building2, CircleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
@@ -11,7 +10,7 @@ import { Input } from "@/shared/ui/input";
 import { Separator } from "@/shared/ui/separator";
 import { useLogin } from "../api";
 import { loginAlert } from "../auth";
-import { waitForAuthTransition } from "../transition";
+import { useEnterApp } from "../use-enter-app";
 import { AuthLayout } from "./auth-layout";
 import { AuthTransition } from "./auth-transition";
 import { DemoAccountPicker, demoCredentials, showDemoAccounts } from "./demo-account-picker";
@@ -21,9 +20,8 @@ import { PasswordInput } from "./password-input";
 export function LoginPage() {
   const [email, setEmail] = useState(demoCredentials.email);
   const [password, setPassword] = useState(demoCredentials.password);
-  const [entering, setEntering] = useState(false);
   const login = useLogin();
-  const router = useRouter();
+  const { entering, enterApp } = useEnterApp();
   const busy = login.isPending || entering;
 
   async function submit(event: FormEvent) {
@@ -32,11 +30,7 @@ export function LoginPage() {
     login.mutate(
       { email, password },
       {
-        onSuccess: async () => {
-          setEntering(true);
-          await waitForAuthTransition(startedAt);
-          router.replace("/app/overview");
-        },
+        onSuccess: () => enterApp(startedAt),
       },
     );
   }

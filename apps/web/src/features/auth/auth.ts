@@ -7,10 +7,12 @@ export const PASSWORD_MAX = 128;
 export type PasswordRule = { label: string; met: boolean };
 
 export function passwordRules(password: string): PasswordRule[] {
+  // Count code points like Python's len(), not UTF-16 units.
+  const length = [...password].length;
   return [
     {
       label: `${PASSWORD_MIN}–${PASSWORD_MAX} karakter`,
-      met: password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX,
+      met: length >= PASSWORD_MIN && length <= PASSWORD_MAX,
     },
     { label: "Minimal satu huruf", met: /[A-Za-z]/.test(password) },
     { label: "Minimal satu angka", met: /\d/.test(password) },
@@ -25,15 +27,16 @@ export type AuthAlert = { title: string; body: string };
 
 /** A1: wrong credentials and the 429 lockout get their own copy; anything else shows the API text. */
 export function loginAlert(error: unknown): AuthAlert {
-  if (error instanceof ApiError && error.status === 401)
+  // 422 is a safety net: the API answers a wrong password with 401 whatever its length.
+  if (error instanceof ApiError && (error.status === 401 || error.status === 422))
     return {
       title: "Email atau kata sandi salah",
-      body: "Periksa kembali, lalu coba lagi. Setelah 5 kali gagal, akun dikunci 15 menit.",
+      body: "Periksa kembali, lalu coba lagi. Setelah beberapa kali gagal, akun dikunci sementara.",
     };
   if (error instanceof ApiError && error.status === 429)
     return {
       title: "Akun dikunci sementara",
-      body: "Terlalu banyak percobaan gagal. Coba lagi dalam 15 menit, atau atur ulang kata sandi.",
+      body: "Terlalu banyak percobaan gagal. Coba lagi dalam beberapa menit, atau atur ulang kata sandi.",
     };
   return { title: "Belum bisa masuk", body: errorMessage(error, "Terjadi kesalahan. Coba lagi.") };
 }
@@ -44,11 +47,23 @@ export function isDeadLink(error: unknown): boolean {
 }
 
 const DAY_MS = 86_400_000;
+const JAKARTA_DATE = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" });
+
+/** Whole calendar days from `from` to `to` on the Asia/Jakarta calendar (0 = same day). */
+function calendarDaysBetween(from: Date, to: Date): number {
+  const day = (date: Date) => Date.parse(`${JAKARTA_DATE.format(date)}T00:00:00Z`);
+  return Math.round((day(to) - day(from)) / DAY_MS);
+}
 
 /** A4 card meta: "Diundang oleh Dewi (HR) · berlaku 6 hari lagi". */
 export function inviteMeta(invitedBy: string | null, expiresAt: string, now = new Date()): string {
-  const days = Math.ceil((new Date(expiresAt).getTime() - now.getTime()) / DAY_MS);
-  const validity = days > 1 ? `berlaku ${days} hari lagi` : "berlaku sampai hari ini";
+  const days = calendarDaysBetween(now, new Date(expiresAt));
+  const validity =
+    days <= 0
+      ? "berlaku sampai hari ini"
+      : days === 1
+        ? "berlaku sampai besok"
+        : `berlaku ${days} hari lagi`;
   return invitedBy ? `Diundang oleh ${invitedBy} (HR) · ${validity}` : validity;
 }
 
@@ -60,7 +75,5 @@ export function formatCountdown(seconds: number): string {
 
 /** "PT Sinar Nusantara" → "PT", "Movon" → "MO": the company badge on the invite card. */
 export function companyInitials(company: string): string {
-  const words = company.trim().split(/\s+/).filter(Boolean);
-  if (words.length > 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0] ?? "").slice(0, 2).toUpperCase();
+  return company.trim().slice(0, 2).toUpperCase();
 }
