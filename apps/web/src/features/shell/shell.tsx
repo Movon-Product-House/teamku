@@ -3,8 +3,8 @@
 import { LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AuthTransition } from "@/features/auth/components/auth-transition";
 import { errorMessage } from "@/shared/api/client";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { useMe, usePendingApprovals, useTodayAttendance } from "./api";
 import { MobileHeader, TabBar } from "./components/mobile-chrome";
@@ -23,17 +23,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const me = useMe();
   const today = useTodayAttendance();
-  const pendingApprovals = usePendingApprovals(me.data?.user.role);
+  const pendingApprovals = usePendingApprovals(me.data);
   const { logout, signingOut } = useLogout();
 
-  if (me.isPending) return <ShellLoading />;
-  if (me.isError)
-    return (
+  // Gate on missing data: a failed background refetch keeps the last good `me`.
+  if (!me.data)
+    return me.isError ? (
       <ShellError
         message={errorMessage(me.error, "Workspace gagal dimuat.")}
         onRetry={() => me.refetch()}
         onLogout={logout}
       />
+    ) : (
+      <ShellLoading />
     );
 
   const { user } = me.data;

@@ -19,5 +19,6 @@ describe("format", () => {
     expect(formatShortTime(new Date(2026, 9, 19, 11, 30).toISOString(), now)).toBe("11.30");
     expect(formatShortTime(new Date(2026, 9, 18, 23, 0).toISOString(), now)).toBe("Kemarin");
     expect(formatShortTime(new Date(2026, 7, 29, 9, 0).toISOString(), now)).toBe("29 Agu");
+    expect(formatShortTime(new Date(2025, 11, 31, 9, 0).toISOString(), now)).toBe("31 Des 2025");
   });
 });

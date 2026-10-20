@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { waitForAuthTransition } from "@/features/auth/transition";
 import { api } from "@/shared/api/client";
 import { clearDemoToken } from "@/shared/api/demo-session";
+import { waitForAuthTransition } from "@/shared/lib/auth-transition";
 
 export function useLogout() {
   const router = useRouter();
@@ -21,8 +21,10 @@ export function useLogout() {
     } finally {
       await waitForAuthTransition(startedAt);
       clearDemoToken();
-      queryClient.clear();
+      await queryClient.cancelQueries();
+      // Navigate first; clearing while /app observers are mounted would refetch /me -> 401.
       router.replace("/login");
+      queryClient.removeQueries();
     }
   };
 

@@ -2,7 +2,7 @@
 
 import { ChevronRight, LogOut, Monitor, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { AuthTransition } from "@/features/auth/components/auth-transition";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { useMe, useTodayAttendance } from "../api";
 import { initials, moreGroups, type NavItem, workLocation } from "../nav";

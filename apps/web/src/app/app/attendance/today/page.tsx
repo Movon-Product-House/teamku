@@ -1,6 +1,8 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { shellKeys } from "@/features/shell/api";
 import { api } from "@/shared/api/client";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -46,12 +48,15 @@ export default function Today() {
     setNotification({ type, title, message });
   }
 
+  const queryClient = useQueryClient();
+  // load() also runs after check-in/out/reverify; the shell reads the same endpoint.
   const load = () =>
     Promise.all([
       api<AttendanceState>("/attendance/today", {}),
       api<{ user: { work_location: OfficeSettings | null } }>("/me", {}),
     ])
       .then(([today, profile]) => {
+        queryClient.invalidateQueries({ queryKey: shellKeys.today });
         setAttendance(today);
         if (profile.user.work_location) setOffice(profile.user.work_location);
       })

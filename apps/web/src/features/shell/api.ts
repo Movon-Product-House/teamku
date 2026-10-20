@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { approvalsKey, fetchApprovals } from "@/shared/api/approvals";
 import { api } from "@/shared/api/client";
-import type { Me, NotificationList, Role, TodayAttendance } from "./types";
+import type { Me, NotificationList, TodayAttendance } from "./types";
 
 // The shell polls the badge sources once a minute, like the legacy shell did.
 const POLL_MS = 60_000;
@@ -9,7 +10,6 @@ export const shellKeys = {
   me: ["me"] as const,
   notifications: ["notifications"] as const,
   today: ["attendance", "today"] as const,
-  dashboard: ["dashboard"] as const,
 };
 
 export function useMe() {
@@ -32,13 +32,19 @@ export function useTodayAttendance() {
   });
 }
 
-/** Pending approvals for the Persetujuan badge. Employees have none, so it is not fetched. */
-export function usePendingApprovals(role: Role | undefined) {
+/**
+ * Pending approvals for the Persetujuan badge. Shares the cache of the approvals page, so a
+ * decision there updates the badge. The approver's own requests are excluded: decide() rejects
+ * them with 403. Employees have no approvals, so nothing is fetched for them.
+ */
+export function usePendingApprovals(me: Me | undefined) {
+  const userId = me?.user.id;
   return useQuery({
-    queryKey: shellKeys.dashboard,
-    queryFn: () => api<{ pending_approvals: number }>("/dashboard"),
-    select: (data) => data.pending_approvals,
-    enabled: role === "manager" || role === "hr_admin",
+    queryKey: approvalsKey,
+    queryFn: () => fetchApprovals(),
+    select: (data) =>
+      data.items.filter((item) => item.status === "pending" && item.employee_id !== userId).length,
+    enabled: me?.user.role === "manager" || me?.user.role === "hr_admin",
     refetchInterval: POLL_MS,
   });
 }

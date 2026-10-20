@@ -1,16 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { approvalsKey, fetchApprovals } from "@/shared/api/approvals";
 import { api } from "@/shared/api/client";
 import type { ApprovalDecision, ApprovalRequest } from "./types";
 
 export const leaveKeys = {
   all: ["leave"] as const,
-  approvals: () => [...leaveKeys.all, "approvals"] as const,
+  approvals: () => approvalsKey,
 };
 
 export function useApprovals() {
   return useQuery({
     queryKey: leaveKeys.approvals(),
-    queryFn: () => api<{ items: ApprovalRequest[] }>("/approvals"),
+    queryFn: () => fetchApprovals<ApprovalRequest>(),
     select: (data) => data.items,
   });
 }

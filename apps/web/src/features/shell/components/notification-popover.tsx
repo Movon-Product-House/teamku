@@ -62,7 +62,7 @@ export function NotificationPopover({ tone }: { tone: "dark" | "light" }) {
           {notifications.isPending && (
             <p className="px-3.5 py-4 text-caption text-muted-foreground">Memuat notifikasi…</p>
           )}
-          {notifications.isError && (
+          {notifications.isError && !notifications.data && (
             <div className="flex items-center justify-between gap-3 px-3.5 py-4">
               <p className="text-caption text-destructive">Notifikasi gagal dimuat.</p>
               <Button size="sm" variant="outline" onClick={() => notifications.refetch()}>
