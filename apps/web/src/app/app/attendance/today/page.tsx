@@ -49,18 +49,17 @@ export default function Today() {
   }
 
   const queryClient = useQueryClient();
-  // load() also runs after check-in/out/reverify; the shell reads the same endpoint.
   const load = () =>
     Promise.all([
       api<AttendanceState>("/attendance/today", {}),
       api<{ user: { work_location: OfficeSettings | null } }>("/me", {}),
     ])
       .then(([today, profile]) => {
-        queryClient.invalidateQueries({ queryKey: shellKeys.today });
         setAttendance(today);
         if (profile.user.work_location) setOffice(profile.user.work_location);
       })
       .catch((e) => notify("error", "Tidak dapat melanjutkan", e.message));
+  const syncShell = () => queryClient.invalidateQueries({ queryKey: shellKeys.today });
 
   function stopCamera() {
     cameraStream.current?.getTracks().forEach((track) => track.stop());
@@ -70,9 +69,7 @@ export default function Today() {
 
   useEffect(() => {
     load();
-    const timer = window.setInterval(() => {
-      load();
-    }, 60_000);
+    const timer = window.setInterval(load, 60_000);
     return () => {
       window.clearInterval(timer);
       stopCamera();
@@ -81,11 +78,8 @@ export default function Today() {
 
   useEffect(() => {
     const pendingId = attendance?.pending_reverification?.id || null;
-    if (pendingId && pendingId !== lastPendingId.current) {
-      setReverifyOpen(true);
-      lastPendingId.current = pendingId;
-    }
-    if (!pendingId) lastPendingId.current = null;
+    if (pendingId && pendingId !== lastPendingId.current) setReverifyOpen(true);
+    lastPendingId.current = pendingId;
   }, [attendance?.pending_reverification?.id]);
 
   async function startCamera() {
@@ -189,7 +183,7 @@ export default function Today() {
       setCameraState("idle");
       setSelfiePreview("");
       setLocationShareApproved(false);
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       const geoCode =
         reason && typeof reason === "object" && "code" in reason
@@ -251,7 +245,7 @@ export default function Today() {
       setReverifyOpen(false);
       setCameraState("idle");
       setSelfiePreview("");
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       const geoCode =
         reason && typeof reason === "object" && "code" in reason
@@ -306,7 +300,7 @@ export default function Today() {
         "Check-out berhasil",
         `Durasi kerja efektif ${result.effective_hours} jam.`,
       );
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       notify(
         "error",
