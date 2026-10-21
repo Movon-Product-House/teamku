@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { HomePage } from "@/features/home/components/home-page";
+import { useMe } from "@/features/shell/api";
 import { api } from "@/shared/api/client";
 import { formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -24,7 +26,15 @@ type Leave = { items: { status: string }[]; balance: { remaining_days: number } 
 type Payslip = { period: string; published_at: string };
 type Office = { name: string };
 
-export default function Overview() {
+// Employees get the v2 Beranda (#11); Manager and HR keep this page until their Beranda ships.
+export default function OverviewPage() {
+  const me = useMe();
+  // The shell only renders its children once /me has loaded.
+  if (!me.data) return null;
+  return me.data.user.role === "employee" ? <HomePage user={me.data.user} /> : <Overview />;
+}
+
+function Overview() {
   const [data, setData] = useState<Dashboard>();
   const [leave, setLeave] = useState<Leave>();
   const [payslip, setPayslip] = useState<Payslip>();
