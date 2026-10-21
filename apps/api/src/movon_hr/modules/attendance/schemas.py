@@ -1,7 +1,13 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+
+
+class AgendaItemIn(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    priority: str | None = Field(default=None, max_length=20)
+    status: str | None = Field(default=None, max_length=20)
 
 
 class CheckIn(BaseModel):
@@ -10,7 +16,7 @@ class CheckIn(BaseModel):
     accuracy_meters: float = Field(ge=0, le=10_000)
     selfie_captured: bool
     location_share_approved: bool
-    agenda: list[dict] = Field(min_length=1, max_length=5)
+    agenda: list[AgendaItemIn] = Field(min_length=1, max_length=5)
 
 
 class CheckOut(BaseModel):
@@ -27,12 +33,24 @@ class ReverifyInput(BaseModel):
     selfie_captured: bool
 
 
+class AgendaItemOut(BaseModel):
+    title: str | None = None
+    status: str | None = None
+
+    @field_validator("title", "status", mode="before")
+    @classmethod
+    def drop_non_strings(cls, value: object) -> str | None:
+        """Rows stored before check-in typed its agenda may hold any JSON here."""
+        return value if isinstance(value, str) else None
+
+
 class SessionOut(BaseModel):
     id: uuid.UUID
     checked_in_at: datetime
     checked_out_at: datetime | None
     anomaly: str | None
     agenda_count: int
+    agenda: list[AgendaItemOut]
     summary: str | None
 
 
@@ -49,6 +67,18 @@ class TodayOut(BaseModel):
     session: SessionOut | None
     pending_reverification: PendingOut | None
     is_remote: bool
+
+
+class WeekDay(BaseModel):
+    date: date
+    hours: float
+    late: bool
+    on_leave: bool
+
+
+class WeekOut(BaseModel):
+    target_hours: int
+    days: list[WeekDay]
 
 
 class CheckInOut(BaseModel):

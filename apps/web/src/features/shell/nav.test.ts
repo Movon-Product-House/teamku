@@ -103,9 +103,12 @@ describe("initials", () => {
 
 describe("workLocation", () => {
   it("names the office, or field work for remote employees", () => {
-    expect(workLocation({ is_remote: false, work_location: { name: "Kantor Pusat" } })).toBe(
-      "Kantor Pusat",
-    );
+    expect(
+      workLocation({
+        is_remote: false,
+        work_location: { name: "Kantor Pusat", radius_meters: 150 },
+      }),
+    ).toBe("Kantor Pusat");
     expect(workLocation({ is_remote: true, work_location: null })).toBe("Pekerja lapangan");
     expect(workLocation({ is_remote: false, work_location: null })).toBe("Lokasi belum diatur");
   });

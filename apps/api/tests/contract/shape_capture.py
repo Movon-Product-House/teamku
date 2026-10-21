@@ -313,6 +313,7 @@ async def _flow(r: _Recorder) -> None:
         },
     )
     await call("GET", "/attendance/today", "employee", "checked_in")
+    await call("GET", "/attendance/week", "employee", "checked_in")
     await call("GET", "/dashboard", "manager", "employee_checked_in")
     await call(
         "POST",

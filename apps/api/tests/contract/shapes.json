@@ -91,6 +91,12 @@
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {
+      "agenda": [
+        {
+          "status": "string",
+          "title": "string"
+        }
+      ],
       "agenda_count": "number",
       "anomaly": "null",
       "checked_in_at": "datetime:9999-99-99T99:99:99.999999Z",
@@ -104,6 +110,12 @@
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {
+      "agenda": [
+        {
+          "status": "string",
+          "title": "string"
+        }
+      ],
       "agenda_count": "number",
       "anomaly": "null",
       "checked_in_at": "datetime:9999-99-99T99:99:99.999999Z",
@@ -121,6 +133,12 @@
       "kind": "string"
     },
     "session": {
+      "agenda": [
+        {
+          "status": "string",
+          "title": "string"
+        }
+      ],
       "agenda_count": "number",
       "anomaly": "null",
       "checked_in_at": "datetime:9999-99-99T99:99:99.999999Z",
@@ -146,6 +164,12 @@
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {
+      "agenda": [
+        {
+          "status": "string",
+          "title": "string"
+        }
+      ],
       "agenda_count": "number",
       "anomaly": "null",
       "checked_in_at": "datetime:9999-99-99T99:99:99Z",
@@ -154,6 +178,17 @@
       "summary": "null"
     },
     "state": "string"
+  },
+  "GET /api/v1/attendance/week | employee | checked_in": {
+    "days": [
+      {
+        "date": "date",
+        "hours": "number",
+        "late": "boolean",
+        "on_leave": "boolean"
+      }
+    ],
+    "target_hours": "number"
   },
   "GET /api/v1/audit-logs | hr": {
     "items": [

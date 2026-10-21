@@ -9,7 +9,7 @@ export type Me = {
     department: string;
     title: string;
     is_remote: boolean;
-    work_location: { name: string } | null;
+    work_location: { name: string; radius_meters: number } | null;
   };
   tenant: { id: string; name: string; slug: string };
 };
