@@ -1934,6 +1934,9 @@
   "POST /api/v1/notifications/read-all | manager": {
     "ok": "boolean"
   },
+  "POST /api/v1/notifications/{notification_id}/read | hr": {
+    "ok": "boolean"
+  },
   "POST /api/v1/payroll/runs | hr": {
     "calculation_version": "string",
     "created_at": "datetime:9999-99-99T99:99:99.999999Z",

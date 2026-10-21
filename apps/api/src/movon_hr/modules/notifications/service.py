@@ -1,6 +1,7 @@
 import uuid
 from collections.abc import Sequence
 
+from fastapi import HTTPException
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,3 +26,14 @@ async def list_for(db: AsyncSession, user_id: uuid.UUID) -> Sequence[Notificatio
 
 async def mark_all_read(db: AsyncSession, user_id: uuid.UUID) -> None:
     await db.execute(update(Notification).where(Notification.user_id == user_id).values(read=True))
+
+
+async def mark_read(db: AsyncSession, user_id: uuid.UUID, notification_id: uuid.UUID) -> None:
+    """Scoped to the owner, so another user's id is a 404, not a leak."""
+    result = await db.execute(
+        update(Notification)
+        .where(Notification.id == notification_id, Notification.user_id == user_id)
+        .values(read=True)
+    )
+    if not getattr(result, "rowcount", 0):
+        raise HTTPException(404, "Notifikasi tidak ditemukan")

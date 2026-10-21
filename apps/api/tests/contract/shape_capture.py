@@ -466,7 +466,14 @@ async def _flow(r: _Recorder) -> None:
 
     # Activity read-back after the flow, then mark read.
     for who in ("hr", "manager", "employee"):
-        await call("GET", "/notifications", who, "after_flow")
+        listed = await call("GET", "/notifications", who, "after_flow")
+        if who == "hr":
+            await call(
+                "POST",
+                "/notifications/{notification_id}/read",
+                who,
+                notification_id=listed["items"][0]["id"],
+            )
         await call("POST", "/notifications/read-all", who)
         await call("GET", "/dashboard", who, "after_flow")
     await call("GET", "/audit-logs", "hr")
