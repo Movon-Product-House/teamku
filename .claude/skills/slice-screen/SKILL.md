@@ -65,4 +65,10 @@ Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + 
 
 Branch `feat/<n>-<kode>` (`<n>` = nomor issue), satu PR per layar. Badan PR berisi: `Closes #<n>` bila ini layar terakhir issue itu (selain itu `Refs #<n>`), kode layar, tabel inventaris dari langkah 3, screenshot desktop + mobile, dan daftar celah backend atau selisih parity yang disengaja.
 
+Screenshot masuk ke **badan PR**, bukan komentar:
+
+1. Simpan screenshot parity dan potongan mockup ke `.playwright-mcp/evidence/`, nama per state (`mockup-desktop.png`, `<state>-desktop.png`, `<state>-mobile.png`).
+2. `scripts/pr-evidence.sh <nomor-pr> .playwright-mcp/evidence/*.png` mengunggahnya ke branch `pr-evidence` (folder `pr-<n>/`) dan mencetak URL gambar.
+3. Di bagian Evidence, buat satu tabel per breakpoint: kolom pertama mockup, lalu satu kolom per state. Pakai `<img src="…" width="300">` (mobile `width="200"`) agar tabel muat.
+
 Setelah PR dibuka: centang item checklist issue yang selesai dan set status board ke In Review (lihat "Siklus tiket").
