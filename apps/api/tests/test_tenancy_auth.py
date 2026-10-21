@@ -27,10 +27,6 @@ def signup(client):
     return post
 
 
-def bearer(response) -> dict[str, str]:
-    return session_of(response)
-
-
 async def test_signup_creates_isolated_tenant_and_sets_cookie(client, db, signup) -> None:
     response = await signup("PT Merdeka Digital", "admin@merdeka.test", "merdeka")
     assert response.status_code == 200
@@ -39,7 +35,7 @@ async def test_signup_creates_isolated_tenant_and_sets_cookie(client, db, signup
     assert body["user"]["role"] == "hr_admin"
     assert body["tenant"]["slug"] == "merdeka"
     assert settings.session_cookie_name in response.cookies
-    me = await client.get("/api/v1/me", headers=bearer(response))
+    me = await client.get("/api/v1/me", headers=session_of(response))
     assert me.json()["tenant"]["slug"] == "merdeka"
     assert await count(db, Tenant) == 2  # demo + new company
 
@@ -49,7 +45,7 @@ async def test_tenants_cannot_see_each_others_employees(client, signup) -> None:
     assert first.status_code == 200
     created = await client.post(
         "/api/v1/employees",
-        headers=bearer(first),
+        headers=session_of(first),
         json={
             "name": "Karyawan Satu",
             "email": "orang@satu.test",
@@ -59,19 +55,15 @@ async def test_tenants_cannot_see_each_others_employees(client, signup) -> None:
         },
     )
     assert created.status_code == 200
-    satu_emails = {
-        item["email"]
-        for item in (await client.get("/api/v1/employees", headers=bearer(first))).json()["items"]
-    }
+    listed = await client.get("/api/v1/employees", headers=session_of(first))
+    satu_emails = {item["email"] for item in listed.json()["items"]}
     assert "orang@satu.test" in satu_emails
     assert "hr@movon.test" not in satu_emails
 
     second = await signup("PT Dua", "hr@dua.test", "dua")
     assert second.status_code == 200
-    dua_emails = {
-        item["email"]
-        for item in (await client.get("/api/v1/employees", headers=bearer(second))).json()["items"]
-    }
+    listed = await client.get("/api/v1/employees", headers=session_of(second))
+    dua_emails = {item["email"] for item in listed.json()["items"]}
     assert dua_emails == {"hr@dua.test"}
 
 
@@ -95,7 +87,7 @@ async def test_invite_and_accept_creates_employee_in_same_tenant(client, signup)
     assert created.status_code == 200
     invited = await client.post(
         "/api/v1/invites",
-        headers=bearer(created),
+        headers=session_of(created),
         json={
             "name": "Sinta Baru",
             "email": "sinta@undang.test",
