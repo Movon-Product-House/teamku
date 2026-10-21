@@ -117,7 +117,7 @@ async def test_session_before_midnight_wib_does_not_count_for_the_new_day(
         checked_out_at=wednesday_late + timedelta(minutes=20),
         agenda=[{"title": "Lembur"}],
     )
-    clock.move_to(datetime(2026, 10, 22, 0, 30, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 21, 17, 30, tzinfo=UTC))  # 00:30 WIB Thursday
 
     await run_alerts(db)
 

@@ -29,14 +29,15 @@ from movon_hr.core.identity import AuthSession, Employee
 from movon_hr.core.mailer import reset_outbox
 from movon_hr.core.settings import settings
 from movon_hr.core.tenancy import TenantSession
-from movon_hr.core.time import JAKARTA
 from movon_hr.main import app
 from movon_hr.seed import seed_demo
 
-# Every test starts at this moment: a Wednesday morning in WIB, after the seed's
-# 08:50-09:14 check-ins and far from midnight, so UTC and Jakarta agree on "today".
-# Postgres now() (server defaults) still reads the real clock.
-TEST_NOW = datetime(2026, 10, 21, 10, 0, tzinfo=JAKARTA)
+# Every test starts at this moment: Wednesday 10:00 WIB, after the seed's 08:50-09:14
+# check-ins and far from midnight, so UTC and Jakarta agree on "today".
+# Always pass UTC to the clock: time-machine also sets the process time zone from the
+# destination's tzinfo, and prod/CI run in UTC (a Jakarta TZ would hide local-time bugs).
+# Postgres now() (server defaults) still reads the real clock, so keep this in the past.
+TEST_NOW = datetime(2026, 10, 21, 3, 0, tzinfo=UTC)
 
 TEST_DATABASE_URL = os.environ.get(
     "MOVON_TEST_DATABASE_URL", "postgresql+psycopg://movon:movon@localhost:5432/movon_test"

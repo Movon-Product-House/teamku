@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 from helpers import add_leave, location_events, set_employee
 
-from movon_hr.core.time import JAKARTA, jakarta_date
+from movon_hr.core.time import jakarta_date
 from movon_hr.modules.settings.models import WorkLocation
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
@@ -132,7 +132,7 @@ async def test_dashboard_counts_the_jakarta_day_just_after_midnight(
     client, db, clock, login_headers
 ) -> None:
     # 00:30 WIB Thursday is still Wednesday in UTC; leave only on Thursday must count.
-    clock.move_to(datetime(2026, 10, 22, 0, 30, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 21, 17, 30, tzinfo=UTC))  # 00:30 WIB Thursday
     thursday = jakarta_date()
     await add_leave(db, "dian@movon.test", thursday, thursday, "Cuti", status="approved")
 
