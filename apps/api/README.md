@@ -36,7 +36,7 @@ src/movon_hr/
     service.py          #   Aturan bisnis + query ORM. Menerima AsyncSession
     models.py           #   Model SQLAlchemy (Mapped[]) di atas core.db.Base
     rules.py, …         #   Logika murni tanpa I/O (opsional), diberi tes unit
-tests/                  # pytest di PostgreSQL sungguhan; tests/contract/ = tes kontrak beku
+tests/                  # pytest di PostgreSQL sungguhan
 ```
 
 Contoh terkecil: `modules/audit/`.
@@ -79,9 +79,8 @@ Contoh terkecil: `modules/audit/`.
 4. Keunikan bisnis selalu menyertakan `tenant_id` (kecuali email karyawan, yang unik global).
 
 ### HTTP
-1. Kontrak response dijaga `tests/contract/test_contract_shapes.py` terhadap `shapes.json` yang beku. Jangan me-generate ulang file itu.
-2. Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`). `response_model=` hanya kalau handler me-return objek lain.
-3. Cek peran lewat dependency `require_role(...)` dari `core.auth`.
+1. Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`). `response_model=` hanya kalau handler me-return objek lain.
+2. Cek peran lewat dependency `require_role(...)` dari `core.auth`.
 
 ### Bahasa
 Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan commit dalam bahasa Inggris. Teks untuk pengguna (pesan error API) dalam bahasa Indonesia. Dokumen tim di `docs/` dalam bahasa Indonesia.
