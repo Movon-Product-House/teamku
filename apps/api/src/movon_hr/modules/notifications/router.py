@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter
 
 from movon_hr.core.auth import CurrentUser
@@ -17,4 +19,10 @@ async def notifications(db: DB, user: CurrentUser) -> NotificationList:
 @router.post("/notifications/read-all")
 async def read_notifications(db: DB, user: CurrentUser) -> Ok:
     await service.mark_all_read(db, user.id)
+    return Ok(ok=True)
+
+
+@router.post("/notifications/{notification_id}/read")
+async def read_notification(db: DB, user: CurrentUser, notification_id: uuid.UUID) -> Ok:
+    await service.mark_read(db, user.id, notification_id)
     return Ok(ok=True)

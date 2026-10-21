@@ -1,11 +1,11 @@
 "use client";
 
-import { ChevronRight, LogOut, Monitor, ShieldCheck } from "lucide-react";
+import { ChevronRight, LogOut, Monitor } from "lucide-react";
 import Link from "next/link";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { useMe, useTodayAttendance } from "../api";
-import { initials, moreGroups, type NavItem, workLocation } from "../nav";
+import { initials, moreGroups, type NavItem, profile, workLocation } from "../nav";
 import { roleLabels } from "../types";
 import { useLogout } from "../use-logout";
 import { StillWorkingNote } from "./account-menu";
@@ -45,15 +45,7 @@ export function MorePage() {
       ))}
 
       <MoreGroup label="Akun">
-        {/* P7 is built in #17. */}
-        <li
-          aria-disabled="true"
-          className="flex items-center gap-3 px-4 py-3.25 text-faint-foreground"
-        >
-          <RowIcon icon={ShieldCheck} />
-          <span className="flex-1 font-semibold text-sm">Profil & keamanan</span>
-          <span className="text-xs">Segera hadir</span>
-        </li>
+        <MoreLink item={profile} />
       </MoreGroup>
 
       <Button
@@ -75,7 +67,7 @@ export function MorePage() {
 function MoreGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-semibold text-caption text-faint-foreground">{label}</h2>
+      <h2 className="text-faint-foreground text-overline uppercase">{label}</h2>
       <ul className="divide-y divide-border overflow-hidden rounded-card bg-card">{children}</ul>
     </section>
   );

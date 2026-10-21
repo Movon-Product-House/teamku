@@ -8,13 +8,13 @@ import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldLabel } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { Separator } from "@/shared/ui/separator";
 import { useLogin } from "../api";
 import { loginAlert } from "../auth";
 import { useEnterApp } from "../use-enter-app";
 import { AuthLayout } from "./auth-layout";
 import { DemoAccountPicker, demoCredentials, showDemoAccounts } from "./demo-account-picker";
-import { PasswordInput } from "./password-input";
 
 /** A1: work email + password. Wrong credentials and the lockout are shown inline. */
 export function LoginPage() {

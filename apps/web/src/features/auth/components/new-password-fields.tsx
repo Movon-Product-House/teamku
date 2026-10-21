@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { passwordValid } from "@/shared/lib/password";
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
-import { passwordValid } from "../auth";
-import { PasswordInput } from "./password-input";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { PasswordRules } from "./password-rules";
 
 export function useNewPassword() {

@@ -133,6 +133,23 @@ async def test_invite_preview_names_the_inviter_and_tells_expired_from_used(
     assert expired.json()["detail"] == auth_service.INVITE_EXPIRED
 
 
+async def test_password_reset_lifts_the_login_lockout(client, login) -> None:
+    for _ in range(LOGIN_MAX_ATTEMPTS):
+        assert (await login(EMPLOYEE, "wrong-pass-9")).status_code == 401
+    assert (await login(EMPLOYEE)).status_code == 429
+
+    await client.post("/api/v1/auth/forgot-password", json={"email": EMPLOYEE})
+    message = last_email_to(EMPLOYEE)
+    assert message is not None
+    token = next(part for part in message.body.split() if "token=" in part).split("token=")[1]
+    reset = await client.post(
+        "/api/v1/auth/reset-password", json={"token": token, "password": "BaruSekali1"}
+    )
+    assert reset.status_code == 200
+
+    assert (await login(EMPLOYEE, "BaruSekali1")).status_code == 200
+
+
 async def test_reset_token_works_once(client) -> None:
     await client.post("/api/v1/auth/forgot-password", json={"email": EMPLOYEE})
     message = last_email_to(EMPLOYEE)

@@ -49,6 +49,21 @@ export function usePendingApprovals(me: Me | undefined) {
   });
 }
 
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (body: { current_password: string; new_password: string }) =>
+      api("/auth/change-password", { method: "POST", body: JSON.stringify(body) }),
+  });
+}
+
+export function useMarkRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api(`/notifications/${id}/read`, { method: "POST" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shellKeys.notifications }),
+  });
+}
+
 export function useMarkAllRead() {
   const queryClient = useQueryClient();
   return useMutation({
