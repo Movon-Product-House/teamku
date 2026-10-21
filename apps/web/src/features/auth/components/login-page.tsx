@@ -4,6 +4,7 @@ import { Building2, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldLabel } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
@@ -12,7 +13,6 @@ import { useLogin } from "../api";
 import { loginAlert } from "../auth";
 import { useEnterApp } from "../use-enter-app";
 import { AuthLayout } from "./auth-layout";
-import { AuthTransition } from "./auth-transition";
 import { DemoAccountPicker, demoCredentials, showDemoAccounts } from "./demo-account-picker";
 import { PasswordInput } from "./password-input";
 

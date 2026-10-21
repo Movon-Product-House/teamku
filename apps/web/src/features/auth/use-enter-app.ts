@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { waitForAuthTransition } from "./transition";
+import { waitForAuthTransition } from "@/shared/lib/auth-transition";
 
 /** After a successful login/activation/reset: hold the transition screen, then open the app. */
 export function useEnterApp() {

@@ -74,8 +74,7 @@
         "src/app/app/people/**",
         "src/app/app/settings/**",
         "src/app/app/time/**",
-        "src/app/app/ask-teamku/**",
-        "src/features/shell/shell.tsx"
+        "src/app/app/ask-teamku/**"
       ],
       "linter": {
         "rules": {
