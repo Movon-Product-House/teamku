@@ -95,7 +95,11 @@ async def test_change_password_enforces_policy_and_current_password(client, toke
         headers={"X-Demo-User": token},
         json={"current_password": "not-the-one", "new_password": "BrandNew123"},
     )
-    assert wrong_current.status_code == 401
+    # 422, not 401: the session is valid, so the web client must not log the user out.
+    assert wrong_current.status_code == 422
+    assert wrong_current.json()["detail"] == "Kata sandi saat ini salah"
+    still_in = await client.get("/api/v1/me", headers={"X-Demo-User": token})
+    assert still_in.status_code == 200
 
     weak = await client.post(
         "/api/v1/auth/change-password",

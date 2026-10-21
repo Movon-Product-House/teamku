@@ -401,7 +401,8 @@ async def change_password(
     db: AsyncSession, user: Employee, token: str, payload: ChangePassword
 ) -> None:
     if not await verify_password_async(payload.current_password, user.password_hash):
-        raise HTTPException(401, "Kata sandi saat ini salah")
+        # 422, not 401: the session is valid; 401 makes the web client log the user out.
+        raise HTTPException(422, "Kata sandi saat ini salah")
     if payload.new_password == payload.current_password:
         raise HTTPException(422, "Kata sandi baru harus berbeda dari kata sandi lama")
     check_password_policy(payload.new_password)
