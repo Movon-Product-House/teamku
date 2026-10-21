@@ -143,6 +143,27 @@ async def test_change_password_wrong_guesses_share_the_login_lockout(
     assert (await login("employee@movon.test")).status_code == 429
 
 
+async def test_change_password_success_clears_earlier_wrong_guesses(
+    client, login, token_for
+) -> None:
+    token = await token_for("employee@movon.test")
+
+    async def change(current: str):
+        return await client.post(
+            "/api/v1/auth/change-password",
+            headers={"X-Demo-User": token},
+            json={"current_password": current, "new_password": "BrandNew123"},
+        )
+
+    for _ in range(LOGIN_MAX_ATTEMPTS - 1):
+        assert (await change("WrongPass1")).status_code == 422
+    assert (await change(DEMO_PASSWORD)).is_success
+
+    # Without the reset these two would make 5 failures and the second would be 429.
+    for _ in range(2):
+        assert (await login("employee@movon.test", "WrongPass1")).status_code == 401
+
+
 async def test_created_employee_gets_temporary_password_and_can_sign_in(
     client, login, token_for
 ) -> None:

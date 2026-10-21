@@ -416,6 +416,9 @@ async def change_password(
         await record_failed_attempt(db, email)
         # 422, not 401: the session is valid; 401 makes the web client log the user out.
         raise HTTPException(422, "Kata sandi saat ini salah")
+    await db.execute(
+        delete(LoginAttempt).where(LoginAttempt.email == email).execution_options(**CROSS_TENANT)
+    )
     if payload.new_password == payload.current_password:
         raise HTTPException(422, "Kata sandi baru harus berbeda dari kata sandi lama")
     check_password_policy(payload.new_password)
