@@ -3,13 +3,13 @@
 import { CircleAlert, CircleCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { passwordValid } from "@/shared/lib/password";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/shared/ui/field";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { useChangePassword, useMe } from "../api";
 import { workLocation } from "../nav";
-import { newPasswordFits } from "../profile";
 import { roleLabels } from "../types";
 
 /** P7: work data is read-only (HR owns it); the user can only change their password. */
@@ -30,7 +30,7 @@ export function ProfilePage() {
     ["Role", roleLabels[user.role]],
     ["Lokasi kerja", workLocation(user)],
   ];
-  const ready = current !== "" && newPasswordFits(next);
+  const ready = current !== "" && passwordValid(next);
 
   function submit(event: FormEvent) {
     event.preventDefault();
