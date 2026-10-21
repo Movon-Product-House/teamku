@@ -104,6 +104,27 @@ async def test_open_session_past_max_hours_notifies_employee(client, db, login_h
     assert "Sesi masih terbuka" in titles
 
 
+async def test_session_before_midnight_wib_does_not_count_for_the_new_day(
+    client, db, clock
+) -> None:
+    await enable_alerts(db)
+    # 23:30 WIB Wednesday = 16:30 UTC, still "today" in UTC at 00:30 WIB Thursday.
+    wednesday_late = datetime(2026, 10, 21, 23, 30, tzinfo=JAKARTA)
+    await add_attendance(
+        db,
+        "fresh@movon.test",
+        checked_in_at=wednesday_late,
+        checked_out_at=wednesday_late + timedelta(minutes=20),
+        agenda=[{"title": "Lembur"}],
+    )
+    clock.move_to(datetime(2026, 10, 22, 0, 30, tzinfo=JAKARTA))
+
+    await run_alerts(db)
+
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
+    assert titles == ["Belum clock-in"]
+
+
 async def test_alert_managers_notifies_department_manager_and_hr(client, db, login_headers) -> None:
     await enable_alerts(db, alert_managers=True)
 
