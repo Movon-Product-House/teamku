@@ -1,4 +1,4 @@
-import { AuthTransition } from "@/features/auth/components/auth-transition";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 
 export default function Loading() {
   return <AuthTransition message="Menyiapkan halaman masuk…" />;

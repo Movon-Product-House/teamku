@@ -2,10 +2,10 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { AuthLink, AuthLinks, AuthShell } from "@/features/auth/components/auth-shell";
-import { AuthTransition } from "@/features/auth/components/auth-transition";
-import { waitForAuthTransition } from "@/features/auth/transition";
 import { api } from "@/shared/api/client";
 import { storeDemoToken } from "@/shared/api/demo-session";
+import { waitForAuthTransition } from "@/shared/lib/auth-transition";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
 export default function Signup() {

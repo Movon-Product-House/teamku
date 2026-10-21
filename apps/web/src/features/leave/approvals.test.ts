@@ -5,6 +5,7 @@ import type { ApprovalRequest } from "./types";
 const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest => ({
   id,
   status,
+  employee_id: "e1",
   employee_name: "Rina",
   department: "Ops",
   start: "2026-10-01",

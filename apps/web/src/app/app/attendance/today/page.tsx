@@ -1,6 +1,8 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { shellKeys } from "@/features/shell/api";
 import { api } from "@/shared/api/client";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -46,6 +48,7 @@ export default function Today() {
     setNotification({ type, title, message });
   }
 
+  const queryClient = useQueryClient();
   const load = () =>
     Promise.all([
       api<AttendanceState>("/attendance/today", {}),
@@ -56,6 +59,7 @@ export default function Today() {
         if (profile.user.work_location) setOffice(profile.user.work_location);
       })
       .catch((e) => notify("error", "Tidak dapat melanjutkan", e.message));
+  const syncShell = () => queryClient.invalidateQueries({ queryKey: shellKeys.today });
 
   function stopCamera() {
     cameraStream.current?.getTracks().forEach((track) => track.stop());
@@ -65,9 +69,7 @@ export default function Today() {
 
   useEffect(() => {
     load();
-    const timer = window.setInterval(() => {
-      load();
-    }, 60_000);
+    const timer = window.setInterval(load, 60_000);
     return () => {
       window.clearInterval(timer);
       stopCamera();
@@ -76,11 +78,8 @@ export default function Today() {
 
   useEffect(() => {
     const pendingId = attendance?.pending_reverification?.id || null;
-    if (pendingId && pendingId !== lastPendingId.current) {
-      setReverifyOpen(true);
-      lastPendingId.current = pendingId;
-    }
-    if (!pendingId) lastPendingId.current = null;
+    if (pendingId && pendingId !== lastPendingId.current) setReverifyOpen(true);
+    lastPendingId.current = pendingId;
   }, [attendance?.pending_reverification?.id]);
 
   async function startCamera() {
@@ -184,7 +183,7 @@ export default function Today() {
       setCameraState("idle");
       setSelfiePreview("");
       setLocationShareApproved(false);
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       const geoCode =
         reason && typeof reason === "object" && "code" in reason
@@ -246,7 +245,7 @@ export default function Today() {
       setReverifyOpen(false);
       setCameraState("idle");
       setSelfiePreview("");
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       const geoCode =
         reason && typeof reason === "object" && "code" in reason
@@ -301,7 +300,7 @@ export default function Today() {
         "Check-out berhasil",
         `Durasi kerja efektif ${result.effective_hours} jam.`,
       );
-      await load();
+      await load().then(syncShell);
     } catch (reason) {
       notify(
         "error",

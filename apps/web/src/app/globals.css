@@ -79,6 +79,10 @@
   --text-title-sm--line-height: 1.15;
   --text-title-sm--font-weight: 400;
   --text-title-sm--letter-spacing: -0.02em;
+  --text-title-xs: 1.5rem; /* serif · 24, judul panel melayang (notifikasi) */
+  --text-title-xs--line-height: 1.2;
+  --text-title-xs--font-weight: 400;
+  --text-title-xs--letter-spacing: -0.02em;
   --text-heading: 1.125rem; /* 18, judul kartu */
   --text-heading--line-height: 1.4;
   --text-heading--font-weight: 600;
@@ -97,6 +101,7 @@
 
   /* Kartu datar; bayangan hanya untuk lapisan yang melayang */
   --shadow-overlay: 0 30px 80px rgb(0 0 0 / 0.25);
+  --shadow-float: 0 6px 24px rgb(23 23 26 / 0.1); /* tab bar mobile */
 }
 
 @layer ui-reset {

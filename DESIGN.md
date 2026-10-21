@@ -57,6 +57,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.15
     letterSpacing: "-0.02em"
+  title-xs:
+    fontFamily: "Newsreader, ui-serif, Georgia, serif"
+    fontSize: "24px"
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: "-0.02em"
   heading:
     fontFamily: "Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "18px"

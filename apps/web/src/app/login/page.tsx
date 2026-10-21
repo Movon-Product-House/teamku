@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { AuthLink, AuthLinks, AuthShell } from "@/features/auth/components/auth-shell";
-import { AuthTransition } from "@/features/auth/components/auth-transition";
 import { DemoAccountPicker, demoCredentials } from "@/features/auth/components/demo-account-picker";
-import { waitForAuthTransition } from "@/features/auth/transition";
 import { api, errorMessage } from "@/shared/api/client";
 import { storeDemoToken } from "@/shared/api/demo-session";
+import { waitForAuthTransition } from "@/shared/lib/auth-transition";
+import { AuthTransition } from "@/shared/ui/auth-transition";
 import { notify } from "@/shared/ui/notifications";
 
 export default function Login() {

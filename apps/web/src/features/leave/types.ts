@@ -2,6 +2,7 @@ export type LeaveStatus = "pending" | "approved" | "rejected" | "revision_reques
 
 export type ApprovalRequest = {
   id: string;
+  employee_id: string;
   employee_name: string;
   department: string;
   start: string;

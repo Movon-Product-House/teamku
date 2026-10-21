@@ -23,3 +23,22 @@ export function formatPeriod(value: string): string {
 export function formatMoney(value: number): string {
   return moneyFormat.format(value);
 }
+
+const clockFormat = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
+const dayMonthFormat = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short" });
+const dayMonthYearFormat = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+/** Waktu singkat untuk daftar: "11.30" hari ini, "Kemarin", lalu "29 Agu" (dengan tahun bila bukan tahun ini). */
+export function formatShortTime(value: string, now: Date = new Date()): string {
+  const date = new Date(value);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if (date.getTime() >= startOfToday) return clockFormat.format(date);
+  if (date.getTime() >= startOfToday - 86_400_000) return "Kemarin";
+  return (date.getFullYear() === now.getFullYear() ? dayMonthFormat : dayMonthYearFormat).format(
+    date,
+  );
+}
