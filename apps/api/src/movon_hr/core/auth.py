@@ -1,10 +1,10 @@
-"""Request authentication: session token (X-Demo-User header or cookie) -> employee."""
+"""Request authentication: session cookie -> employee."""
 
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
 
 from movon_hr.core.db import DB
@@ -15,13 +15,9 @@ INVALID_SESSION = "Sesi tidak valid"
 EXPIRED_SESSION = "Sesi telah berakhir. Silakan masuk kembali."
 
 
-async def current_user(
-    request: Request,
-    db: DB,
-    x_demo_user: Annotated[str | None, Header()] = None,
-) -> Employee:
+async def current_user(request: Request, db: DB) -> Employee:
     """Resolve the employee behind the session token and bind their tenant to ``db``."""
-    token = x_demo_user or request.cookies.get(settings.session_cookie_name)
+    token = request.cookies.get(settings.session_cookie_name)
     if not token:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, INVALID_SESSION)
     # The token is the only thing that identifies the tenant, so this lookup is cross-tenant.

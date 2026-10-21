@@ -14,6 +14,7 @@ import httpx
 import pytest
 from alembic import command
 from alembic.config import Config
+from helpers import session_cookie
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
@@ -131,6 +132,6 @@ def login_headers(db: AsyncSession) -> Callable[[str], Awaitable[dict[str, str]]
             )
         )
         await db.commit()
-        return {"X-Demo-User": token}
+        return session_cookie(token)
 
     return login

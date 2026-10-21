@@ -29,7 +29,6 @@ src/
     components/        #   UI. Tidak memanggil api() secara langsung
   shared/
     api/client.ts      # Satu-satunya fetch wrapper (ApiError, timeout, redirect 401)
-    api/demo-session.ts# DEMO-ONLY, lihat "Mode demo"
     lib/               # Helper lintas fitur (format tanggal/uang)
     ui/                # Komponen generik: primitive shadcn + komposisi Teamku
   styles/legacy.css    # CSS lama, dibekukan. Jangan ditambah
@@ -84,9 +83,6 @@ Urutan `@layer` di `app/globals.css`: `legacy` < `ui-reset` < `utilities`. Utili
 
 ## Mode demo
 
-Akun demo dan token `X-Demo-User` di localStorage sengaja diisolasi supaya mudah dihapus:
+Akun demo (seed API) masuk lewat login biasa dan sesinya sama dengan akun nyata: cookie httpOnly `teamku_session`. Satu-satunya bagian khusus demo adalah `src/features/auth/components/demo-account-picker.tsx`, tombol akun demo + kredensial awal di login, aktif hanya bila `NEXT_PUBLIC_DEMO_ACCOUNTS=1`.
 
-- `src/shared/api/demo-session.ts`: penyimpanan token + header
-- `src/features/auth/components/demo-account-picker.tsx`: tombol akun demo + kredensial awal di login
-
-Cara menghapus: hapus kedua file, lalu perbaiki error `tsc` yang muncul (semua pemanggilnya ikut ketahuan), dan hapus header `X-Demo-User` di `apps/api`. Sesi tetap berjalan lewat cookie httpOnly `teamku_session`.
+Cara menghapus: hapus file itu, lalu perbaiki error `tsc` yang muncul di halaman login.

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+from helpers import session_cookie
 from sqlalchemy import select
 
 from movon_hr.core.time import JAKARTA
@@ -99,7 +100,7 @@ async def test_forged_and_missing_session_tokens_are_rejected_and_logout_revokes
     client, login_headers
 ) -> None:
     assert (await client.get("/api/v1/me")).status_code == 401
-    assert (await client.get("/api/v1/me", headers={"X-Demo-User": "e-hr"})).status_code == 401
+    assert (await client.get("/api/v1/me", headers=session_cookie("e-hr"))).status_code == 401
 
     session_headers = await login_headers(EMPLOYEE)
     assert (await client.get("/api/v1/me", headers=session_headers)).status_code == 200

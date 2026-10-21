@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 import pytest
-from helpers import count
+from helpers import count, session_of
 
 from movon_hr.core.time import jakarta_date
 from movon_hr.modules.policies.models import PolicyAnswerAudit
@@ -74,7 +74,7 @@ async def test_draft_and_cross_tenant_policy_never_answer_question(client, login
             "password": "Company123",
         },
     )
-    await create_policy(client, {"X-Demo-User": other.json()["access_token"]})
+    await create_policy(client, session_of(other))
     assert (
         await client.post(
             "/api/v1/policy-assistant/questions",

@@ -1,6 +1,6 @@
 import httpx
 import pytest
-from helpers import count
+from helpers import count, session_of
 
 from movon_hr.core.identity import Tenant
 from movon_hr.core.mailer import last_email_to, outbox
@@ -28,7 +28,7 @@ def signup(client):
 
 
 def bearer(response) -> dict[str, str]:
-    return {"X-Demo-User": response.json()["access_token"]}
+    return session_of(response)
 
 
 async def test_signup_creates_isolated_tenant_and_sets_cookie(client, db, signup) -> None:

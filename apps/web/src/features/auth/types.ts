@@ -1,6 +1,3 @@
-/** Session payload from login, reset and invite acceptance (`AuthOut`). */
-export type AuthOut = { access_token: string };
-
 /** `GET /invites/{token}`: who is invited, by whom, and until when. */
 export type InvitePreview = {
   email: string;

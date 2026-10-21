@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from helpers import count
+from helpers import count, session_of
 from sqlalchemy import select
 
 from movon_hr.core.identity import Employee
@@ -78,7 +78,7 @@ async def test_invite_is_accepted_into_the_inviting_tenant(client, db) -> None:
 
     invited = await client.post(
         "/api/v1/invites",
-        headers={"X-Demo-User": signup.json()["access_token"]},
+        headers=session_of(signup),
         json={"name": "Tari", "email": "tari@lain.test", "department": "Ops", "role": "employee"},
     )
     assert invited.status_code == 200
@@ -111,10 +111,11 @@ async def test_invite_is_accepted_into_the_inviting_tenant(client, db) -> None:
 async def test_invite_preview_names_the_inviter_and_tells_expired_from_used(
     client, db, login
 ) -> None:
-    hr = (await login("hr@movon.test")).json()
+    hr_login = await login("hr@movon.test")
+    hr = hr_login.json()
     invited = await client.post(
         "/api/v1/invites",
-        headers={"X-Demo-User": hr["access_token"]},
+        headers=session_of(hr_login),
         json={"name": "Tari", "email": "tari@movon.test", "department": "Ops", "role": "employee"},
     )
     token = invited.json()["invite_url"].split("token=")[1]
