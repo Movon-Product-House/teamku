@@ -101,6 +101,15 @@ async def pending_slot(
     )
 
 
+def worked_hours(session: Attendance, now: datetime) -> float:
+    """Up to check-out (or now), but never past the end of the check-in day."""
+    until = min(
+        session.checked_out_at or now,
+        rules.jakarta_day_bounds(jakarta_date(session.checked_in_at))[1],
+    )
+    return (until - session.checked_in_at).total_seconds() / 3600
+
+
 async def today(db: AsyncSession, user: Employee) -> TodayOut:
     """Pure read."""
     sessions = await sessions_on(db, user.id, jakarta_date())
@@ -110,6 +119,7 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
             session=None,
             pending_reverification=None,
             is_remote=user.is_remote,
+            closed_hours_today=0,
         )
     latest = sessions[-1]
     pending = None
@@ -128,14 +138,19 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
         ),
         pending_reverification=PendingOut.model_validate(pending) if pending else None,
         is_remote=user.is_remote,
+        closed_hours_today=round(
+            sum(
+                worked_hours(item, item.checked_out_at) for item in sessions if item.checked_out_at
+            ),
+            2,
+        ),
     )
 
 
 async def week(db: AsyncSession, user: Employee) -> WeekOut:
     """Monday to Friday of the current Jakarta week.
 
-    A session counts up to its check-out (or now), but never past the end of its own day. A day is late
-    when its first check-in is late.
+    Hours per day follow ``worked_hours``. A day is late when its first check-in is late.
     """
     today = jakarta_date()
     days = [today - timedelta(days=today.weekday() - offset) for offset in range(5)]
@@ -165,8 +180,7 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
     late: dict[date, bool] = {}
     for item in sessions:
         day = jakarta_date(item.checked_in_at)
-        until = min(item.checked_out_at or now, rules.jakarta_day_bounds(day)[1])
-        hours[day] += (until - item.checked_in_at).total_seconds() / 3600
+        hours[day] += worked_hours(item, now)
         late.setdefault(day, rules.is_late(item.checked_in_at))
     return WeekOut(
         target_hours=rules.TARGET_HOURS_PER_DAY,

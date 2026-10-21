@@ -25,6 +25,9 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
   const end = session.checked_out_at ? new Date(session.checked_out_at) : now;
   const working = today.state === "checked_in";
   const pending = today.pending_reverification;
+  // Every session today counts, not just the latest one.
+  const worked =
+    today.closed_hours_today * 3_600_000 + (working ? now.getTime() - start.getTime() : 0);
 
   return (
     <section
@@ -38,7 +41,7 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
           </p>
           <div className="flex flex-wrap items-baseline gap-3">
             <h2 id="today-duration" className="font-display text-title lg:text-display">
-              {formatDuration(end.getTime() - start.getTime())}
+              {formatDuration(worked)}
             </h2>
             <Badge tone={working ? "success" : "neutral"} variant="plain">
               {working ? "Sedang bekerja" : "Hari kerja selesai"}

@@ -67,6 +67,8 @@ class TodayOut(BaseModel):
     session: SessionOut | None
     pending_reverification: PendingOut | None
     is_remote: bool
+    # Sessions already checked out today, so the client can add the open one live.
+    closed_hours_today: float
 
 
 class WeekDay(BaseModel):

@@ -32,6 +32,7 @@ async def test_fresh_demo_account_starts_without_a_check_in(client, login_header
         "session": None,
         "pending_reverification": None,
         "is_remote": False,
+        "closed_hours_today": 0,
     }
 
 

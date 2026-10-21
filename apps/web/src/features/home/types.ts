@@ -12,6 +12,7 @@ export type Today = {
   } | null;
   pending_reverification: { id: string; due_at: string | null } | null;
   is_remote: boolean;
+  closed_hours_today: number;
 };
 
 export type Week = {
