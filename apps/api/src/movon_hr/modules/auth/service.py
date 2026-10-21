@@ -123,11 +123,6 @@ async def me(db: AsyncSession, user: Employee) -> MeOut:
     return MeOut(user=user_out, tenant=TenantOut.model_validate(tenant))
 
 
-async def auth_out(db: AsyncSession, user: Employee, token: str) -> tuple[MeOut, str]:
-    """The response body plus the session token, which the router puts in the cookie only."""
-    return await me(db, user), token
-
-
 # --- Signup and login ---
 
 
@@ -172,7 +167,7 @@ async def signup(db: AsyncSession, payload: Signup) -> tuple[MeOut, str]:
     await db.flush()
     token = create_session(db, admin)
     await audit(db, "auth.signup", admin, str(tenant.id))
-    return await auth_out(db, admin, token)
+    return await me(db, admin), token
 
 
 async def raise_if_locked_out(db: AsyncSession, email: str, message: str) -> None:
@@ -220,7 +215,7 @@ async def login(db: AsyncSession, payload: Login) -> tuple[MeOut, str]:
         user.password_hash = await hash_password_async(payload.password)
     token = create_session(db, user)
     await audit(db, "auth.login", user, str(user.id))
-    return await auth_out(db, user, token)
+    return await me(db, user), token
 
 
 async def logout(db: AsyncSession, user: Employee, token: str) -> None:
@@ -345,7 +340,7 @@ async def accept_invite(db: AsyncSession, payload: AcceptInvite) -> tuple[MeOut,
         "/app/overview",
     )
     await audit(db, "invite.accepted", employee, invitation.email)
-    return await auth_out(db, employee, token)
+    return await me(db, employee), token
 
 
 # --- Passwords ---
@@ -408,7 +403,7 @@ async def reset_password(db: AsyncSession, payload: ResetPassword) -> tuple[MeOu
     await employees_service.revoke_sessions(db, user.id)
     token = create_session(db, user)
     await audit(db, "auth.password_reset", user, str(user.id))
-    return await auth_out(db, user, token)
+    return await me(db, user), token
 
 
 async def change_password(

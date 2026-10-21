@@ -1,10 +1,11 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from helpers import session_cookie
+from helpers import session_cookie, session_of
 from sqlalchemy import select, update
 
 from movon_hr.core.identity import AuthSession
+from movon_hr.core.settings import settings
 from movon_hr.modules.auth.service import LOGIN_MAX_ATTEMPTS
 from movon_hr.seed import DEMO_PASSWORD
 
@@ -22,7 +23,7 @@ def login(client):
 @pytest.fixture
 def token_for(login):
     async def token(email: str) -> str:
-        return (await login(email)).cookies["teamku_session"]
+        return (await login(email)).cookies[settings.session_cookie_name]
 
     return token
 
@@ -36,7 +37,7 @@ async def test_password_is_verified_against_hash_and_never_leaked(client, login)
     assert "password_hash" not in ok.json()["user"]
 
     assert "access_token" not in ok.json()  # the token lives only in the httpOnly cookie
-    headers = session_cookie(ok.cookies["teamku_session"])
+    headers = session_of(ok)
     assert "password_hash" not in (await client.get("/api/v1/me", headers=headers)).json()["user"]
 
     listed = (await client.get("/api/v1/employees", headers=headers)).json()["items"]
