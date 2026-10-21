@@ -104,9 +104,7 @@ async def test_open_session_past_max_hours_notifies_employee(client, db, login_h
     assert "Sesi masih terbuka" in titles
 
 
-async def test_session_before_midnight_wib_does_not_count_for_the_new_day(
-    client, db, clock
-) -> None:
+async def test_session_before_midnight_wib_does_not_count_for_the_new_day(db, clock) -> None:
     await enable_alerts(db)
     # 23:30 WIB Wednesday = 16:30 UTC, still "today" in UTC at 00:30 WIB Thursday.
     wednesday_late = datetime(2026, 10, 21, 23, 30, tzinfo=JAKARTA)

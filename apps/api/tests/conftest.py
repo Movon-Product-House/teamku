@@ -54,7 +54,7 @@ def anyio_backend() -> str:
 @pytest.fixture(autouse=True)
 def clock(time_machine: time_machine.TimeMachineFixture) -> time_machine.TimeMachineFixture:
     """Simulated clock; a test that needs another moment calls ``clock.move_to(...)``."""
-    time_machine.move_to(TEST_NOW, tick=True)
+    time_machine.move_to(TEST_NOW)  # ticks by default: time still advances from here
     return time_machine
 
 
