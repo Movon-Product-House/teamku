@@ -122,9 +122,11 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
             closed_hours_today=0,
         )
     latest = sessions[-1]
+    now = datetime.now(UTC)
     pending = None
     if latest.checked_out_at is None:
-        pending = await pending_slot(db, latest.id, datetime.now(UTC))
+        pending = await pending_slot(db, latest.id, now)
+    closed = sum(worked_hours(item, now) for item in sessions if item.checked_out_at)
     return TodayOut(
         state="completed" if latest.checked_out_at else "checked_in",
         session=SessionOut(
@@ -138,12 +140,7 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
         ),
         pending_reverification=PendingOut.model_validate(pending) if pending else None,
         is_remote=user.is_remote,
-        closed_hours_today=round(
-            sum(
-                worked_hours(item, item.checked_out_at) for item in sessions if item.checked_out_at
-            ),
-            2,
-        ),
+        closed_hours_today=round(closed, 2),
     )
 
 

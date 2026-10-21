@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, greeting, timelineSlots, weekBars } from "./home";
+import { formatDuration, greeting, timelineSlots, weekBars, workedMs } from "./home";
+import type { Today } from "./types";
 
 const at = (hour: number, minute = 0) => new Date(2026, 8, 29, hour, minute);
 
@@ -9,6 +10,18 @@ describe("home", () => {
     expect(greeting(at(12))).toBe("Selamat siang");
     expect(greeting(at(16))).toBe("Selamat sore");
     expect(greeting(at(20))).toBe("Selamat malam");
+  });
+
+  it("sums the closed sessions of today with the open one", () => {
+    const today = (state: Today["state"], checked_out_at: string | null): Today => ({
+      state,
+      session: { id: "s", checked_in_at: at(13).toISOString(), checked_out_at, agenda: [] },
+      pending_reverification: null,
+      is_remote: false,
+      closed_hours_today: 1.5,
+    });
+    expect(workedMs(today("checked_in", null), at(14))).toBe(2.5 * 3_600_000);
+    expect(workedMs(today("completed", at(14).toISOString()), at(18))).toBe(1.5 * 3_600_000);
   });
 
   it("formats a work duration as hours and minutes", () => {

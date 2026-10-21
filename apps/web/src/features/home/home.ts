@@ -1,4 +1,4 @@
-import type { Week } from "./types";
+import type { Today, Week } from "./types";
 
 export function greeting(now: Date): string {
   const hour = now.getHours();
@@ -6,6 +6,17 @@ export function greeting(now: Date): string {
   if (hour < 15) return "Selamat siang";
   if (hour < 18) return "Selamat sore";
   return "Selamat malam";
+}
+
+/** Every session today counts: the closed ones plus the open one up to now. */
+export function workedMs(today: Today, now: Date): number {
+  // ?? 0: an older API without the field must not render "NaNm".
+  const closed = (today.closed_hours_today ?? 0) * 3_600_000;
+  const open =
+    today.state === "checked_in" && today.session
+      ? now.getTime() - new Date(today.session.checked_in_at).getTime()
+      : 0;
+  return closed + open;
 }
 
 /** 198 minutes → "3j 18m"; under an hour → "18m". */
