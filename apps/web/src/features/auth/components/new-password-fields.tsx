@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { passwordValid } from "../auth";
-import { PasswordInput } from "./password-input";
 import { PasswordRules } from "./password-rules";
 
 export function useNewPassword() {
