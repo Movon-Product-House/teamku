@@ -64,7 +64,7 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
       <ul className="flex flex-wrap gap-x-6 gap-y-2 border-border border-t pt-4 text-caption text-muted-foreground max-lg:hidden">
         <li className="flex items-center gap-2">
           <LogIn className="size-4" aria-hidden />
-          Check-in {clock.format(start)}
+          Sesi terakhir check-in {clock.format(start)}
         </li>
         <li className="flex items-center gap-2">
           <Camera className="size-4" aria-hidden />
