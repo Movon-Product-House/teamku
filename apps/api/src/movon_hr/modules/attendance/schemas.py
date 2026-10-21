@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
@@ -33,6 +33,7 @@ class SessionOut(BaseModel):
     checked_out_at: datetime | None
     anomaly: str | None
     agenda_count: int
+    agenda: list[dict]
     summary: str | None
 
 
@@ -49,6 +50,18 @@ class TodayOut(BaseModel):
     session: SessionOut | None
     pending_reverification: PendingOut | None
     is_remote: bool
+
+
+class WeekDay(BaseModel):
+    date: date
+    hours: float
+    late: bool
+    on_leave: bool
+
+
+class WeekOut(BaseModel):
+    target_hours: int
+    days: list[WeekDay]
 
 
 class CheckInOut(BaseModel):

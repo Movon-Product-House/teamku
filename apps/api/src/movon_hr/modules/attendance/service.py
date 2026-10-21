@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
-from movon_hr.core.time import jakarta_date
+from movon_hr.core.time import JAKARTA, jakarta_date
 from movon_hr.modules.attendance import rules
 from movon_hr.modules.attendance.models import Attendance, IdempotencyKey, LocationEvent
 from movon_hr.modules.attendance.schemas import (
@@ -25,9 +25,12 @@ from movon_hr.modules.attendance.schemas import (
     SkippedEventOut,
     SkippedOut,
     TodayOut,
+    WeekDay,
+    WeekOut,
 )
 from movon_hr.modules.audit.service import audit
 from movon_hr.modules.employees import service as employees_service
+from movon_hr.modules.leave.models import LeaveRequest
 from movon_hr.modules.settings import service as settings_service
 from movon_hr.modules.settings.models import WorkLocation
 
@@ -120,10 +123,56 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
             checked_out_at=latest.checked_out_at,
             anomaly=latest.anomaly,
             agenda_count=len(latest.agenda),
+            agenda=latest.agenda,
             summary=latest.summary,
         ),
         pending_reverification=PendingOut.model_validate(pending) if pending else None,
         is_remote=user.is_remote,
+    )
+
+
+async def week(db: AsyncSession, user: Employee) -> WeekOut:
+    """Monday to Friday of the current Jakarta week; an open session counts up to now."""
+    today = jakarta_date()
+    days = [today - timedelta(days=today.weekday() - offset) for offset in range(5)]
+    start, _ = rules.jakarta_day_bounds(days[0])
+    _, end = rules.jakarta_day_bounds(days[-1])
+    sessions = await db.scalars(
+        select(Attendance).where(
+            Attendance.employee_id == user.id,
+            Attendance.checked_in_at >= start,
+            Attendance.checked_in_at < end,
+        )
+    )
+    leaves = (
+        await db.execute(
+            select(LeaveRequest.start_date, LeaveRequest.end_date).where(
+                LeaveRequest.employee_id == user.id,
+                LeaveRequest.status == "approved",
+                LeaveRequest.start_date <= days[-1],
+                LeaveRequest.end_date >= days[0],
+            )
+        )
+    ).all()
+    now = datetime.now(UTC)
+    hours = dict.fromkeys(days, 0.0)
+    late: set[date] = set()
+    for item in sessions:
+        day = jakarta_date(item.checked_in_at)
+        hours[day] += ((item.checked_out_at or now) - item.checked_in_at).total_seconds() / 3600
+        if item.checked_in_at.astimezone(JAKARTA).time() >= rules.LATE_AFTER:
+            late.add(day)
+    return WeekOut(
+        target_hours=rules.TARGET_HOURS_PER_DAY,
+        days=[
+            WeekDay(
+                date=day,
+                hours=round(hours[day], 2),
+                late=day in late,
+                on_leave=any(first <= day <= last for first, last in leaves),
+            )
+            for day in days
+        ],
     )
 
 

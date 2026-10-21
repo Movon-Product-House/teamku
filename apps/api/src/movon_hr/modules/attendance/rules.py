@@ -11,6 +11,8 @@ MAX_ACCURACY_CREDIT_METERS = 50
 LOW_ACCURACY_METERS = 100
 # A reverify slot counts as missed this long after it is due.
 REVERIFY_GRACE = timedelta(minutes=15)
+LATE_AFTER = time(9, 0)  # hardcoded, kept as is (#19)
+TARGET_HOURS_PER_DAY = 8  # ponytail: fixed until shifts exist; per-office setting when they do
 
 
 def haversine_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
