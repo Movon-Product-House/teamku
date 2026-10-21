@@ -20,6 +20,8 @@ Semua dijalankan dari `apps/api`. Postgres lokal: `docker compose -f ../../infra
 
 Jalankan `scripts/check.sh` sebelum push. Tes butuh database kosong terpisah: sekali saja jalankan `docker compose -f ../../infra/compose/docker-compose.yml exec postgres createdb -U movon movon_test`, atau arahkan `MOVON_TEST_DATABASE_URL` ke DB lain. CI (`.github/workflows/api.yml`) menjalankan `check.sh` ditambah `alembic upgrade head`, `alembic check`, dan cek satu head.
 
+Tes berjalan di jam simulasi (`time-machine`): fixture autouse `clock` di `tests/conftest.py` memulai setiap tes pada `TEST_NOW` (Rabu 10:00 WIB), jadi hasilnya tidak bergantung kapan CI jalan. Butuh momen lain: `clock.move_to(...)`. Kolom `server_default=func.now()` tetap diisi jam asli Postgres, jadi jangan bandingkan kolom itu dengan jam aplikasi di tes.
+
 ## Struktur
 
 ```
