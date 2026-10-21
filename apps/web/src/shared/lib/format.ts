@@ -32,12 +32,17 @@ const dayMonthYearFormat = new Intl.DateTimeFormat("id-ID", {
   year: "numeric",
 });
 
+/** Tengah malam lokal hari `now`, dalam ms. Satu batas "hari ini" untuk semua daftar. */
+export function startOfToday(now: Date = new Date()): number {
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+}
+
 /** Waktu singkat untuk daftar: "11.30" hari ini, "Kemarin", lalu "29 Agu" (dengan tahun bila bukan tahun ini). */
 export function formatShortTime(value: string, now: Date = new Date()): string {
   const date = new Date(value);
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  if (date.getTime() >= startOfToday) return clockFormat.format(date);
-  if (date.getTime() >= startOfToday - 86_400_000) return "Kemarin";
+  const today = startOfToday(now);
+  if (date.getTime() >= today) return clockFormat.format(date);
+  if (date.getTime() >= today - 86_400_000) return "Kemarin";
   return (date.getFullYear() === now.getFullYear() ? dayMonthFormat : dayMonthYearFormat).format(
     date,
   );

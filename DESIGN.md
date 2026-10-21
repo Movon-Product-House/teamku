@@ -12,6 +12,7 @@ colors:
   primary: "#17171A"
   primary-foreground: "#FFFFFF"
   secondary: "#EFEEEA"
+  subtle: "#F6F5F2"
   secondary-foreground: "#17171A"
   muted: "#EFEEEA"
   muted-foreground: "#55565C"
@@ -87,6 +88,7 @@ typography:
 rounded:
   control: "10px"
   field: "12px"
+  tile: "16px"
   card: "20px"
   dialog: "24px"
 # GENERATED:END

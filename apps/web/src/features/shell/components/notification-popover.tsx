@@ -2,11 +2,10 @@
 
 import { Bell } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { useMarkAllRead, useNotifications } from "../api";
-import { NotificationItem } from "./notification-item";
+import { NotificationRow, NotificationStates } from "./notification-item";
 
 export function unreadLabel(unread: number): string {
   return unread ? `Notifikasi, ${unread} belum dibaca` : "Notifikasi";
@@ -51,27 +50,9 @@ export function NotificationPopover() {
           )}
         </div>
         <div className="flex max-h-[70dvh] flex-col gap-0.5 overflow-y-auto">
-          {notifications.isPending && (
-            <p className="px-3.5 py-4 text-caption text-muted-foreground">Memuat notifikasi…</p>
-          )}
-          {notifications.isError && !notifications.data && (
-            <div className="flex items-center justify-between gap-3 px-3.5 py-4">
-              <p className="text-caption text-destructive">Notifikasi gagal dimuat.</p>
-              <Button size="sm" variant="outline" onClick={() => notifications.refetch()}>
-                Coba lagi
-              </Button>
-            </div>
-          )}
-          {notifications.isSuccess && notifications.data.items.length === 0 && (
-            <p className="px-3.5 py-4 text-caption text-muted-foreground">Belum ada notifikasi.</p>
-          )}
+          <NotificationStates notifications={notifications} />
           {notifications.data?.items.map((item) => (
-            <NotificationItem
-              key={item.id}
-              item={item}
-              onOpen={() => setOpen(false)}
-              className={cn(!item.read && "bg-background")}
-            />
+            <NotificationRow key={item.id} item={item} onOpen={() => setOpen(false)} />
           ))}
         </div>
       </PopoverContent>

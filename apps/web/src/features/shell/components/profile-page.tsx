@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
-import { Field, FieldLabel } from "@/shared/ui/field";
+import { Field, FieldDescription, FieldLabel } from "@/shared/ui/field";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { useChangePassword, useMe } from "../api";
 import { workLocation } from "../nav";
@@ -46,25 +46,25 @@ export function ProfilePage() {
   }
 
   return (
-    <div data-surface="v2" className="mx-auto flex w-full max-w-xl flex-col gap-3.5 pb-5">
+    <div data-surface="v2" className="mx-auto flex w-full max-w-xl flex-col gap-5 pb-5">
       <h1 className="hidden font-display text-title-sm lg:block">Profil & keamanan</h1>
 
       <section className="flex flex-col gap-2">
         <h2 className="text-faint-foreground text-overline uppercase">Data kerja</h2>
-        <dl className="divide-y divide-border rounded-card bg-card px-4">
+        <dl className="divide-y divide-border rounded-tile border border-border bg-card px-4 py-1">
           {rows.map(([label, value]) => (
-            <div key={label} className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="text-muted-foreground text-sm">{label}</dt>
-              <dd className="text-right font-semibold text-sm">{value}</dd>
+            <div key={label} className="flex items-baseline justify-between gap-3 py-3">
+              <dt className="text-caption text-faint-foreground">{label}</dt>
+              <dd className="text-right font-bold text-caption">{value}</dd>
             </div>
           ))}
         </dl>
-        <p className="text-caption text-faint-foreground">
+        <p className="font-medium text-faint-foreground text-xs">
           Data salah? Minta HR mengubahnya. Kamu tidak bisa mengubah data ini sendiri.
         </p>
       </section>
 
-      <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
+      <form className="flex flex-col gap-3" onSubmit={submit} noValidate>
         <h2 className="text-faint-foreground text-overline uppercase">Ganti kata sandi</h2>
         {/* Lets password managers update the saved entry for this account. */}
         <input type="hidden" autoComplete="username" value={user.email} readOnly />
@@ -94,9 +94,9 @@ export function ProfilePage() {
               setNext(event.target.value);
             }}
           />
-          <p id="new-password-hint" className="text-caption text-faint-foreground">
+          <FieldDescription id="new-password-hint">
             8–128 karakter, minimal satu huruf dan satu angka.
-          </p>
+          </FieldDescription>
         </Field>
         {change.isError && (
           <Alert variant="destructive" aria-live="polite">
@@ -115,7 +115,7 @@ export function ProfilePage() {
         <Button type="submit" size="lg" className="w-full" disabled={!ready || change.isPending}>
           {change.isPending ? "Menyimpan…" : "Simpan kata sandi"}
         </Button>
-        <p className="text-center text-caption text-faint-foreground">
+        <p className="text-center font-medium text-faint-foreground text-xs">
           Perangkat lain akan otomatis keluar setelah kata sandi diganti.
         </p>
       </form>
