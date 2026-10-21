@@ -175,8 +175,8 @@ async def signup(db: AsyncSession, payload: Signup) -> AuthOut:
     return await auth_out(db, admin, token)
 
 
-async def login(db: AsyncSession, payload: Login) -> AuthOut:
-    email = payload.email.strip().lower()
+async def raise_if_locked_out(db: AsyncSession, email: str, message: str) -> None:
+    """Password guesses per email, shared by login and change-password."""
     failures = await db.scalar(
         select(func.count())
         .select_from(LoginAttempt)
@@ -187,17 +187,25 @@ async def login(db: AsyncSession, payload: Login) -> AuthOut:
         .execution_options(**CROSS_TENANT)
     )
     if (failures or 0) >= LOGIN_MAX_ATTEMPTS:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS,
-            "Terlalu banyak percobaan masuk. Coba lagi dalam beberapa menit.",
-        )
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, message)
+
+
+async def record_failed_attempt(db: AsyncSession, email: str) -> None:
+    db.add(LoginAttempt(email=email))
+    await db.commit()  # keep the failure: get_db rolls back on the error the caller raises
+
+
+async def login(db: AsyncSession, payload: Login) -> AuthOut:
+    email = payload.email.strip().lower()
+    await raise_if_locked_out(
+        db, email, "Terlalu banyak percobaan masuk. Coba lagi dalam beberapa menit."
+    )
     user = await employee_by_email(db, email)
     # Always verify against a real hash, then give every failure the same error.
     reference_hash = user.password_hash if user else await dummy_hash()
     password_ok = await verify_password_async(payload.password, reference_hash)
     if user is None or not password_ok or user.status != "active":
-        db.add(LoginAttempt(email=email))
-        await db.commit()  # keep the failure: get_db rolls back on the 401 below
+        await record_failed_attempt(db, email)
         raise HTTPException(401, INVALID_LOGIN)
     bind_tenant(db, user.tenant_id)
     await db.execute(
@@ -400,7 +408,12 @@ async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
 async def change_password(
     db: AsyncSession, user: Employee, token: str, payload: ChangePassword
 ) -> None:
+    email = user.email.strip().lower()
+    await raise_if_locked_out(
+        db, email, "Terlalu banyak percobaan. Coba lagi dalam beberapa menit."
+    )
     if not await verify_password_async(payload.current_password, user.password_hash):
+        await record_failed_attempt(db, email)
         # 422, not 401: the session is valid; 401 makes the web client log the user out.
         raise HTTPException(422, "Kata sandi saat ini salah")
     if payload.new_password == payload.current_password:
