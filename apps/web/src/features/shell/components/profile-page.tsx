@@ -9,6 +9,7 @@ import { Field, FieldLabel } from "@/shared/ui/field";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { useChangePassword, useMe } from "../api";
 import { workLocation } from "../nav";
+import { newPasswordFits } from "../profile";
 import { roleLabels } from "../types";
 
 /** P7: work data is read-only (HR owns it); the user can only change their password. */
@@ -29,8 +30,7 @@ export function ProfilePage() {
     ["Role", roleLabels[user.role]],
     ["Lokasi kerja", workLocation(user)],
   ];
-  // Shorter values fail the API's schema check with a generic message, so wait for 8.
-  const ready = current.length >= 8 && next.length >= 8;
+  const ready = current !== "" && newPasswordFits(next);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -75,7 +75,10 @@ export function ProfilePage() {
             autoComplete="current-password"
             value={current}
             disabled={change.isPending}
-            onChange={(event) => setCurrent(event.target.value)}
+            onChange={(event) => {
+              change.reset();
+              setCurrent(event.target.value);
+            }}
           />
         </Field>
         <Field>
@@ -86,7 +89,10 @@ export function ProfilePage() {
             value={next}
             disabled={change.isPending}
             aria-describedby="new-password-hint"
-            onChange={(event) => setNext(event.target.value)}
+            onChange={(event) => {
+              change.reset();
+              setNext(event.target.value);
+            }}
           />
           <p id="new-password-hint" className="text-caption text-faint-foreground">
             8–128 karakter, minimal satu huruf dan satu angka.
