@@ -2,8 +2,10 @@ from datetime import datetime, time, timedelta
 
 import pytest
 from helpers import add_attendance, add_leave
+from sqlalchemy import select
 
 from movon_hr.core.time import JAKARTA, jakarta_date
+from movon_hr.modules.attendance.models import Attendance
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
 pytestmark = pytest.mark.anyio
@@ -59,6 +61,25 @@ async def test_check_in_rejects_an_agenda_item_without_a_string_title(
     )
 
     assert response.status_code == 422
+
+
+async def test_check_in_stores_only_known_agenda_keys(client, db, login_headers) -> None:
+    response = await client.post(
+        "/api/v1/attendance/check-in",
+        headers=await login_headers(EMAIL) | {"Idempotency-Key": "extra-agenda"},
+        json={
+            "latitude": OFFICE_LATITUDE,
+            "longitude": OFFICE_LONGITUDE,
+            "accuracy_meters": 10,
+            "selfie_captured": True,
+            "location_share_approved": True,
+            "agenda": [{"title": "Laporan", "priority": "high", "junk": "x" * 10_000}],
+        },
+    )
+
+    assert response.status_code == 200
+    record = await db.scalar(select(Attendance).where(Attendance.id == response.json()["id"]))
+    assert record.agenda == [{"title": "Laporan", "priority": "high", "status": None}]
 
 
 async def test_week_reports_hours_lateness_and_leave_per_workday(client, db, login_headers) -> None:

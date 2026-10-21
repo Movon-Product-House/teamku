@@ -5,10 +5,9 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validat
 
 
 class AgendaItemIn(BaseModel):
-    model_config = ConfigDict(extra="allow")  # the check-in form also sends `priority`
-
     title: str = Field(min_length=1, max_length=200)
-    status: str | None = None
+    priority: str | None = Field(default=None, max_length=20)
+    status: str | None = Field(default=None, max_length=20)
 
 
 class CheckIn(BaseModel):
