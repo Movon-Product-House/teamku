@@ -11,6 +11,7 @@ from movon_hr.core.mailer import last_email_to
 from movon_hr.modules.auth import service as auth_service
 from movon_hr.modules.auth.models import LoginAttempt, PasswordReset
 from movon_hr.modules.auth.service import LOGIN_ATTEMPT_WINDOW, LOGIN_MAX_ATTEMPTS
+from movon_hr.modules.employees.models import Invitation
 from movon_hr.seed import DEMO_PASSWORD
 
 pytestmark = pytest.mark.anyio
@@ -46,6 +47,12 @@ async def test_failed_logins_are_stored_and_lock_the_email(db, login) -> None:
     # Unknown emails are counted too, without revealing that they do not exist.
     assert (await login("ghost@unknown.test")).status_code == 401
     assert await count(db, LoginAttempt) == LOGIN_MAX_ATTEMPTS + 1
+
+
+async def test_short_wrong_password_is_a_401_and_counts(db, login) -> None:
+    assert (await login(EMPLOYEE, "abc")).status_code == 401
+    assert (await login("ghost@unknown.test", "x")).status_code == 401
+    assert await count(db, LoginAttempt) == 2
 
 
 async def test_failures_outside_the_window_do_not_lock(db, login) -> None:
@@ -92,11 +99,38 @@ async def test_invite_is_accepted_into_the_inviting_tenant(client, db) -> None:
     # Signup gave the new company its own primary location; the invitee falls back to it.
     assert accepted.json()["user"]["work_location"]["name"] == "Kantor Pusat"
 
-    assert (await client.get(f"/api/v1/invites/{token}")).status_code == 410
+    used = await client.get(f"/api/v1/invites/{token}")
+    assert used.status_code == 410
+    assert used.json()["detail"] == auth_service.INVITE_USED
     again = await client.post(
         "/api/v1/auth/accept-invite", json={"token": token, "password": "Tari12345"}
     )
     assert again.status_code == 410
+
+
+async def test_invite_preview_names_the_inviter_and_tells_expired_from_used(
+    client, db, login
+) -> None:
+    hr = (await login("hr@movon.test")).json()
+    invited = await client.post(
+        "/api/v1/invites",
+        headers={"X-Demo-User": hr["access_token"]},
+        json={"name": "Tari", "email": "tari@movon.test", "department": "Ops", "role": "employee"},
+    )
+    token = invited.json()["invite_url"].split("token=")[1]
+
+    preview = await client.get(f"/api/v1/invites/{token}")
+    assert preview.status_code == 200
+    assert preview.json()["invited_by"] == hr["user"]["name"]
+    assert preview.json()["expires_at"] == invited.json()["expires_at"]
+
+    invitation = await db.get(Invitation, token)
+    assert invitation is not None
+    invitation.expires_at = datetime.now(UTC) - timedelta(seconds=1)
+    await db.commit()
+    expired = await client.get(f"/api/v1/invites/{token}")
+    assert expired.status_code == 410
+    assert expired.json()["detail"] == auth_service.INVITE_EXPIRED
 
 
 async def test_reset_token_works_once(client) -> None:
@@ -104,6 +138,10 @@ async def test_reset_token_works_once(client) -> None:
     message = last_email_to(EMPLOYEE)
     assert message is not None
     token = next(part for part in message.body.split() if "token=" in part).split("token=")[1]
+
+    preview = await client.post("/api/v1/auth/reset-password/preview", json={"token": token})
+    assert preview.status_code == 200
+    assert preview.json() == {"email": EMPLOYEE}
 
     first = await client.post(
         "/api/v1/auth/reset-password", json={"token": token, "password": "BaruSekali1"}
@@ -113,6 +151,14 @@ async def test_reset_token_works_once(client) -> None:
         "/api/v1/auth/reset-password", json={"token": token, "password": "BaruLagi12"}
     )
     assert second.status_code == 410
+    gone = await client.post("/api/v1/auth/reset-password/preview", json={"token": token})
+    assert gone.status_code == 410
+    missing = await client.post(
+        "/api/v1/auth/reset-password/preview", json={"token": "not-a-token"}
+    )
+    assert missing.status_code == 404
+    cut_off = await client.post("/api/v1/auth/reset-password/preview", json={"token": "abc"})
+    assert cut_off.status_code == 404
     unknown = await client.post(
         "/api/v1/auth/reset-password", json={"token": "not-a-token", "password": "BaruLagi12"}
     )

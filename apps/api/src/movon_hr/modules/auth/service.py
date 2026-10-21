@@ -28,6 +28,7 @@ from movon_hr.modules.auth.schemas import (
     Login,
     MeOut,
     ResetPassword,
+    ResetPreview,
     Signup,
     TenantOut,
 )
@@ -53,8 +54,10 @@ CROSS_TENANT = {"cross_tenant": True}
 INVALID_LOGIN = "Email atau kata sandi salah"
 EMAIL_TAKEN = "Email kerja sudah digunakan"
 INVITE_NOT_FOUND = "Undangan tidak ditemukan"
-INVITE_GONE = "Undangan sudah tidak berlaku"
+INVITE_EXPIRED = "Undangan sudah kedaluwarsa. Minta HR mengirim undangan baru."
+INVITE_USED = "Undangan sudah dipakai. Masuk dengan email dan kata sandi Anda."
 RESET_NOT_FOUND = "Tautan atur ulang tidak valid"
+RESET_GONE = "Tautan atur ulang sudah tidak berlaku"
 
 _dummy_hash: str | None = None
 
@@ -265,7 +268,7 @@ async def create_invite(db: AsyncSession, user: Employee, payload: InviteInput) 
 
 
 async def open_invitation(db: AsyncSession, token: str) -> tuple[Invitation, str]:
-    """The invitation behind ``token`` and its company name; 404/410 like before."""
+    """The invitation behind ``token`` and its company name; 404 unknown, 410 used or expired."""
     row = (
         await db.execute(
             select(Invitation, Tenant.name)
@@ -277,13 +280,17 @@ async def open_invitation(db: AsyncSession, token: str) -> tuple[Invitation, str
     if row is None:
         raise HTTPException(404, INVITE_NOT_FOUND)
     invitation, company = row
-    if invitation.accepted_at or invitation.expires_at <= datetime.now(UTC):
-        raise HTTPException(410, INVITE_GONE)
+    if invitation.accepted_at:
+        raise HTTPException(410, INVITE_USED)
+    if invitation.expires_at <= datetime.now(UTC):
+        raise HTTPException(410, INVITE_EXPIRED)
     return invitation, company
 
 
 async def preview_invite(db: AsyncSession, token: str) -> InvitePreview:
     invitation, company = await open_invitation(db, token)
+    bind_tenant(db, invitation.tenant_id)
+    inviter = await db.get(Employee, invitation.invited_by)
     return InvitePreview(
         email=invitation.email,
         name=invitation.name,
@@ -291,6 +298,8 @@ async def preview_invite(db: AsyncSession, token: str) -> InvitePreview:
         role=invitation.role,
         department=invitation.department,
         title=invitation.title,
+        invited_by=inviter.name if inviter else None,
+        expires_at=invitation.expires_at,
     )
 
 
@@ -356,21 +365,30 @@ async def forgot_password(db: AsyncSession, email: str, background_tasks: Backgr
     await audit(db, "auth.password_reset_requested", user, str(user.id))
 
 
-async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
+async def open_reset(db: AsyncSession, token: str) -> tuple[PasswordReset, Employee]:
+    """The usable reset behind ``token`` and its employee; 404 unknown, 410 used or expired."""
     reset = await db.scalar(
-        select(PasswordReset)
-        .where(PasswordReset.token == payload.token)
-        .execution_options(**CROSS_TENANT)
+        select(PasswordReset).where(PasswordReset.token == token).execution_options(**CROSS_TENANT)
     )
     if reset is None:
         raise HTTPException(404, RESET_NOT_FOUND)
     if reset.used_at or reset.expires_at <= datetime.now(UTC):
-        raise HTTPException(410, "Tautan atur ulang sudah tidak berlaku")
-    check_password_policy(payload.password)
+        raise HTTPException(410, RESET_GONE)
     bind_tenant(db, reset.tenant_id)
     user = await db.get(Employee, reset.employee_id)
     if user is None or user.status != "active":
         raise HTTPException(404, RESET_NOT_FOUND)
+    return reset, user
+
+
+async def preview_reset(db: AsyncSession, token: str) -> ResetPreview:
+    _, user = await open_reset(db, token)
+    return ResetPreview(email=user.email)
+
+
+async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
+    reset, user = await open_reset(db, payload.token)
+    check_password_policy(payload.password)
     user.password_hash = await hash_password_async(payload.password)
     reset.used_at = datetime.now(UTC)
     await employees_service.revoke_sessions(db, user.id)

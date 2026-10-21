@@ -868,6 +868,8 @@
     "company": "string",
     "department": "string",
     "email": "string",
+    "expires_at": "datetime:9999-99-99T99:99:99.999999Z",
+    "invited_by": "string",
     "name": "string",
     "role": "string",
     "title": "string"
@@ -1758,6 +1760,9 @@
       "work_location_id": "string",
       "work_mode": "string"
     }
+  },
+  "POST /api/v1/auth/reset-password/preview | anon": {
+    "email": "string"
   },
   "POST /api/v1/auth/signup | anon": {
     "access_token": "string",

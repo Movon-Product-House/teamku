@@ -18,6 +18,8 @@ from movon_hr.modules.auth.schemas import (
     Login,
     MeOut,
     ResetPassword,
+    ResetPreview,
+    ResetPreviewInput,
     Signup,
 )
 from movon_hr.modules.notifications.schemas import Ok
@@ -78,6 +80,12 @@ async def accept_invite(db: DB, payload: AcceptInvite, response: Response) -> Au
 async def forgot_password(db: DB, payload: ForgotPassword, background_tasks: BackgroundTasks) -> Ok:
     await service.forgot_password(db, payload.email, background_tasks)
     return Ok(ok=True)
+
+
+@router.post("/auth/reset-password/preview")
+async def preview_reset(db: DB, payload: ResetPreviewInput) -> ResetPreview:
+    # POST so the token stays out of the URL (and the access logs).
+    return await service.preview_reset(db, payload.token)
 
 
 @router.post("/auth/reset-password")

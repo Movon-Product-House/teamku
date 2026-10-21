@@ -508,6 +508,12 @@ async def _flow(r: _Recorder) -> None:
     reset_token = next(part for part in message.body.split() if "token=" in part)
     await call(
         "POST",
+        "/auth/reset-password/preview",
+        "anon",
+        json={"token": reset_token.split("token=")[1]},
+    )
+    await call(
+        "POST",
         "/auth/reset-password",
         "anon",
         json={"token": reset_token.split("token=")[1], "password": "BaruSekali1"},
