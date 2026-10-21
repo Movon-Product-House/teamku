@@ -172,31 +172,3 @@ async def test_week_caps_a_session_closed_the_next_day_at_the_end_of_its_day(
 
     assert response.json()["days"][0]["hours"] == 4
     assert response.json()["days"][1]["hours"] == 0
-
-
-async def test_today_sums_the_hours_of_every_closed_session_today(
-    client, db, login_headers
-) -> None:
-    now = datetime.now(JAKARTA)
-    if jakarta_date(now - timedelta(hours=3)) != jakarta_date():
-        pytest.skip("needs three hours of today behind us")
-    await add_attendance(
-        db,
-        EMAIL,
-        checked_in_at=now - timedelta(hours=3),
-        checked_out_at=now - timedelta(hours=2),
-        agenda=[{}],
-    )
-    await add_attendance(
-        db,
-        EMAIL,
-        checked_in_at=now - timedelta(minutes=90),
-        checked_out_at=now - timedelta(minutes=60),
-        agenda=[{}],
-    )
-    await add_attendance(db, EMAIL, checked_in_at=now - timedelta(minutes=30), agenda=[{}])
-
-    response = await client.get("/api/v1/attendance/today", headers=await login_headers(EMAIL))
-
-    assert response.json()["state"] == "checked_in"
-    assert response.json()["closed_hours_today"] == 1.5

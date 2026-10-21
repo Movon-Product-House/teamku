@@ -8,15 +8,18 @@ export function greeting(now: Date): string {
   return "Selamat malam";
 }
 
-/** Every session today counts: the closed ones plus the open one up to now. */
+const HOUR_MS = 3_600_000;
+const DAY_MS = 24 * HOUR_MS;
+const WIB_OFFSET_MS = 7 * HOUR_MS; // Asia/Jakarta has no DST.
+
+/** Every session today counts: the closed ones plus the open one, capped like the API's worked_hours. */
 export function workedMs(today: Today, now: Date): number {
-  // ?? 0: an older API without the field must not render "NaNm".
-  const closed = (today.closed_hours_today ?? 0) * 3_600_000;
-  const open =
-    today.state === "checked_in" && today.session
-      ? now.getTime() - new Date(today.session.checked_in_at).getTime()
-      : 0;
-  return closed + open;
+  const closed = (today.closed_hours_today ?? 0) * HOUR_MS;
+  if (today.state !== "checked_in" || !today.session) return closed;
+  const start = new Date(today.session.checked_in_at).getTime();
+  const dayEnd = Math.floor((start + WIB_OFFSET_MS) / DAY_MS) * DAY_MS + DAY_MS - WIB_OFFSET_MS;
+  // max(0): a device clock behind the server must not eat into the closed hours.
+  return closed + Math.max(0, Math.min(now.getTime(), dayEnd) - start);
 }
 
 /** 198 minutes → "3j 18m"; under an hour → "18m". */
