@@ -195,6 +195,12 @@ async def record_failed_attempt(db: AsyncSession, email: str) -> None:
     await db.commit()  # keep the failure: get_db rolls back on the error the caller raises
 
 
+async def clear_failed_attempts(db: AsyncSession, email: str) -> None:
+    await db.execute(
+        delete(LoginAttempt).where(LoginAttempt.email == email).execution_options(**CROSS_TENANT)
+    )
+
+
 async def login(db: AsyncSession, payload: Login) -> AuthOut:
     email = payload.email.strip().lower()
     await raise_if_locked_out(
@@ -208,9 +214,7 @@ async def login(db: AsyncSession, payload: Login) -> AuthOut:
         await record_failed_attempt(db, email)
         raise HTTPException(401, INVALID_LOGIN)
     bind_tenant(db, user.tenant_id)
-    await db.execute(
-        delete(LoginAttempt).where(LoginAttempt.email == email).execution_options(**CROSS_TENANT)
-    )
+    await clear_failed_attempts(db, email)
     # Transparently upgrade legacy/weak hashes on successful login.
     if needs_rehash(user.password_hash):
         user.password_hash = await hash_password_async(payload.password)
@@ -399,6 +403,8 @@ async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
     check_password_policy(payload.password)
     user.password_hash = await hash_password_async(payload.password)
     reset.used_at = datetime.now(UTC)
+    # The lockout copy offers a reset as the way out, so it must lift the lock.
+    await clear_failed_attempts(db, user.email.strip().lower())
     await employees_service.revoke_sessions(db, user.id)
     token = create_session(db, user)
     await audit(db, "auth.password_reset", user, str(user.id))
@@ -416,9 +422,7 @@ async def change_password(
         await record_failed_attempt(db, email)
         # 422, not 401: the session is valid; 401 makes the web client log the user out.
         raise HTTPException(422, "Kata sandi saat ini salah")
-    await db.execute(
-        delete(LoginAttempt).where(LoginAttempt.email == email).execution_options(**CROSS_TENANT)
-    )
+    await clear_failed_attempts(db, email)
     if payload.new_password == payload.current_password:
         raise HTTPException(422, "Kata sandi baru harus berbeda dari kata sandi lama")
     check_password_policy(payload.new_password)
