@@ -29,7 +29,7 @@ export function WeekCard({ week }: { week: Week }) {
         </p>
       </div>
       <ul className="flex h-40 items-end justify-between gap-3 border-border border-b pb-3">
-        {bars.map((bar, index) => (
+        {bars.map((bar) => (
           <li key={bar.date} className="flex h-full flex-1 flex-col items-center gap-2">
             <div className="flex w-full flex-1 items-end justify-center gap-1">
               <span
@@ -45,7 +45,7 @@ export function WeekCard({ week }: { week: Week }) {
             <span className="sr-only">
               {bar.tone === "leave"
                 ? "cuti"
-                : `${week.days[index].hours} jam${bar.tone === "late" ? ", terlambat" : ""}`}
+                : `${bar.hours.toLocaleString("id-ID")} jam${bar.tone === "late" ? ", terlambat" : ""}`}
             </span>
           </li>
         ))}

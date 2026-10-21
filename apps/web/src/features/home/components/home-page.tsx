@@ -338,10 +338,10 @@ function LatestLeave({ item }: { item: LeaveSummary["items"][number] }) {
       </div>
       <div className="flex items-center gap-3 rounded-card bg-card p-4">
         <span className="flex size-12 shrink-0 flex-col items-center justify-center rounded-control bg-secondary">
-          <span className="font-bold text-xs uppercase">
+          <span className="font-bold text-caption uppercase">
             {start.toLocaleDateString("id-ID", { month: "short" })}
           </span>
-          <span className="font-display text-heading leading-none">{start.getDate()}</span>
+          <span className="font-display text-heading">{start.getDate()}</span>
         </span>
         <span className="flex flex-1 flex-col">
           <span className="font-semibold text-body">Cuti · {item.days} hari kerja</span>

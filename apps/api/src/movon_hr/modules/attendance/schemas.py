@@ -27,13 +27,20 @@ class ReverifyInput(BaseModel):
     selfie_captured: bool
 
 
+class AgendaItemOut(BaseModel):
+    """Check-in accepts free-form agenda dicts; Beranda only reads these two keys."""
+
+    title: str | None = None
+    status: str | None = None
+
+
 class SessionOut(BaseModel):
     id: uuid.UUID
     checked_in_at: datetime
     checked_out_at: datetime | None
     anomaly: str | None
     agenda_count: int
-    agenda: list[dict]
+    agenda: list[AgendaItemOut]
     summary: str | None
 
 

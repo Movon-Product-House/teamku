@@ -1,6 +1,6 @@
 import type { AttendanceState } from "@/features/shell/types";
 
-export type AgendaItem = { title?: string; status?: string };
+export type AgendaItem = { title: string | null; status: string | null };
 
 export type Today = {
   state: AttendanceState;

@@ -41,6 +41,10 @@ def is_missed(due_at: datetime, now: datetime) -> bool:
     return now >= due_at + REVERIFY_GRACE
 
 
+def is_late(checked_in_at: datetime) -> bool:
+    return checked_in_at.astimezone(JAKARTA).time() >= LATE_AFTER
+
+
 def parse_hhmm(value: str) -> time:
     hour, minute = value.split(":")
     return time(int(hour), int(minute))

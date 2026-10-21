@@ -142,7 +142,7 @@ function Timeline({ start, end }: { start: Date; end: Date }) {
             // biome-ignore lint/suspicious/noArrayIndexKey: slot jam tetap, tidak pernah diurut ulang
             key={index}
             className={cn(
-              "flex-1 rounded-[1px]",
+              "flex-1 rounded-xs",
               filled ? "h-full bg-foreground" : "h-1.5 bg-secondary",
             )}
           />

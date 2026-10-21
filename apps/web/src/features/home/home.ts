@@ -30,6 +30,7 @@ const DAY_LABELS = ["Sen", "Sel", "Rab", "Kam", "Jum"];
 export type WeekBar = {
   date: string;
   label: string;
+  hours: number;
   /** Bar heights as a percentage of the tallest value (target or longest day). */
   actual: number;
   target: number;
@@ -42,6 +43,7 @@ export function weekBars(week: Week): WeekBar[] {
   return week.days.map((day, index) => ({
     date: day.date,
     label: DAY_LABELS[index] ?? day.date,
+    hours: day.hours,
     actual: day.on_leave ? target : (day.hours / scale) * 100,
     target,
     tone: day.on_leave ? "leave" : day.late ? "late" : "actual",

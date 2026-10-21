@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from movon_hr.core.identity import Employee
 from movon_hr.core.time import JAKARTA, jakarta_date
 from movon_hr.modules.attendance.models import Attendance
-from movon_hr.modules.attendance.rules import LATE_AFTER
+from movon_hr.modules.attendance.rules import is_late
 from movon_hr.modules.dashboard.schemas import DashboardAttendance, DashboardOut
 from movon_hr.modules.employees import service as employees_service
 from movon_hr.modules.leave.models import LeaveRequest
@@ -52,11 +52,7 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
     present = {item.employee_id for item in sessions}
     on_leave = {employee_id for employee_id, status in requests if status == "approved"}
     absent = set(ids) - present - on_leave
-    late = {
-        item.employee_id
-        for item in sessions
-        if item.checked_in_at.astimezone(JAKARTA).time() >= LATE_AFTER
-    }
+    late = {item.employee_id for item in sessions if is_late(item.checked_in_at)}
     agenda = [entry for item in sessions for entry in item.agenda]
     return DashboardOut(
         current_user=(await employees_service.to_out(db, [user]))[0],

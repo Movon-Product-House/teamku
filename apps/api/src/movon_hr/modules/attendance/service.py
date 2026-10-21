@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
-from movon_hr.core.time import JAKARTA, jakarta_date
+from movon_hr.core.time import jakarta_date
 from movon_hr.modules.attendance import rules
 from movon_hr.modules.attendance.models import Attendance, IdempotencyKey, LocationEvent
 from movon_hr.modules.attendance.schemas import (
@@ -132,17 +132,23 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
 
 
 async def week(db: AsyncSession, user: Employee) -> WeekOut:
-    """Monday to Friday of the current Jakarta week; an open session counts up to now."""
+    """Monday to Friday of the current Jakarta week.
+
+    An open session counts up to now, but never past the end of its own day. A day is late
+    when its first check-in is late.
+    """
     today = jakarta_date()
     days = [today - timedelta(days=today.weekday() - offset) for offset in range(5)]
     start, _ = rules.jakarta_day_bounds(days[0])
     _, end = rules.jakarta_day_bounds(days[-1])
     sessions = await db.scalars(
-        select(Attendance).where(
+        select(Attendance)
+        .where(
             Attendance.employee_id == user.id,
             Attendance.checked_in_at >= start,
             Attendance.checked_in_at < end,
         )
+        .order_by(Attendance.checked_in_at)
     )
     leaves = (
         await db.execute(
@@ -156,19 +162,19 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
     ).all()
     now = datetime.now(UTC)
     hours = dict.fromkeys(days, 0.0)
-    late: set[date] = set()
+    late: dict[date, bool] = {}
     for item in sessions:
         day = jakarta_date(item.checked_in_at)
-        hours[day] += ((item.checked_out_at or now) - item.checked_in_at).total_seconds() / 3600
-        if item.checked_in_at.astimezone(JAKARTA).time() >= rules.LATE_AFTER:
-            late.add(day)
+        until = item.checked_out_at or min(now, rules.jakarta_day_bounds(day)[1])
+        hours[day] += (until - item.checked_in_at).total_seconds() / 3600
+        late.setdefault(day, rules.is_late(item.checked_in_at))
     return WeekOut(
         target_hours=rules.TARGET_HOURS_PER_DAY,
         days=[
             WeekDay(
                 date=day,
                 hours=round(hours[day], 2),
-                late=day in late,
+                late=late.get(day, False),
                 on_leave=any(first <= day <= last for first, last in leaves),
             )
             for day in days
