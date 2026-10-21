@@ -1,6 +1,6 @@
 import { Circle, CircleCheck, Info } from "lucide-react";
 import { cn } from "@/shared/lib/cn";
-import { passwordRules } from "../auth";
+import { passwordRules } from "@/shared/lib/password";
 
 /** Live checklist under the new-password field (A3, A4). */
 export function PasswordRules({

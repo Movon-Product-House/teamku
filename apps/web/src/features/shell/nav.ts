@@ -1,4 +1,5 @@
 import {
+  Bell,
   BookOpen,
   Calculator,
   CalendarDays,
@@ -11,6 +12,7 @@ import {
   ReceiptText,
   ScanFace,
   Settings2,
+  ShieldCheck,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -30,6 +32,15 @@ export type NavItem = {
 export type NavGroup = { label?: string; items: NavItem[]; shortcuts?: boolean };
 
 export const MORE_HREF = "/app/more";
+export const NOTIFICATIONS_HREF = "/app/notifications";
+
+/** P7, reached from the account menu (desktop) and Lainnya (mobile), not from the nav. */
+export const profile: NavItem = {
+  label: "Profil & keamanan",
+  href: "/app/profile",
+  icon: ShieldCheck,
+  description: "Data diri, ganti kata sandi",
+};
 
 const home: NavItem = { label: "Beranda", href: "/app/overview", icon: House };
 const attendance: NavItem = { label: "Presensi", href: "/app/attendance/today", icon: ScanFace };
@@ -127,7 +138,12 @@ export function activeTab(pathname: string, role: Role): string {
 
 /** Title for the mobile top bar, taken from the nav item that matches the path. */
 export function pageTitle(pathname: string, role: Role, department: string): string {
-  const items = [more, ...navGroups(role, department).flatMap((group) => group.items)];
+  const items = [
+    more,
+    { label: "Notifikasi", href: NOTIFICATIONS_HREF, icon: Bell },
+    profile,
+    ...navGroups(role, department).flatMap((group) => group.items),
+  ];
   const href = activeHref(
     pathname,
     items.map((item) => item.href),

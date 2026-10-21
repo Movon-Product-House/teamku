@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronsUpDown, LogOut, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { initials, workLocation } from "../nav";
+import { initials, profile, workLocation } from "../nav";
 import { type Me, roleLabels } from "../types";
 
 /** S3 on desktop: opened from the name at the bottom of the sidebar. */
@@ -45,11 +46,11 @@ export function AccountMenu({
           </p>
         </div>
         <DropdownMenuSeparator />
-        {/* P7 is built in #17; the item stays visible so the menu matches the mockup. */}
-        <DropdownMenuItem disabled>
-          <ShieldCheck className="text-muted-foreground" />
-          Profil & keamanan
-          <span className="ml-auto text-faint-foreground text-xs">Segera</span>
+        <DropdownMenuItem asChild>
+          <Link href={profile.href}>
+            <ShieldCheck className="text-muted-foreground" />
+            {profile.label}
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onSelect={onLogout}>
           <LogOut />

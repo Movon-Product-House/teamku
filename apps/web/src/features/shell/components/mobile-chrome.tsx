@@ -1,10 +1,32 @@
 "use client";
 
+import { Bell } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/shared/lib/cn";
-import { activeTab, initials, MORE_HREF, type NavItem } from "../nav";
+import { useNotifications } from "../api";
+import { activeTab, initials, MORE_HREF, type NavItem, NOTIFICATIONS_HREF } from "../nav";
 import type { Role } from "../types";
-import { NotificationPopover } from "./notification-popover";
+import { unreadLabel } from "./notification-popover";
+
+/** S2 bell: on phones the notifications get their own page (S4), not the D6 panel. */
+function NotificationBell() {
+  const unread = useNotifications().data?.unread ?? 0;
+  return (
+    <Link
+      href={NOTIFICATIONS_HREF}
+      aria-label={unreadLabel(unread)}
+      className="relative inline-flex size-10.5 items-center justify-center rounded-full border border-border bg-card text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      <Bell className="size-4.75" aria-hidden />
+      {unread > 0 && (
+        <span
+          aria-hidden
+          className="absolute top-2 right-2 size-2.25 rounded-full bg-brand ring-2 ring-card"
+        />
+      )}
+    </Link>
+  );
+}
 
 /** S2 top bar: page title, bell, and the avatar that opens Lainnya. */
 export function MobileHeader({ title, name }: { title: string; name: string }) {
@@ -15,7 +37,7 @@ export function MobileHeader({ title, name }: { title: string; name: string }) {
     >
       <p className="truncate font-display text-title-sm">{title}</p>
       <div className="flex items-center gap-2">
-        <NotificationPopover tone="light" />
+        <NotificationBell />
         <Link
           href={MORE_HREF}
           aria-label="Akun dan menu lainnya"

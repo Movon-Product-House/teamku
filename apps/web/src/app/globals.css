@@ -38,6 +38,7 @@
   --color-primary: #17171a; /* ink: satu tombol utama per layar */
   --color-primary-foreground: #ffffff;
   --color-secondary: #efeeea; /* surface-2: pil, tab aktif */
+  --color-subtle: #f6f5f2; /* bg: kartu yang sudah dibaca (S4), sedikit lebih terang dari kanvas */
   --color-secondary-foreground: #17171a;
   --color-muted: #efeeea;
   --color-muted-foreground: #55565c; /* ink-2: teks kedua */
@@ -92,10 +93,15 @@
   --text-caption: 0.8125rem; /* 13, label */
   --text-caption--line-height: 1.4;
   --text-caption--font-weight: 500;
+  --text-overline: 0.6875rem; /* 11, label seksi kapital (DATA KERJA, AKUN); pakai dengan `uppercase` */
+  --text-overline--line-height: 1.4;
+  --text-overline--font-weight: 700;
+  --text-overline--letter-spacing: 1px;
 
   /* Bentuk */
   --radius-control: 10px; /* tombol & select desktop */
   --radius-field: 12px; /* input, tombol mobile (r-md) */
+  --radius-tile: 16px; /* r-lg: kartu notifikasi S4, daftar data P7 */
   --radius-card: 20px;
   --radius-dialog: 24px;
 
