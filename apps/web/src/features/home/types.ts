@@ -12,6 +12,8 @@ export type Today = {
   } | null;
   pending_reverification: { id: string; due_at: string | null } | null;
   is_remote: boolean;
+  // Optional while a web deploy can run ahead of the API.
+  closed_hours_today?: number;
 };
 
 export type Week = {

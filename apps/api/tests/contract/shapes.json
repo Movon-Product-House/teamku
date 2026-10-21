@@ -88,6 +88,7 @@
     "pending": "number"
   },
   "GET /api/v1/attendance/today | employee | checked_in": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {
@@ -107,6 +108,7 @@
     "state": "string"
   },
   "GET /api/v1/attendance/today | employee | completed": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {
@@ -126,6 +128,7 @@
     "state": "string"
   },
   "GET /api/v1/attendance/today | employee | reverify_pending": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": {
       "due_at": "datetime:9999-99-99T99:99:99.999999Z",
@@ -149,18 +152,21 @@
     "state": "string"
   },
   "GET /api/v1/attendance/today | employee | seed": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": "null",
     "state": "string"
   },
   "GET /api/v1/attendance/today | hr | seed": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": "null",
     "state": "string"
   },
   "GET /api/v1/attendance/today | manager | seed": {
+    "closed_hours_today": "number",
     "is_remote": "boolean",
     "pending_reverification": "null",
     "session": {

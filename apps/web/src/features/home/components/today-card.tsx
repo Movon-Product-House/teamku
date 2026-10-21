@@ -7,7 +7,7 @@ import type { Me } from "@/features/shell/types";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { formatDuration, timelineSlots } from "../home";
+import { formatDuration, timelineSlots, workedMs } from "../home";
 import type { Today } from "../types";
 
 export const ATTENDANCE_HREF = "/app/attendance/today";
@@ -34,18 +34,18 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1.5">
           <p className="font-semibold text-caption text-faint-foreground uppercase tracking-wider lg:hidden">
-            Sesi hari ini
+            Total hari ini
           </p>
           <div className="flex flex-wrap items-baseline gap-3">
             <h2 id="today-duration" className="font-display text-title lg:text-display">
-              {formatDuration(end.getTime() - start.getTime())}
+              {formatDuration(workedMs(today, now))}
             </h2>
             <Badge tone={working ? "success" : "neutral"} variant="plain">
               {working ? "Sedang bekerja" : "Hari kerja selesai"}
             </Badge>
           </div>
           <p className="text-body text-muted-foreground">
-            Durasi kerja hari ini · check-in {clock.format(start)}
+            Total kerja hari ini · sesi terakhir check-in {clock.format(start)}
             {session.checked_out_at && ` · check-out ${clock.format(end)}`}
           </p>
         </div>
@@ -64,7 +64,7 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
       <ul className="flex flex-wrap gap-x-6 gap-y-2 border-border border-t pt-4 text-caption text-muted-foreground max-lg:hidden">
         <li className="flex items-center gap-2">
           <LogIn className="size-4" aria-hidden />
-          Check-in {clock.format(start)}
+          Sesi terakhir check-in {clock.format(start)}
         </li>
         <li className="flex items-center gap-2">
           <Camera className="size-4" aria-hidden />
@@ -132,10 +132,10 @@ function NotCheckedIn({ today, user }: { today: Today; user: Me["user"] }) {
 function Timeline({ start, end }: { start: Date; end: Date }) {
   const slots = timelineSlots(start, end);
   return (
-    <figure
-      className="flex flex-col gap-2 max-lg:hidden"
-      aria-label="Timeline jam kerja 08.00 sampai 18.00"
-    >
+    <figure className="flex flex-col gap-2 max-lg:hidden">
+      <figcaption className="text-caption text-faint-foreground">
+        Sesi terakhir, 08.00 sampai 18.00
+      </figcaption>
       <div className="flex h-12 items-end gap-0.5">
         {slots.map((filled, index) => (
           <span

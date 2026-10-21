@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, greeting, timelineSlots, weekBars } from "./home";
+import { formatDuration, greeting, timelineSlots, weekBars, workedMs } from "./home";
+import type { Today } from "./types";
 
 const at = (hour: number, minute = 0) => new Date(2026, 8, 29, hour, minute);
 
@@ -9,6 +10,36 @@ describe("home", () => {
     expect(greeting(at(12))).toBe("Selamat siang");
     expect(greeting(at(16))).toBe("Selamat sore");
     expect(greeting(at(20))).toBe("Selamat malam");
+  });
+
+  it("sums the closed sessions of today with the open one", () => {
+    const today = (state: Today["state"], checked_out_at: string | null): Today => ({
+      state,
+      session: { id: "s", checked_in_at: at(13).toISOString(), checked_out_at, agenda: [] },
+      pending_reverification: null,
+      is_remote: false,
+      closed_hours_today: 1.5,
+    });
+    expect(workedMs(today("checked_in", null), at(14))).toBe(2.5 * 3_600_000);
+    expect(workedMs(today("completed", at(14).toISOString()), at(18))).toBe(1.5 * 3_600_000);
+  });
+
+  it("never lets the open session go negative or past midnight WIB", () => {
+    const open = (checked_in_at: string): Today => ({
+      state: "checked_in",
+      session: { id: "s", checked_in_at, checked_out_at: null, agenda: [] },
+      pending_reverification: null,
+      is_remote: false,
+      closed_hours_today: 1,
+    });
+    // Device clock two minutes behind the server.
+    expect(workedMs(open("2026-09-29T06:02:00Z"), new Date("2026-09-29T06:00:00Z"))).toBe(
+      3_600_000,
+    );
+    // 23.00 WIB check-in, 01.00 WIB now: counts up to 00.00 WIB only.
+    expect(workedMs(open("2026-09-29T16:00:00Z"), new Date("2026-09-29T18:00:00Z"))).toBe(
+      2 * 3_600_000,
+    );
   });
 
   it("formats a work duration as hours and minutes", () => {

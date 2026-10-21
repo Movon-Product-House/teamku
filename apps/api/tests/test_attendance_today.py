@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from helpers import add_attendance
 
+from movon_hr.core.time import jakarta_date
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
 pytestmark = pytest.mark.anyio
@@ -32,6 +33,7 @@ async def test_fresh_demo_account_starts_without_a_check_in(client, login_header
         "session": None,
         "pending_reverification": None,
         "is_remote": False,
+        "closed_hours_today": 0,
     }
 
 
@@ -129,3 +131,29 @@ async def test_check_in_rejects_an_open_session_from_a_prior_day(client, db, log
 
     assert response.status_code == 409
     assert "sesi kehadiran" in response.json()["detail"]
+
+
+async def test_today_sums_the_hours_of_every_closed_session_today(
+    client, db, login_headers
+) -> None:
+    now = datetime.now(UTC)
+    if jakarta_date(now - timedelta(minutes=10)) != jakarta_date(now):
+        pytest.skip("needs ten minutes of today behind us")
+    for start, end in [(10, 7), (6, 3)]:
+        await add_attendance(
+            db,
+            "fresh@movon.test",
+            checked_in_at=now - timedelta(minutes=start),
+            checked_out_at=now - timedelta(minutes=end),
+            agenda=[{}],
+        )
+    await add_attendance(
+        db, "fresh@movon.test", checked_in_at=now - timedelta(minutes=2), agenda=[{}]
+    )
+
+    response = await client.get(
+        "/api/v1/attendance/today", headers=await login_headers("fresh@movon.test")
+    )
+
+    assert response.json()["state"] == "checked_in"
+    assert response.json()["closed_hours_today"] == 0.1
