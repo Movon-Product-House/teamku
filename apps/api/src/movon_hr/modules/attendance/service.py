@@ -134,7 +134,7 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
 async def week(db: AsyncSession, user: Employee) -> WeekOut:
     """Monday to Friday of the current Jakarta week.
 
-    An open session counts up to now, but never past the end of its own day. A day is late
+    A session counts up to its check-out (or now), but never past the end of its own day. A day is late
     when its first check-in is late.
     """
     today = jakarta_date()
@@ -165,7 +165,7 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
     late: dict[date, bool] = {}
     for item in sessions:
         day = jakarta_date(item.checked_in_at)
-        until = item.checked_out_at or min(now, rules.jakarta_day_bounds(day)[1])
+        until = min(item.checked_out_at or now, rules.jakarta_day_bounds(day)[1])
         hours[day] += (until - item.checked_in_at).total_seconds() / 3600
         late.setdefault(day, rules.is_late(item.checked_in_at))
     return WeekOut(
@@ -237,7 +237,7 @@ async def check_in(
         latitude=payload.latitude,
         longitude=payload.longitude,
         accuracy_meters=payload.accuracy_meters,
-        agenda=payload.agenda,
+        agenda=[item.model_dump() for item in payload.agenda],
         anomaly=anomaly,
     )
     db.add(record)

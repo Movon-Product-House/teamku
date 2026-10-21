@@ -1,7 +1,14 @@
 import uuid
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+
+
+class AgendaItemIn(BaseModel):
+    model_config = ConfigDict(extra="allow")  # the check-in form also sends `priority`
+
+    title: str = Field(min_length=1, max_length=200)
+    status: str | None = None
 
 
 class CheckIn(BaseModel):
@@ -10,7 +17,7 @@ class CheckIn(BaseModel):
     accuracy_meters: float = Field(ge=0, le=10_000)
     selfie_captured: bool
     location_share_approved: bool
-    agenda: list[dict] = Field(min_length=1, max_length=5)
+    agenda: list[AgendaItemIn] = Field(min_length=1, max_length=5)
 
 
 class CheckOut(BaseModel):
@@ -28,10 +35,14 @@ class ReverifyInput(BaseModel):
 
 
 class AgendaItemOut(BaseModel):
-    """Check-in accepts free-form agenda dicts; Beranda only reads these two keys."""
-
     title: str | None = None
     status: str | None = None
+
+    @field_validator("title", "status", mode="before")
+    @classmethod
+    def drop_non_strings(cls, value: object) -> str | None:
+        """Rows stored before check-in typed its agenda may hold any JSON here."""
+        return value if isinstance(value, str) else None
 
 
 class SessionOut(BaseModel):

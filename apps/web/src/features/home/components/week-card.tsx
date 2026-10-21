@@ -9,10 +9,10 @@ const TONES = {
 } as const;
 
 const LEGEND = [
-  ["Aktual", "bg-foreground"],
+  ["Aktual", TONES.actual],
   ["Target", "bg-secondary"],
-  ["Terlambat", "bg-warning"],
-  ["Cuti", "bg-info"],
+  ["Terlambat", TONES.late],
+  ["Cuti", TONES.leave],
 ] as const;
 
 /** D1 "Jam kerja minggu ini": actual hours per weekday next to the daily target. */
