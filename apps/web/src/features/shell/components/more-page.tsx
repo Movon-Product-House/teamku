@@ -67,7 +67,7 @@ export function MorePage() {
 function MoreGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-semibold text-caption text-faint-foreground">{label}</h2>
+      <h2 className="text-faint-foreground text-overline uppercase">{label}</h2>
       <ul className="divide-y divide-border overflow-hidden rounded-card bg-card">{children}</ul>
     </section>
   );

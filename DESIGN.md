@@ -78,6 +78,12 @@ typography:
     fontSize: "13px"
     fontWeight: 500
     lineHeight: 1.4
+  overline:
+    fontFamily: "Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "11px"
+    fontWeight: 700
+    lineHeight: 1.4
+    letterSpacing: "1px"
 rounded:
   control: "10px"
   field: "12px"
@@ -187,6 +193,7 @@ Setiap utility `text-*` sudah membawa ukuran, line-height, letter-spacing, dan w
 - **Heading**: judul kartu. `text-heading`.
 - **Body**: isi, maks 65–75ch. `text-body`.
 - **Caption**: label dan meta. `text-caption`.
+- **Overline**: label seksi kapital di atas kartu/grup (DATA KERJA, AKUN). `text-overline uppercase`; teks sumber tetap huruf biasa.
 
 ### Named Rules
 **The Serif For Meaning Rule.** Serif hanya untuk judul halaman/dialog dan angka utama. Tombol, label, tabel, dan input selalu sans.

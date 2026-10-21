@@ -50,7 +50,7 @@ export function ProfilePage() {
       <h1 className="hidden font-display text-title-sm lg:block">Profil & keamanan</h1>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold text-caption text-faint-foreground">Data kerja</h2>
+        <h2 className="text-faint-foreground text-overline uppercase">Data kerja</h2>
         <dl className="divide-y divide-border rounded-card bg-card px-4">
           {rows.map(([label, value]) => (
             <div key={label} className="flex items-baseline justify-between gap-4 py-3">
@@ -65,7 +65,7 @@ export function ProfilePage() {
       </section>
 
       <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-        <h2 className="font-semibold text-caption text-faint-foreground">Ganti kata sandi</h2>
+        <h2 className="text-faint-foreground text-overline uppercase">Ganti kata sandi</h2>
         {/* Lets password managers update the saved entry for this account. */}
         <input type="hidden" autoComplete="username" value={user.email} readOnly />
         <Field>

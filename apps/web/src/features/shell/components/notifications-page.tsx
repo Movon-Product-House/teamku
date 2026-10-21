@@ -55,7 +55,7 @@ export function NotificationsPage() {
       {notifications.data &&
         groupByDay(notifications.data.items).map((group) => (
           <section key={group.label} className="flex flex-col gap-2">
-            <h2 className="text-caption text-faint-foreground">{group.label}</h2>
+            <h2 className="font-bold text-caption text-faint-foreground">{group.label}</h2>
             <div className="flex flex-col gap-1 rounded-card bg-card p-1.5">
               {group.items.map((item) => (
                 <NotificationItem key={item.id} item={item} />
