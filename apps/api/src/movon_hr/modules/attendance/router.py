@@ -18,6 +18,7 @@ from movon_hr.modules.attendance.schemas import (
     SkippedEventOut,
     SkippedOut,
     TodayOut,
+    WeekOut,
 )
 
 router = APIRouter()
@@ -27,6 +28,11 @@ HrOrManager = Annotated[Employee, Depends(require_role("manager", "hr_admin"))]
 @router.get("/attendance/today")
 async def attendance_today(db: DB, user: CurrentUser) -> TodayOut:
     return await service.today(db, user)
+
+
+@router.get("/attendance/week")
+async def attendance_week(db: DB, user: CurrentUser) -> WeekOut:
+    return await service.week(db, user)
 
 
 @router.post("/attendance/check-in")
