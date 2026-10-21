@@ -49,6 +49,14 @@ export function usePendingApprovals(me: Me | undefined) {
   });
 }
 
+export function useMarkRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api(`/notifications/${id}/read`, { method: "POST" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shellKeys.notifications }),
+  });
+}
+
 export function useMarkAllRead() {
   const queryClient = useQueryClient();
   return useMutation({

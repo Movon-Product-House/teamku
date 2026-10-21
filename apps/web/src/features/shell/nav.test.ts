@@ -89,6 +89,7 @@ describe("pageTitle", () => {
     expect(pageTitle("/app/people/42", "manager", "Sales")).toBe("Tim Saya");
     expect(pageTitle("/app/people", "hr_admin", "HR")).toBe("Karyawan");
     expect(pageTitle(MORE_HREF, "employee", "Sales")).toBe("Lainnya");
+    expect(pageTitle("/app/notifications", "employee", "Sales")).toBe("Notifikasi");
     expect(pageTitle("/app/unknown", "employee", "Sales")).toBe("Teamku");
   });
 });

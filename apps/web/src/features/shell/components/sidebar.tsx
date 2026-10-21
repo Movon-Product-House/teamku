@@ -41,7 +41,7 @@ export function Sidebar({
         >
           <BrandLogo variant="white" className="h-7 w-auto" />
         </Link>
-        <NotificationPopover tone="dark" />
+        <NotificationPopover />
       </div>
 
       {groups.map((group) => (
