@@ -1,13 +1,17 @@
 import uuid
 from datetime import date, datetime
+from typing import Literal
 
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from movon_hr.core.db import Base
+from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
+
+Language = Literal["id", "en"]
+PolicyState = Literal["draft", "published", "archived"]
 
 
 class Policy(TenantScoped, Base):
@@ -16,10 +20,10 @@ class Policy(TenantScoped, Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=UUIDV7)
     title: Mapped[str]
     category: Mapped[str]
-    language: Mapped[str]
+    language: Mapped[Language]
     effective_date: Mapped[date]
     expiry_date: Mapped[date | None]
-    state: Mapped[str] = mapped_column(default="draft")
+    state: Mapped[PolicyState] = mapped_column(default="draft")
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now())
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("employees.id"))
@@ -31,6 +35,8 @@ class Policy(TenantScoped, Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+
+    __table_args__ = (one_of("language", Language), one_of("state", PolicyState))
 
 
 class PolicySection(TenantScoped, Base):

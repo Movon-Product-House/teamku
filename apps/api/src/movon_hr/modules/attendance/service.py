@@ -25,6 +25,7 @@ from movon_hr.modules.attendance.schemas import (
     SkippedEventOut,
     SkippedOut,
     TodayOut,
+    VerifiedEventOut,
     WeekDay,
     WeekOut,
 )
@@ -336,7 +337,7 @@ async def check_out(db: AsyncSession, user: Employee, payload: CheckOut) -> Chec
 
 async def reverify(
     db: AsyncSession, user: Employee, payload: ReverifyInput
-) -> LocationEventOut | SkippedEventOut | SkippedOut:
+) -> VerifiedEventOut | SkippedEventOut | SkippedOut:
     record = next(
         (
             item
@@ -373,10 +374,10 @@ async def reverify(
     pending.inside_geofence = inside
     pending.anomaly = None if inside else "outside_geofence"
     await audit(db, "attendance.reverify", user, str(pending.id))
-    event = LocationEventOut.model_validate(pending)
+    event = LocationEventOut.model_validate(pending).model_dump(exclude={"maps_url"})
     if user.is_remote:
-        return SkippedEventOut(**event.model_dump(exclude={"maps_url"}), skipped=True)
-    return event
+        return SkippedEventOut(**event, skipped=True)
+    return VerifiedEventOut(**event)
 
 
 async def location_history(db: AsyncSession, user: Employee, employee_id: str) -> LocationHistory:

@@ -125,5 +125,6 @@ async def test_check_in_replay_returns_the_first_attendance(client, db, login_he
     second = await client.post("/api/v1/attendance/check-in", headers=headers, json=CHECK_IN)
 
     assert first.status_code == 200
-    assert second.json() == {"id": first.json()["id"], "idempotent": True}
+    assert first.json()["result"] == "created"
+    assert second.json() == {"result": "idempotent", "id": first.json()["id"], "idempotent": True}
     assert await count(db, Attendance) == before + 1

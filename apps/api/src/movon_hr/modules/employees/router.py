@@ -7,11 +7,11 @@ from movon_hr.core.db import DB
 from movon_hr.core.identity import Employee
 from movon_hr.modules.employees import service
 from movon_hr.modules.employees.schemas import (
+    CreateEmployeeResult,
     EmployeeInput,
     EmployeeList,
     EmployeeOut,
     EmployeeUpdate,
-    NewEmployeeOut,
 )
 
 router = APIRouter(tags=["employees"])
@@ -33,9 +33,7 @@ async def get_employee(db: DB, user: CurrentUser, employee_id: str) -> EmployeeO
 
 
 @router.post("/employees")
-async def create_employee(
-    db: DB, user: HrAdmin, payload: EmployeeInput
-) -> EmployeeOut | NewEmployeeOut:
+async def create_employee(db: DB, user: HrAdmin, payload: EmployeeInput) -> CreateEmployeeResult:
     return await service.create_employee(db, user, payload)
 
 

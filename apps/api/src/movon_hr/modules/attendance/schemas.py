@@ -1,7 +1,10 @@
 import uuid
 from datetime import date, datetime
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+
+from movon_hr.modules.attendance.models import Anomaly, EventKind
 
 
 class AgendaItemIn(BaseModel):
@@ -48,7 +51,7 @@ class SessionOut(BaseModel):
     id: uuid.UUID
     checked_in_at: datetime
     checked_out_at: datetime | None
-    anomaly: str | None
+    anomaly: Anomaly | None
     agenda_count: int
     agenda: list[AgendaItemOut]
     summary: str | None
@@ -59,11 +62,11 @@ class PendingOut(BaseModel):
 
     id: uuid.UUID
     due_at: datetime | None
-    kind: str
+    kind: EventKind
 
 
 class TodayOut(BaseModel):
-    state: str
+    state: Literal["not_checked_in", "checked_in", "completed"]
     session: SessionOut | None
     pending_reverification: PendingOut | None
     is_remote: bool
@@ -84,17 +87,24 @@ class WeekOut(BaseModel):
 
 
 class CheckInOut(BaseModel):
+    result: Literal["created"] = "created"
     id: uuid.UUID
     checked_in_at: datetime
     distance_meters: int
     allowed_radius_meters: int
-    anomaly: str | None
+    anomaly: Anomaly | None
     agenda_count: int
 
 
 class IdempotentOut(BaseModel):
+    """A replayed Idempotency-Key: the attendance the first request created."""
+
+    result: Literal["idempotent"] = "idempotent"
     id: uuid.UUID
     idempotent: bool
+
+
+CheckInResult = Annotated[CheckInOut | IdempotentOut, Field(discriminator="result")]
 
 
 class CheckOutOut(BaseModel):
@@ -109,14 +119,14 @@ class LocationEventOut(BaseModel):
     id: uuid.UUID
     employee_id: uuid.UUID
     attendance_id: uuid.UUID
-    kind: str
+    kind: EventKind
     at: datetime
     lat: float | None
     lng: float | None
     accuracy: float | None
     distance_meters: int | None  # always stored rounded; int keeps the old JSON (0, not 0.0)
     inside_geofence: bool | None
-    anomaly: str | None
+    anomaly: Anomaly | None
     due_at: datetime | None
 
     @computed_field
@@ -127,15 +137,30 @@ class LocationEventOut(BaseModel):
         return f"https://www.google.com/maps?q={self.lat},{self.lng}"
 
 
+class VerifiedEventOut(LocationEventOut):
+    """The pending slot, answered."""
+
+    result: Literal["verified"] = "verified"
+
+
 class SkippedEventOut(LocationEventOut):
     """A remote worker answering a slot scheduled before they became remote."""
 
-    skipped: bool  # required, so the response union never picks it for a plain event
+    result: Literal["skipped_slot"] = "skipped_slot"
+    skipped: bool
 
 
 class SkippedOut(BaseModel):
+    """A remote worker with no slot pending."""
+
+    result: Literal["skipped"] = "skipped"
     skipped: bool
     pending_reverification: None
+
+
+ReverifyResult = Annotated[
+    VerifiedEventOut | SkippedEventOut | SkippedOut, Field(discriminator="result")
+]
 
 
 class LocationHistory(BaseModel):

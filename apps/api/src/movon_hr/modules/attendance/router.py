@@ -8,15 +8,12 @@ from movon_hr.core.identity import Employee
 from movon_hr.modules.attendance import service
 from movon_hr.modules.attendance.schemas import (
     CheckIn,
-    CheckInOut,
+    CheckInResult,
     CheckOut,
     CheckOutOut,
-    IdempotentOut,
-    LocationEventOut,
     LocationHistory,
     ReverifyInput,
-    SkippedEventOut,
-    SkippedOut,
+    ReverifyResult,
     TodayOut,
     WeekOut,
 )
@@ -38,7 +35,7 @@ async def attendance_week(db: DB, user: CurrentUser) -> WeekOut:
 @router.post("/attendance/check-in")
 async def check_in(
     db: DB, user: CurrentUser, payload: CheckIn, idempotency_key: Annotated[str, Header()]
-) -> CheckInOut | IdempotentOut:
+) -> CheckInResult:
     return await service.check_in(db, user, payload, idempotency_key)
 
 
@@ -48,9 +45,7 @@ async def check_out(db: DB, user: CurrentUser, payload: CheckOut) -> CheckOutOut
 
 
 @router.post("/attendance/reverify")
-async def reverify(
-    db: DB, user: CurrentUser, payload: ReverifyInput
-) -> SkippedEventOut | LocationEventOut | SkippedOut:
+async def reverify(db: DB, user: CurrentUser, payload: ReverifyInput) -> ReverifyResult:
     return await service.reverify(db, user, payload)
 
 

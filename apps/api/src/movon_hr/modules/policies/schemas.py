@@ -3,6 +3,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from movon_hr.modules.policies.models import Language, PolicyState
+
 
 class PolicySectionInput(BaseModel):
     # Kept only when it is the id of an existing section of the same policy.
@@ -14,7 +16,7 @@ class PolicySectionInput(BaseModel):
 class PolicyInput(BaseModel):
     title: str = Field(min_length=2, max_length=160)
     category: str = Field(default="general", min_length=2, max_length=80)
-    language: str = Field(default="id", pattern="^(id|en)$")
+    language: Language = "id"
     effective_date: date
     expiry_date: date | None = None
     sections: list[PolicySectionInput] = Field(min_length=1, max_length=50)
@@ -39,10 +41,10 @@ class PolicyOut(BaseModel):
     id: uuid.UUID
     title: str
     category: str
-    language: str
+    language: Language
     effective_date: date
     expiry_date: date | None
-    state: str
+    state: PolicyState
     sections: list[PolicySectionOut]
     created_at: datetime
     updated_at: datetime

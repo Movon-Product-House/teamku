@@ -2,10 +2,10 @@
 
 from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, Literal, get_args
 
 from fastapi import Depends
-from sqlalchemy import DateTime, MetaData, Text
+from sqlalchemy import CheckConstraint, DateTime, MetaData, Text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -23,8 +23,23 @@ NAMING_CONVENTION = {
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
-    # Text without length, every timestamp is timestamptz.
-    type_annotation_map: ClassVar = {str: Text, datetime: DateTime(timezone=True)}
+    # Text without length, every timestamp is timestamptz. Literal columns stay text: their
+    # values are enforced with one_of(), not a Postgres enum.
+    type_annotation_map: ClassVar = {
+        str: Text,
+        Literal: Text,
+        datetime: DateTime(timezone=True),
+    }
+
+
+def one_of(column: str, values: object) -> CheckConstraint:
+    """CHECK keeping a text column inside a ``Literal``, so the API enum always holds.
+
+    Alembic autogenerate does not see CHECK changes: edit the Literal, then write the
+    revision by hand.
+    """
+    allowed = ", ".join(f"'{value}'" for value in get_args(values))
+    return CheckConstraint(f"{column} IN ({allowed})", name=column)
 
 
 engine = create_async_engine(

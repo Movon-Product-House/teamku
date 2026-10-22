@@ -15,6 +15,7 @@ from movon_hr.core.security import (
 from movon_hr.modules.audit.service import audit
 from movon_hr.modules.employees.models import Invitation
 from movon_hr.modules.employees.schemas import (
+    CreatedEmployeeOut,
     EmployeeColumns,
     EmployeeInput,
     EmployeeOut,
@@ -122,7 +123,7 @@ async def revoke_sessions(
 
 async def create_employee(
     db: AsyncSession, user: Employee, payload: EmployeeInput
-) -> EmployeeOut | NewEmployeeOut:
+) -> CreatedEmployeeOut | NewEmployeeOut:
     if await email_taken(db, payload.email):
         raise HTTPException(409, "Email kerja sudah digunakan")
     temporary_password: str | None = None
@@ -147,7 +148,7 @@ async def create_employee(
     await notify(db, employee.id, "Akun Anda siap", "Profil dibuat oleh HR.", "/app/overview")
     out = employee_out(employee, locations, await settings_service.primary_location(db))
     if temporary_password is None:
-        return out
+        return CreatedEmployeeOut(**out.model_dump())
     # Returned once so HR can share it; never stored in plain text.
     return NewEmployeeOut(**out.model_dump(), temporary_password=temporary_password)
 

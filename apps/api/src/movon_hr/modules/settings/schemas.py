@@ -2,6 +2,13 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from movon_hr.modules.settings.models import (
+    CalendarProvider,
+    CalendarScope,
+    DeliveryMode,
+    StoredCalendarProvider,
+)
+
 HHMM = r"^([01]\d|2[0-3]):[0-5]\d$"
 
 
@@ -29,13 +36,13 @@ class WorkLocationInput(BaseModel):
 
 
 class CalendarSettingsInput(BaseModel):
-    provider: str = Field(pattern="^(google|microsoft)$")
+    provider: CalendarProvider
     team_calendar_id: str = Field(min_length=2, max_length=300)
     connected: bool = False
     calendar_name: str = Field(default="Kalender perusahaan", max_length=120)
-    scope: str = Field(default="company", pattern="^(company|division)$")
+    scope: CalendarScope = "company"
     division: str = Field(default="", max_length=100)
-    delivery_mode: str = Field(default="shared_and_email", pattern="^(shared|shared_and_email)$")
+    delivery_mode: DeliveryMode = "shared_and_email"
 
 
 class MapsUrlInput(BaseModel):
@@ -71,13 +78,13 @@ class LocationList(BaseModel):
 class CalendarOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    provider: str
+    provider: StoredCalendarProvider
     connected: bool
     team_calendar_id: str
     calendar_name: str
-    scope: str
+    scope: CalendarScope
     division: str
-    delivery_mode: str
+    delivery_mode: DeliveryMode
 
 
 class AuthorizationUrl(BaseModel):

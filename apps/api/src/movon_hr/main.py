@@ -2,6 +2,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from movon_hr.core.settings import settings
 from movon_hr.modules.attendance.router import router as attendance_router
@@ -34,16 +35,33 @@ app.add_middleware(
     allow_headers=["Content-Type", "Idempotency-Key"],
 )
 
-app.include_router(attendance_router, prefix="/api/v1")
-app.include_router(audit_router, prefix="/api/v1")
-app.include_router(auth_router, prefix="/api/v1")
-app.include_router(dashboard_router, prefix="/api/v1")
-app.include_router(employees_router, prefix="/api/v1")
-app.include_router(leave_router, prefix="/api/v1")
-app.include_router(notifications_router, prefix="/api/v1")
-app.include_router(payroll_router, prefix="/api/v1")
-app.include_router(policies_router, prefix="/api/v1")
-app.include_router(settings_router, prefix="/api/v1")
+
+class FieldError(BaseModel):
+    loc: list[str | int]
+    msg: str
+    type: str
+
+
+class ErrorOut(BaseModel):
+    """Every 4xx body: an HTTPException message, or the field errors of a request 422."""
+
+    detail: str | list[FieldError]
+
+
+# "4XX" replaces FastAPI's own 422 entry, so ErrorOut covers validation errors too.
+for router in (
+    attendance_router,
+    audit_router,
+    auth_router,
+    dashboard_router,
+    employees_router,
+    leave_router,
+    notifications_router,
+    payroll_router,
+    policies_router,
+    settings_router,
+):
+    app.include_router(router, prefix="/api/v1", responses={"4XX": {"model": ErrorOut}})
 
 
 @app.get("/health/live", include_in_schema=False)

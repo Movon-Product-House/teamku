@@ -13,7 +13,7 @@ from movon_hr.core.time import jakarta_date
 from movon_hr.modules.audit.service import audit
 from movon_hr.modules.employees.service import parse_id
 from movon_hr.modules.leave.service import leave_balance
-from movon_hr.modules.policies.models import Policy, PolicyAnswerAudit, PolicySection
+from movon_hr.modules.policies.models import Policy, PolicyAnswerAudit, PolicySection, PolicyState
 from movon_hr.modules.policies.schemas import AnswerOut, PolicyInput
 
 NOT_FOUND = "Kebijakan tidak ditemukan"
@@ -105,7 +105,7 @@ async def update_policy(
     return policy
 
 
-async def set_state(db: AsyncSession, user: Employee, policy_id: str, state: str) -> Policy:
+async def set_state(db: AsyncSession, user: Employee, policy_id: str, state: PolicyState) -> Policy:
     """Publish or archive; no transition rules, as before (kept, #26)."""
     policy = await policy_or_404(db, policy_id)
     if state == "published":
