@@ -16,6 +16,7 @@ Semua dijalankan dari `apps/api`. Postgres lokal: `docker compose -f ../../infra
 | `uv run python -m movon_hr.jobs attendance-alerts` | Job alert presensi (di prod tiap 5 menit) |
 | `uv run python -m movon_hr.jobs cleanup` | Job pembersihan harian |
 | `uv run alembic revision --autogenerate -m "<domain>_<perubahan>"` | Revisi migrasi baru dari model |
+| `uv run python -m movon_hr.openapi` | Tulis ulang `openapi.json` (kontrak sumber client web). Wajib setelah mengubah route atau schema; `tests/test_openapi.py` gagal kalau basi |
 | `scripts/check.sh` | Gerbang yang sama dengan CI: ruff check, ruff format --check, pyrefly, lint-imports, pytest |
 
 Jalankan `scripts/check.sh` sebelum push. Tes butuh database kosong terpisah: sekali saja jalankan `docker compose -f ../../infra/compose/docker-compose.yml exec postgres createdb -U movon movon_test`, atau arahkan `MOVON_TEST_DATABASE_URL` ke DB lain. CI (`.github/workflows/api.yml`) menjalankan `check.sh` ditambah `alembic upgrade head`, `alembic check`, dan cek satu head.
