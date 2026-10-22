@@ -45,7 +45,7 @@ src/
 ### Arsitektur
 1. **Arah import:** `app → features → shared`. `shared` tidak boleh import dari `features`. Antar-feature hanya boleh import `types.ts`. Bila butuh lebih dari itu, pindahkan ke `shared`.
 2. **Import pakai alias `@/`**, bukan `../../`. Di dalam feature yang sama boleh relatif (`../api`).
-3. **Server state = TanStack Query lewat client generate.** Pakai hook dari `@/shared/api/generated` (`useApprovals`, `useDecide`, …) dan type dari `@/shared/api/generated/model` apa adanya, tanpa alias dan tanpa type tulisan tangan untuk data API. Jangan memakai `useEffect` + `useState` untuk fetch. Opsi per pemanggil lewat `query`: `useNotifications({ query: { refetchInterval } })`.
+3. **Server state = TanStack Query lewat client generate.** Pakai hook dari `@/shared/api/generated` (`useApprovals`, `useDecide`, …) dan type dari `@/shared/api/generated/model` apa adanya, tanpa alias dan tanpa type tulisan tangan untuk data API. Jangan memakai `useEffect` + `useState` untuk fetch. Perilaku tambahan (polling, `select`, `enabled`) dioper lewat opsi `query` di satu hook pembungkus di `features/<domain>/api.ts`, bukan langsung di komponen: `usePolledNotifications()` = `useNotifications({ query: { refetchInterval } })`.
    - **Invalidasi otomatis:** setiap mutation yang sukses meng-invalidate semua query (`MutationCache` di `app/providers.tsx`), jadi tidak perlu `onSuccess` invalidasi atau query key per domain. Query yang tidak boleh ikut (pratinjau token) memakai `meta: { keepOnMutation: true }`.
    - Panggilan yang tidak boleh memicu invalidasi (logout) memakai fungsi fetch biasa (`logout()`), bukan hook mutation.
    - API berubah? `npm run api:gen`, lalu biarkan `tsc` menunjukkan pemakaian yang perlu disesuaikan.
