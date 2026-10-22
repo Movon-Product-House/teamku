@@ -22,7 +22,7 @@ export function ApprovalsPage() {
   const approvals = useApprovals();
   const [filter, setFilter] = useState<ApprovalFilter>("pending");
   const [selected, setSelected] = useState<{
-    request: ApprovalOut;
+    approval: ApprovalOut;
     decision: Decision;
   } | null>(null);
 
@@ -109,14 +109,14 @@ export function ApprovalsPage() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => setSelected({ request: item, decision: "approved" })}
+                          onClick={() => setSelected({ approval: item, decision: "approved" })}
                         >
                           Setujui
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => setSelected({ request: item, decision: "rejected" })}
+                          onClick={() => setSelected({ approval: item, decision: "rejected" })}
                         >
                           Tolak
                         </Button>
@@ -145,7 +145,7 @@ export function ApprovalsPage() {
       </div>
       {selected && (
         <DecisionDialog
-          request={selected.request}
+          approval={selected.approval}
           decision={selected.decision}
           onClose={() => setSelected(null)}
         />

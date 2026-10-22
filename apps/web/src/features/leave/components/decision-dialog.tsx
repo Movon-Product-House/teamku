@@ -20,9 +20,9 @@ import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
 
-type Props = { request: ApprovalOut; decision: Decision; onClose: () => void };
+type Props = { approval: ApprovalOut; decision: Decision; onClose: () => void };
 
-export function DecisionDialog({ request, decision, onClose }: Props) {
+export function DecisionDialog({ approval, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));
   const [error, setError] = useState<string | null>(null);
   const decide = useDecide();
@@ -36,7 +36,7 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
     setError(invalid);
     if (invalid) return;
     decide.mutate(
-      { requestId: request.id, data: { decision, comment } },
+      { requestId: approval.id, data: { decision, comment } },
       {
         onSuccess: (result) => {
           notify({
@@ -45,7 +45,7 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
             message:
               result.calendar_sync_status === "failed"
                 ? "Permohonan diproses, tetapi event Google Calendar gagal dibuat."
-                : `Permohonan ${request.employee_name} berhasil diproses.`,
+                : `Permohonan ${approval.employee_name} berhasil diproses.`,
           });
           onClose();
         },
@@ -67,10 +67,10 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
           <DialogHeader>
             <p className="font-semibold text-caption text-faint-foreground">Konfirmasi keputusan</p>
             <DialogTitle>
-              {approving ? "Setujui" : "Tolak"} permohonan {request.employee_name}?
+              {approving ? "Setujui" : "Tolak"} permohonan {approval.employee_name}?
             </DialogTitle>
             <DialogDescription>
-              {formatDate(request.start)} sampai {formatDate(request.end)} · {request.days} hari
+              {formatDate(approval.start)} sampai {formatDate(approval.end)} · {approval.days} hari
               kerja
             </DialogDescription>
           </DialogHeader>

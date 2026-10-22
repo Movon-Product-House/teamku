@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ApprovalOut } from "@/shared/api/generated/model";
 import { countApprovals, filterApprovals, validateDecisionComment } from "./approvals";
 
-const request = (id: string, status: ApprovalOut["status"]): ApprovalOut => ({
+const approval = (id: string, status: ApprovalOut["status"]): ApprovalOut => ({
   id,
   status,
   employee_id: "e1",
@@ -21,7 +21,7 @@ const request = (id: string, status: ApprovalOut["status"]): ApprovalOut => ({
 });
 
 describe("approvals", () => {
-  const items = [request("1", "pending"), request("2", "approved"), request("3", "pending")];
+  const items = [approval("1", "pending"), approval("2", "approved"), approval("3", "pending")];
 
   it("filters by status and keeps everything for 'all'", () => {
     expect(filterApprovals(items, "pending").map((item) => item.id)).toEqual(["1", "3"]);
