@@ -4,6 +4,7 @@ import uuid
 from datetime import date, datetime
 from typing import Any
 
+import httpx
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +24,7 @@ def session_cookie(token: str) -> dict[str, str]:
     return {"Cookie": f"{settings.session_cookie_name}={token}"}
 
 
-def session_of(response: Any) -> dict[str, str]:
+def session_of(response: httpx.Response) -> dict[str, str]:
     """``session_cookie`` for the session an auth response just set."""
     return session_cookie(response.cookies[settings.session_cookie_name])
 
