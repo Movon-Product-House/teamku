@@ -17,7 +17,7 @@ def test_operation_ids_are_unique() -> None:
 
 
 def test_operation_ids_follow_the_method() -> None:
-    # Naming rule in the README (HTTP 4). GET/PUT/PATCH must use their prefix; a reserved
+    # Naming rule in apps/api/AGENTS.md (Kontrak HTTP). GET/PUT/PATCH must use their prefix; a reserved
     # prefix only appears on the method it belongs to (POST actions are free-form).
     allowed = {
         "get": ("list_", "get_"),
