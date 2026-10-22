@@ -9,10 +9,10 @@ from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
-CalendarProvider = Literal["google", "microsoft"]
-StoredCalendarProvider = Literal["", "google", "microsoft"]  # "" until HR saves the settings
-CalendarScope = Literal["company", "division"]
-DeliveryMode = Literal["shared", "shared_and_email"]
+type CalendarProvider = Literal["google", "microsoft"]
+type StoredCalendarProvider = Literal["", "google", "microsoft"]  # "" until HR saves the settings
+type CalendarScope = Literal["company", "division"]
+type DeliveryMode = Literal["shared", "shared_and_email"]
 
 
 class WorkLocation(TenantScoped, Base):

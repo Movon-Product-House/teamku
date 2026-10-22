@@ -10,7 +10,7 @@ from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
-PayrollStatus = Literal["draft", "finalized", "published"]
+type PayrollStatus = Literal["draft", "finalized", "published"]
 
 
 class PayrollRun(TenantScoped, Base):

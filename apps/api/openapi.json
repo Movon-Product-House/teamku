@@ -2098,6 +2098,14 @@
         "type": "object",
         "title": "AgendaItemOut"
       },
+      "Anomaly": {
+        "type": "string",
+        "enum": [
+          "low_accuracy",
+          "missed_reverify",
+          "outside_geofence"
+        ]
+      },
       "AnswerOut": {
         "properties": {
           "answer": {
@@ -2139,13 +2147,7 @@
       "ApprovalInput": {
         "properties": {
           "decision": {
-            "type": "string",
-            "enum": [
-              "approved",
-              "rejected",
-              "revision_requested"
-            ],
-            "title": "Decision"
+            "$ref": "#/components/schemas/Decision"
           },
           "comment": {
             "type": "string",
@@ -2209,20 +2211,10 @@
             "title": "Reason"
           },
           "request_type": {
-            "type": "string",
-            "const": "time_off",
-            "title": "Request Type"
+            "$ref": "#/components/schemas/LeaveType"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "cancelled",
-              "approved",
-              "rejected",
-              "revision_requested"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/LeaveStatus"
           },
           "created_at": {
             "type": "string",
@@ -2241,15 +2233,7 @@
             "title": "Approver Comment"
           },
           "calendar_sync_status": {
-            "type": "string",
-            "enum": [
-              "not_applicable",
-              "skipped",
-              "ok",
-              "failed",
-              "removed"
-            ],
-            "title": "Calendar Sync Status"
+            "$ref": "#/components/schemas/CalendarSyncStatus"
           },
           "employee_calendar_event_id": {
             "anyOf": [
@@ -2374,13 +2358,7 @@
       "CalendarOut": {
         "properties": {
           "provider": {
-            "type": "string",
-            "enum": [
-              "",
-              "google",
-              "microsoft"
-            ],
-            "title": "Provider"
+            "$ref": "#/components/schemas/StoredCalendarProvider"
           },
           "connected": {
             "type": "boolean",
@@ -2395,24 +2373,14 @@
             "title": "Calendar Name"
           },
           "scope": {
-            "type": "string",
-            "enum": [
-              "company",
-              "division"
-            ],
-            "title": "Scope"
+            "$ref": "#/components/schemas/CalendarScope"
           },
           "division": {
             "type": "string",
             "title": "Division"
           },
           "delivery_mode": {
-            "type": "string",
-            "enum": [
-              "shared",
-              "shared_and_email"
-            ],
-            "title": "Delivery Mode"
+            "$ref": "#/components/schemas/DeliveryMode"
           }
         },
         "type": "object",
@@ -2427,15 +2395,24 @@
         ],
         "title": "CalendarOut"
       },
+      "CalendarProvider": {
+        "type": "string",
+        "enum": [
+          "google",
+          "microsoft"
+        ]
+      },
+      "CalendarScope": {
+        "type": "string",
+        "enum": [
+          "company",
+          "division"
+        ]
+      },
       "CalendarSettingsInput": {
         "properties": {
           "provider": {
-            "type": "string",
-            "enum": [
-              "google",
-              "microsoft"
-            ],
-            "title": "Provider"
+            "$ref": "#/components/schemas/CalendarProvider"
           },
           "team_calendar_id": {
             "type": "string",
@@ -2455,12 +2432,7 @@
             "default": "Kalender perusahaan"
           },
           "scope": {
-            "type": "string",
-            "enum": [
-              "company",
-              "division"
-            ],
-            "title": "Scope",
+            "$ref": "#/components/schemas/CalendarScope",
             "default": "company"
           },
           "division": {
@@ -2470,12 +2442,7 @@
             "default": ""
           },
           "delivery_mode": {
-            "type": "string",
-            "enum": [
-              "shared",
-              "shared_and_email"
-            ],
-            "title": "Delivery Mode",
+            "$ref": "#/components/schemas/DeliveryMode",
             "default": "shared_and_email"
           }
         },
@@ -2485,6 +2452,16 @@
           "team_calendar_id"
         ],
         "title": "CalendarSettingsInput"
+      },
+      "CalendarSyncStatus": {
+        "type": "string",
+        "enum": [
+          "not_applicable",
+          "skipped",
+          "ok",
+          "failed",
+          "removed"
+        ]
       },
       "ChangePassword": {
         "properties": {
@@ -2586,18 +2563,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           },
           "agenda_count": {
             "type": "integer",
@@ -2756,13 +2727,7 @@
             "title": "Email"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "department": {
             "type": "string",
@@ -2773,13 +2738,7 @@
             "title": "Title"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "terminated"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/EmployeeStatus"
           },
           "salary": {
             "anyOf": [
@@ -2881,18 +2840,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           }
         },
         "type": "object",
@@ -2970,6 +2923,21 @@
         ],
         "title": "DashboardOut"
       },
+      "Decision": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "revision_requested"
+        ]
+      },
+      "DeliveryMode": {
+        "type": "string",
+        "enum": [
+          "shared",
+          "shared_and_email"
+        ]
+      },
       "EmployeeInput": {
         "properties": {
           "name": {
@@ -2991,13 +2959,7 @@
             "title": "Department"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "title": {
             "type": "string",
@@ -3089,13 +3051,7 @@
             "title": "Email"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "department": {
             "type": "string",
@@ -3106,13 +3062,7 @@
             "title": "Title"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "terminated"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/EmployeeStatus"
           },
           "salary": {
             "anyOf": [
@@ -3177,23 +3127,25 @@
         ],
         "title": "EmployeeOut"
       },
+      "EmployeeStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "suspended",
+          "terminated"
+        ]
+      },
       "EmployeeUpdate": {
         "properties": {
           "status": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "active",
-                  "suspended",
-                  "terminated"
-                ]
+                "$ref": "#/components/schemas/EmployeeStatus"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Status"
+            ]
           },
           "is_remote": {
             "anyOf": [
@@ -3244,6 +3196,14 @@
         ],
         "title": "ErrorOut",
         "description": "Every 4xx body: an HTTPException message, or the field errors of a request 422."
+      },
+      "EventKind": {
+        "type": "string",
+        "enum": [
+          "check_in",
+          "check_out",
+          "reverify"
+        ]
       },
       "FieldError": {
         "properties": {
@@ -3379,13 +3339,7 @@
             "title": "Department"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "title": {
             "type": "string",
@@ -3475,13 +3429,7 @@
             "title": "Company"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "department": {
             "type": "string",
@@ -3520,6 +3468,13 @@
           "expires_at"
         ],
         "title": "InvitePreview"
+      },
+      "Language": {
+        "type": "string",
+        "enum": [
+          "id",
+          "en"
+        ]
       },
       "LeaveBalance": {
         "properties": {
@@ -3571,20 +3526,10 @@
             "title": "Reason"
           },
           "request_type": {
-            "type": "string",
-            "const": "time_off",
-            "title": "Request Type"
+            "$ref": "#/components/schemas/LeaveType"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "cancelled",
-              "approved",
-              "rejected",
-              "revision_requested"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/LeaveStatus"
           },
           "created_at": {
             "type": "string",
@@ -3603,15 +3548,7 @@
             "title": "Approver Comment"
           },
           "calendar_sync_status": {
-            "type": "string",
-            "enum": [
-              "not_applicable",
-              "skipped",
-              "ok",
-              "failed",
-              "removed"
-            ],
-            "title": "Calendar Sync Status"
+            "$ref": "#/components/schemas/CalendarSyncStatus"
           },
           "employee_calendar_event_id": {
             "anyOf": [
@@ -3733,20 +3670,10 @@
             "title": "Reason"
           },
           "request_type": {
-            "type": "string",
-            "const": "time_off",
-            "title": "Request Type"
+            "$ref": "#/components/schemas/LeaveType"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "cancelled",
-              "approved",
-              "rejected",
-              "revision_requested"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/LeaveStatus"
           },
           "created_at": {
             "type": "string",
@@ -3765,15 +3692,7 @@
             "title": "Approver Comment"
           },
           "calendar_sync_status": {
-            "type": "string",
-            "enum": [
-              "not_applicable",
-              "skipped",
-              "ok",
-              "failed",
-              "removed"
-            ],
-            "title": "Calendar Sync Status"
+            "$ref": "#/components/schemas/CalendarSyncStatus"
           },
           "employee_calendar_event_id": {
             "anyOf": [
@@ -3816,6 +3735,20 @@
         "title": "LeaveOut",
         "description": "JSON keeps the old ``start``/``end`` names; the columns are start_date/end_date."
       },
+      "LeaveStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "cancelled",
+          "approved",
+          "rejected",
+          "revision_requested"
+        ]
+      },
+      "LeaveType": {
+        "type": "string",
+        "const": "time_off"
+      },
       "LocationEventOut": {
         "properties": {
           "id": {
@@ -3834,13 +3767,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "type": "string",
-            "enum": [
-              "check_in",
-              "check_out",
-              "reverify"
-            ],
-            "title": "Kind"
+            "$ref": "#/components/schemas/EventKind"
           },
           "at": {
             "type": "string",
@@ -3905,18 +3832,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           },
           "due_at": {
             "anyOf": [
@@ -4177,13 +4098,7 @@
             "title": "Email"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "employee",
-              "manager",
-              "hr_admin"
-            ],
-            "title": "Role"
+            "$ref": "#/components/schemas/Role"
           },
           "department": {
             "type": "string",
@@ -4194,13 +4109,7 @@
             "title": "Title"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "terminated"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/EmployeeStatus"
           },
           "salary": {
             "anyOf": [
@@ -4577,13 +4486,7 @@
             "title": "Period"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "finalized",
-              "published"
-            ],
-            "title": "Status"
+            "$ref": "#/components/schemas/PayrollStatus"
           },
           "items": {
             "items": {
@@ -4661,6 +4564,14 @@
           "total_net_rupiah"
         ],
         "title": "PayrollRunOut"
+      },
+      "PayrollStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "finalized",
+          "published"
+        ]
       },
       "PayslipList": {
         "properties": {
@@ -4755,13 +4666,7 @@
             "title": "Due At"
           },
           "kind": {
-            "type": "string",
-            "enum": [
-              "check_in",
-              "check_out",
-              "reverify"
-            ],
-            "title": "Kind"
+            "$ref": "#/components/schemas/EventKind"
           }
         },
         "type": "object",
@@ -4811,12 +4716,7 @@
             "default": "general"
           },
           "language": {
-            "type": "string",
-            "enum": [
-              "id",
-              "en"
-            ],
-            "title": "Language",
+            "$ref": "#/components/schemas/Language",
             "default": "id"
           },
           "effective_date": {
@@ -4886,12 +4786,7 @@
             "title": "Category"
           },
           "language": {
-            "type": "string",
-            "enum": [
-              "id",
-              "en"
-            ],
-            "title": "Language"
+            "$ref": "#/components/schemas/Language"
           },
           "effective_date": {
             "type": "string",
@@ -4911,13 +4806,7 @@
             "title": "Expiry Date"
           },
           "state": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "published",
-              "archived"
-            ],
-            "title": "State"
+            "$ref": "#/components/schemas/PolicyState"
           },
           "sections": {
             "items": {
@@ -5042,6 +4931,14 @@
         ],
         "title": "PolicySectionOut"
       },
+      "PolicyState": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "published",
+          "archived"
+        ]
+      },
       "ResetPassword": {
         "properties": {
           "token": {
@@ -5125,6 +5022,14 @@
         ],
         "title": "ReverifyInput"
       },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "employee",
+          "manager",
+          "hr_admin"
+        ]
+      },
       "SessionOut": {
         "properties": {
           "id": {
@@ -5152,18 +5057,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           },
           "agenda_count": {
             "type": "integer",
@@ -5267,13 +5166,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "type": "string",
-            "enum": [
-              "check_in",
-              "check_out",
-              "reverify"
-            ],
-            "title": "Kind"
+            "$ref": "#/components/schemas/EventKind"
           },
           "at": {
             "type": "string",
@@ -5338,18 +5231,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           },
           "due_at": {
             "anyOf": [
@@ -5430,6 +5317,14 @@
         ],
         "title": "SkippedOut",
         "description": "A remote worker with no slot pending."
+      },
+      "StoredCalendarProvider": {
+        "type": "string",
+        "enum": [
+          "",
+          "google",
+          "microsoft"
+        ]
       },
       "SuggestedAction": {
         "properties": {
@@ -5541,13 +5436,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "type": "string",
-            "enum": [
-              "check_in",
-              "check_out",
-              "reverify"
-            ],
-            "title": "Kind"
+            "$ref": "#/components/schemas/EventKind"
           },
           "at": {
             "type": "string",
@@ -5612,18 +5501,12 @@
           "anomaly": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "low_accuracy",
-                  "missed_reverify",
-                  "outside_geofence"
-                ]
+                "$ref": "#/components/schemas/Anomaly"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Anomaly"
+            ]
           },
           "due_at": {
             "anyOf": [

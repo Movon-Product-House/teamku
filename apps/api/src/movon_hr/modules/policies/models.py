@@ -10,8 +10,8 @@ from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
-Language = Literal["id", "en"]
-PolicyState = Literal["draft", "published", "archived"]
+type Language = Literal["id", "en"]
+type PolicyState = Literal["draft", "published", "archived"]
 
 
 class Policy(TenantScoped, Base):

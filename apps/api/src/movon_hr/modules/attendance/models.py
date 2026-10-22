@@ -10,8 +10,8 @@ from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
-Anomaly = Literal["low_accuracy", "missed_reverify", "outside_geofence"]
-EventKind = Literal["check_in", "check_out", "reverify"]
+type Anomaly = Literal["low_accuracy", "missed_reverify", "outside_geofence"]
+type EventKind = Literal["check_in", "check_out", "reverify"]
 
 
 class Attendance(TenantScoped, Base):

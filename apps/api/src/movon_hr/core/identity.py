@@ -12,8 +12,9 @@ from movon_hr.core.tenancy import TenantScoped
 
 UUIDV7 = text("uuidv7()")
 
-Role = Literal["employee", "manager", "hr_admin"]
-EmployeeStatus = Literal["active", "suspended", "terminated"]
+# `type` aliases become named enums in the OpenAPI spec (and in the generated web client).
+type Role = Literal["employee", "manager", "hr_admin"]
+type EmployeeStatus = Literal["active", "suspended", "terminated"]
 
 
 class Tenant(Base):

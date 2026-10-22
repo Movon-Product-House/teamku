@@ -38,7 +38,8 @@ def one_of(column: str, values: object) -> CheckConstraint:
     Alembic autogenerate does not see CHECK changes: edit the Literal, then write the
     revision by hand.
     """
-    allowed = ", ".join(f"'{value}'" for value in get_args(values))
+    literal = getattr(values, "__value__", values)  # unwrap a `type X = Literal[...]` alias
+    allowed = ", ".join(f"'{value}'" for value in get_args(literal))
     return CheckConstraint(f"{column} IN ({allowed})", name=column)
 
 
