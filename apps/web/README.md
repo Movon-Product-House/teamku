@@ -7,7 +7,7 @@ Keputusan arsitekturnya ada di [`docs/adr/0001-web-frontend-architecture.md`](..
 
 | Perintah | Fungsi |
 |---|---|
-| `npm run dev` | Dev server. Request `/api/*` di-proxy ke `MOVON_API_ORIGIN` (default `http://127.0.0.1:8000`) |
+| `npm run dev` | Dev server. Request `/api/v1/*` di-proxy apa adanya ke `MOVON_API_ORIGIN` (default `http://127.0.0.1:8000`) |
 | `npm run check` | Gerbang sebelum push: generate ulang client API + `biome ci` + batas panjang file + `tsc` + `vitest`. File generate yang berubah muncul di `git status` untuk di-commit |
 | `npm run api:gen` | Generate ulang client API (`src/shared/api/generated/`) dari `apps/api/openapi.json` dengan Orval. Jalankan setelah spec API berubah, lalu commit hasilnya |
 | `npm run lint:fix` | Format + organize imports + fix lint yang aman |
@@ -29,7 +29,7 @@ src/
     <logic>.ts         #   Logika murni (filter, validasi, kalkulasi) + <logic>.test.ts
     components/        #   UI. Memanggil hook/fungsi dari shared/api/generated
   shared/
-    api/client.ts      # Fetch wrapper = mutator Orval (ApiError, timeout, redirect 401, prefix /api/v1)
+    api/client.ts      # Fetch wrapper = mutator Orval (ApiError, timeout, redirect 401)
     api/generated/     # Hasil Orval: fungsi fetch, hook TanStack Query, model. Jangan diedit
     lib/               # Helper lintas fitur (format tanggal/uang)
     ui/                # Komponen generik: primitive shadcn + komposisi Teamku

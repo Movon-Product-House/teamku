@@ -16,7 +16,7 @@
 - **Batas 600 baris per file** dan **nama file kebab-case**, dipaksa oleh `scripts/check-file-lines.mjs` dan Biome.
 - **Biome** menggantikan ESLint + Prettier. **Vitest** untuk logika murni. CI GitHub Actions menjalankan `npm run check` + build.
 - **Auth**: cookie httpOnly `teamku_session` menjadi sumber kebenaran, dan `middleware.ts` menjaga `/app/*`. Token tidak pernah disimpan di JS: salinan demo di localStorage/header `X-Demo-User` dihapus (#41), akun demo pun login lewat cookie.
-- **Client API di-generate dari OpenAPI** (2026-10-22, #46). `apps/api/openapi.json` (di-commit, dijaga test di API) adalah kontraknya. Orval meng-generate fungsi fetch, hook TanStack Query, dan model ke `shared/api/generated/` dengan `api()` sebagai mutator. `npm run check` gagal bila hasil generate berbeda dengan yang di-commit, dan CI web ikut jalan saat spec berubah. Type data API tidak lagi ditulis tangan.
+- **Client API di-generate dari OpenAPI** (2026-10-22, #46). `apps/api/openapi.json` (di-commit, dijaga test di API) adalah kontraknya. Orval meng-generate fungsi fetch, hook TanStack Query, dan model ke `shared/api/generated/` dengan `api()` sebagai mutator. `npm run check` meregenerate client, CI web gagal bila hasilnya berbeda dengan yang di-commit, dan CI web ikut jalan saat spec berubah. Browser memanggil path spec apa adanya (`/api/v1/...`); rewrite Next meneruskannya ke API tanpa mengubah path. Type data API tidak lagi ditulis tangan.
 - **Invalidasi cache otomatis** (#46): setiap mutation sukses meng-invalidate semua query lewat `MutationCache`, menggantikan query key per domain. Batasnya refetch ekstra untuk query yang sedang tampil; dipersempit per mutation (`meta`) bila nanti terasa berat.
 
 ## Alternatif yang ditolak

@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
   // sendiri, jadi dimatikan di sana agar tidak ada artefak yang mubazir.
   output: process.env.VERCEL ? undefined : "standalone",
   async rewrites() {
-    return [{ source: "/api/:path*", destination: `${target}/api/v1/:path*` }];
+    // Same path on both sides: the generated client calls the spec's own /api/v1/... paths.
+    return [{ source: "/api/v1/:path*", destination: `${target}/api/v1/:path*` }];
   },
 };
 

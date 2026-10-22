@@ -11,13 +11,13 @@ function stubFetch(status: number, body: unknown) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("api", () => {
-  it("sends spec paths through the /api proxy without the API prefix", async () => {
+  it("sends spec paths unchanged to the same-origin proxy, with the session cookie", async () => {
     const fetch = stubFetch(200, { ok: true });
     await expect(api("/api/v1/notifications/read-all", { method: "POST" })).resolves.toEqual({
       ok: true,
     });
     expect(fetch).toHaveBeenCalledWith(
-      "/api/notifications/read-all",
+      "/api/v1/notifications/read-all",
       expect.objectContaining({ method: "POST", credentials: "include" }),
     );
   });
@@ -41,5 +41,15 @@ describe("api", () => {
       message: "Terjadi kesalahan",
       status: 422,
     });
+  });
+
+  it("redirects a 401 to /login, except on the public auth endpoints", async () => {
+    stubFetch(401, { detail: "Sesi berakhir" });
+    const assign = vi.fn();
+    vi.stubGlobal("window", { setTimeout, clearTimeout, location: { pathname: "/app", assign } });
+    await api("/api/v1/auth/login", { method: "POST" }).catch(() => undefined);
+    expect(assign).not.toHaveBeenCalled();
+    await api("/api/v1/me").catch(() => undefined);
+    expect(assign).toHaveBeenCalledWith("/login");
   });
 });
