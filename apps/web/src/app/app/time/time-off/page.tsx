@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { type LeaveStatus, leaveStatusLabels } from "@/features/leave/types";
+import { leaveStatusLabels } from "@/features/leave/types";
 import { api } from "@/shared/api/client";
+import type { LeaveStatus } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 

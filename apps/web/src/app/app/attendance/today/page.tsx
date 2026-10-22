@@ -2,8 +2,8 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { shellKeys } from "@/features/shell/api";
 import { api } from "@/shared/api/client";
+import { getAttendanceTodayQueryKey } from "@/shared/api/generated";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
@@ -59,7 +59,7 @@ export default function Today() {
         if (profile.user.work_location) setOffice(profile.user.work_location);
       })
       .catch((e) => notify("error", "Tidak dapat melanjutkan", e.message));
-  const syncShell = () => queryClient.invalidateQueries({ queryKey: shellKeys.today });
+  const syncShell = () => queryClient.invalidateQueries({ queryKey: getAttendanceTodayQueryKey() });
 
   function stopCamera() {
     cameraStream.current?.getTracks().forEach((track) => track.stop());

@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@/shared/api/client";
+import { logout as endSession } from "@/shared/api/generated";
 import { waitForAuthTransition } from "@/shared/lib/auth-transition";
 
 export function useLogout() {
@@ -14,7 +14,8 @@ export function useLogout() {
     const startedAt = Date.now();
     setSigningOut(true);
     try {
-      await api("/auth/logout", { method: "POST" });
+      // The plain function, not useLogout(): a mutation would invalidate (refetch) /me -> 401.
+      await endSession();
     } catch {
       // Local logout must still complete if the server is unavailable.
     } finally {

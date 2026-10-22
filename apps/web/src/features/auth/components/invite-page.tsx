@@ -4,12 +4,13 @@ import { CircleAlert } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useAcceptInvite } from "@/shared/api/generated";
+import type { InvitePreview } from "@/shared/api/generated/model";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
-import { useAcceptInvite, useInvitePreview } from "../api";
+import { useInvitePreview } from "../api";
 import { companyInitials, inviteMeta, isDeadLink } from "../auth";
-import type { InvitePreview } from "../types";
 import { useEnterApp } from "../use-enter-app";
 import { AuthChecking, AuthLayout } from "./auth-layout";
 import { DeadLink, PreviewFailed } from "./dead-link";
@@ -47,7 +48,7 @@ export function InvitePage() {
     event.preventDefault();
     const startedAt = Date.now();
     accept.mutate(
-      { token, password: fields.password },
+      { data: { token, password: fields.password } },
       {
         onSuccess: () => enterApp(startedAt),
       },

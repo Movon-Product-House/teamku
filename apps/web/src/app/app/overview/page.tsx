@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HomePage } from "@/features/home/components/home-page";
-import { useMe } from "@/features/shell/api";
 import { api } from "@/shared/api/client";
+import { useMe } from "@/shared/api/generated";
 import { formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 

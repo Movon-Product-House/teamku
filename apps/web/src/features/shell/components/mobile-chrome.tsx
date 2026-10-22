@@ -2,15 +2,15 @@
 
 import { Bell } from "lucide-react";
 import Link from "next/link";
+import type { Role } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
-import { useNotifications } from "../api";
+import { usePolledNotifications } from "../api";
 import { activeTab, initials, MORE_HREF, type NavItem, NOTIFICATIONS_HREF } from "../nav";
-import type { Role } from "../types";
 import { unreadLabel } from "./notification-popover";
 
 /** S2 bell: on phones the notifications get their own page (S4), not the D6 panel. */
 function NotificationBell() {
-  const unread = useNotifications().data?.unread ?? 0;
+  const unread = usePolledNotifications().data?.unread ?? 0;
   return (
     <Link
       href={NOTIFICATIONS_HREF}

@@ -3,12 +3,11 @@
 import { Camera, LogIn, LogOut, MapPin, ScanFace } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Me } from "@/features/shell/types";
+import type { MeOut as Me, TodayOut as Today } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { formatDuration, timelineSlots, workedMs } from "../home";
-import type { Today } from "../types";
 
 export const ATTENDANCE_HREF = "/app/attendance/today";
 const clock = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });

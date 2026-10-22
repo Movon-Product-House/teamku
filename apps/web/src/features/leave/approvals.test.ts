@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { ApprovalOut as ApprovalRequest } from "@/shared/api/generated/model";
 import { countApprovals, filterApprovals, validateDecisionComment } from "./approvals";
-import type { ApprovalRequest } from "./types";
 
 const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest => ({
   id,
@@ -12,6 +12,12 @@ const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest
   end: "2026-10-02",
   days: 2,
   reason: "Keluarga",
+  request_type: "time_off",
+  created_at: "2026-09-30T02:00:00Z",
+  approver_comment: null,
+  calendar_sync_status: "not_applicable",
+  employee_calendar_event_id: null,
+  team_calendar_event_id: null,
 });
 
 describe("approvals", () => {

@@ -1,6 +1,6 @@
+import type { WeekOut as Week } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { weekBars } from "../home";
-import type { Week } from "../types";
 
 const TONES = {
   actual: "bg-foreground",

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import type { MeOut as Me } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { BrandLogo } from "@/shared/ui/brand-logo";
 import { activeHref, type NavGroup } from "../nav";
-import type { Me } from "../types";
 import { AccountMenu } from "./account-menu";
 import { NotificationPopover } from "./notification-popover";
 

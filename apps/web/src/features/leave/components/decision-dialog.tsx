@@ -2,6 +2,11 @@
 
 import { type FormEvent, useId, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useDecide } from "@/shared/api/generated";
+import type {
+  Decision as ApprovalDecision,
+  ApprovalOut as ApprovalRequest,
+} from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import {
@@ -16,16 +21,14 @@ import {
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
 import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
-import { useDecideApproval } from "../api";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
-import type { ApprovalDecision, ApprovalRequest } from "../types";
 
 type Props = { request: ApprovalRequest; decision: ApprovalDecision; onClose: () => void };
 
 export function DecisionDialog({ request, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));
   const [error, setError] = useState<string | null>(null);
-  const decide = useDecideApproval();
+  const decide = useDecide();
   const commentId = useId();
   const errorId = useId();
   const approving = decision === "approved";
@@ -36,7 +39,7 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
     setError(invalid);
     if (invalid) return;
     decide.mutate(
-      { id: request.id, decision, comment },
+      { requestId: request.id, data: { decision, comment } },
       {
         onSuccess: (result) => {
           notify({

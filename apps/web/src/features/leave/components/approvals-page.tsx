@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useApprovals } from "@/shared/api/generated";
+import type {
+  Decision as ApprovalDecision,
+  ApprovalOut as ApprovalRequest,
+} from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import { notify } from "@/shared/ui/notifications";
-import { useApprovals } from "../api";
 import { type ApprovalFilter, countApprovals, filterApprovals } from "../approvals";
-import { type ApprovalDecision, type ApprovalRequest, leaveStatusLabels } from "../types";
+import { leaveStatusLabels } from "../types";
 import { DecisionDialog } from "./decision-dialog";
 
 const FILTERS: [ApprovalFilter, string][] = [
@@ -34,7 +38,7 @@ export function ApprovalsPage() {
       });
   }, [approvals.error]);
 
-  const items = approvals.data ?? [];
+  const items = approvals.data?.items ?? [];
   const visible = filterApprovals(items, filter);
 
   return (

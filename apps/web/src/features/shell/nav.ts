@@ -16,7 +16,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import type { Me, Role } from "./types";
+import type { Role } from "@/shared/api/generated/model";
 
 export type NavItem = {
   label: string;
@@ -162,6 +162,9 @@ export function initials(name: string): string {
   );
 }
 
-export function workLocation(user: Pick<Me["user"], "is_remote" | "work_location">): string {
+export function workLocation(user: {
+  is_remote: boolean;
+  work_location: { name: string } | null;
+}): string {
   return user.is_remote ? "Pekerja lapangan" : (user.work_location?.name ?? "Lokasi belum diatur");
 }

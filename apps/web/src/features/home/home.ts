@@ -1,4 +1,4 @@
-import type { Today, Week } from "./types";
+import type { TodayOut as Today, WeekOut as Week } from "@/shared/api/generated/model";
 
 export function greeting(now: Date): string {
   const hour = now.getHours();

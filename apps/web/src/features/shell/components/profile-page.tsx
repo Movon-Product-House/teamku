@@ -3,12 +3,12 @@
 import { CircleAlert, CircleCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useChangePassword, useMe } from "@/shared/api/generated";
 import { passwordValid } from "@/shared/lib/password";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/shared/ui/field";
 import { PasswordInput } from "@/shared/ui/password-input";
-import { useChangePassword, useMe } from "../api";
 import { workLocation } from "../nav";
 import { roleLabels } from "../types";
 
@@ -35,7 +35,7 @@ export function ProfilePage() {
   function submit(event: FormEvent) {
     event.preventDefault();
     change.mutate(
-      { current_password: current, new_password: next },
+      { data: { current_password: current, new_password: next } },
       {
         onSuccess: () => {
           setCurrent("");

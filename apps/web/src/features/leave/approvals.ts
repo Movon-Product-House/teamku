@@ -1,4 +1,8 @@
-import type { ApprovalDecision, ApprovalRequest, LeaveStatus } from "./types";
+import type {
+  Decision as ApprovalDecision,
+  ApprovalOut as ApprovalRequest,
+  LeaveStatus,
+} from "@/shared/api/generated/model";
 
 export type ApprovalFilter = LeaveStatus | "all";
 

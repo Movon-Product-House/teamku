@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useReadNotification } from "@/shared/api/generated";
+import type { NotificationOut as Notification } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { formatShortTime } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
-import { useMarkRead, type useNotifications } from "../api";
+import type { usePolledNotifications } from "../api";
 import { notificationIcon } from "../notifications";
-import type { Notification } from "../types";
 
 /** Opening a notification marks it read, then follows its target. */
 function useOpen(item: Notification, onOpen?: () => void) {
-  const markRead = useMarkRead();
+  const markRead = useReadNotification();
   return () => {
-    if (!item.read) markRead.mutate(item.id);
+    if (!item.read) markRead.mutate({ notificationId: item.id });
     onOpen?.();
   };
 }
@@ -90,7 +91,7 @@ export function NotificationCard({ item }: { item: Notification }) {
 export function NotificationStates({
   notifications,
 }: {
-  notifications: ReturnType<typeof useNotifications>;
+  notifications: ReturnType<typeof usePolledNotifications>;
 }) {
   if (notifications.isPending)
     return (
