@@ -21,5 +21,8 @@ export function useResetPreview(token: string) {
 }
 
 export function useInvitePreview(token: string) {
-  return usePreviewInvite(token, { query: { enabled: token !== "", ...PREVIEW_OPTIONS } });
+  // The generated URL builder inserts path params raw; the token comes from ?token=.
+  return usePreviewInvite(encodeURIComponent(token), {
+    query: { enabled: token !== "", ...PREVIEW_OPTIONS },
+  });
 }

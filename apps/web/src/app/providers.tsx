@@ -14,8 +14,11 @@ function createQueryClient() {
     // ponytail: refetch ekstra untuk query aktif; persempit lewat `meta.invalidates` per
     // mutation bila terasa berat.
     mutationCache: new MutationCache({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ predicate: (query) => !query.meta?.keepOnMutation }),
+      // Not returned: MutationCache awaits it, which would hold every mutation pending
+      // until all on-screen queries finish refetching.
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ predicate: (query) => !query.meta?.keepOnMutation });
+      },
     }),
     defaultOptions: {
       queries: {
