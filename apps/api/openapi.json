@@ -2114,6 +2114,11 @@
           },
           "confidence": {
             "type": "string",
+            "enum": [
+              "supported",
+              "partially_supported",
+              "insufficient_evidence"
+            ],
             "title": "Confidence"
           },
           "citations": {
@@ -4681,6 +4686,7 @@
         "properties": {
           "type": {
             "type": "string",
+            "const": "leave_balance",
             "title": "Type"
           },
           "label": {
@@ -5330,6 +5336,10 @@
         "properties": {
           "type": {
             "type": "string",
+            "enum": [
+              "contact_hr",
+              "open_leave_request"
+            ],
             "title": "Type"
           },
           "href": {

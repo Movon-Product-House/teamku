@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -66,20 +67,21 @@ class Citation(BaseModel):
     score: int
 
 
+# The assistant (core/policy_assistant.py) maps provider output onto these closed sets.
 class PersonalFact(BaseModel):
-    type: str
+    type: Literal["leave_balance"]
     label: str
     value: int
 
 
 class SuggestedAction(BaseModel):
-    type: str
+    type: Literal["contact_hr", "open_leave_request"]
     href: str
 
 
 class AnswerOut(BaseModel):
     answer: str
-    confidence: str
+    confidence: Literal["supported", "partially_supported", "insufficient_evidence"]
     citations: list[Citation]
     personal_facts: list[PersonalFact]
     suggested_action: SuggestedAction
