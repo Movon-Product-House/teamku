@@ -26,10 +26,10 @@ import type {
 import type {
   AnswerOut,
   ErrorOut,
-  PolicyInput,
-  PolicyList,
+  PolicyIn,
+  PolicyListOut,
   PolicyOut,
-  PolicyQuestion
+  PolicyQuestionIn
 } from '../model';
 
 import { api } from '../../client';
@@ -66,9 +66,9 @@ export const getListPoliciesUrl = () => {
 /**
  * @summary List Policies
  */
-export const listPolicies = async ( options?: Parameters<typeof api>[1]): Promise<PolicyList> => {
+export const listPolicies = async ( options?: Parameters<typeof api>[1]): Promise<PolicyListOut> => {
 
-  return api<PolicyList>(getListPoliciesUrl(),
+  return api<PolicyListOut>(getListPoliciesUrl(),
   {
     ...options,
     method: 'GET'
@@ -166,7 +166,7 @@ export const getCreatePolicyUrl = () => {
 /**
  * @summary Create Policy
  */
-export const createPolicy = async (policyInput: PolicyInput, options?: Parameters<typeof api>[1]): Promise<PolicyOut> => {
+export const createPolicy = async (policyIn: PolicyIn, options?: Parameters<typeof api>[1]): Promise<PolicyOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -187,7 +187,7 @@ return api<PolicyOut>(getCreatePolicyUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(policyInput)
+    body: JSON.stringify(policyIn)
   }
 );}
 
@@ -225,9 +225,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreatePolicyMutationResult = NonNullable<Awaited<ReturnType<typeof createPolicy>>>
-    export type CreatePolicyMutationBody = PolicyInput
+    export type CreatePolicyMutationBody = PolicyIn
     export type CreatePolicyMutationError = ErrorType<ErrorOut>
-    export type CreatePolicyMutationVariables = {data: PolicyInput}
+    export type CreatePolicyMutationVariables = {data: PolicyIn}
 
     /**
  * @summary Create Policy
@@ -254,7 +254,7 @@ export const useCreatePolicy = <TError = ErrorType<ErrorOut>,
  * @summary Update Policy
  */
 export const updatePolicy = async (policyId: string,
-    policyInput: PolicyInput, options?: Parameters<typeof api>[1]): Promise<PolicyOut> => {
+    policyIn: PolicyIn, options?: Parameters<typeof api>[1]): Promise<PolicyOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -275,7 +275,7 @@ return api<PolicyOut>(getUpdatePolicyUrl(policyId),
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(policyInput)
+    body: JSON.stringify(policyIn)
   }
 );}
 
@@ -313,9 +313,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdatePolicyMutationResult = NonNullable<Awaited<ReturnType<typeof updatePolicy>>>
-    export type UpdatePolicyMutationBody = PolicyInput
+    export type UpdatePolicyMutationBody = PolicyIn
     export type UpdatePolicyMutationError = ErrorType<ErrorOut>
-    export type UpdatePolicyMutationVariables = {policyId: string;data: PolicyInput}
+    export type UpdatePolicyMutationVariables = {policyId: string;data: PolicyIn}
 
     /**
  * @summary Update Policy
@@ -487,7 +487,7 @@ export const useArchivePolicy = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Ask
  */
-export const ask = async (policyQuestion: PolicyQuestion, options?: Parameters<typeof api>[1]): Promise<AnswerOut> => {
+export const ask = async (policyQuestionIn: PolicyQuestionIn, options?: Parameters<typeof api>[1]): Promise<AnswerOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -508,7 +508,7 @@ return api<AnswerOut>(getAskUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(policyQuestion)
+    body: JSON.stringify(policyQuestionIn)
   }
 );}
 
@@ -546,9 +546,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AskMutationResult = NonNullable<Awaited<ReturnType<typeof ask>>>
-    export type AskMutationBody = PolicyQuestion
+    export type AskMutationBody = PolicyQuestionIn
     export type AskMutationError = ErrorType<ErrorOut>
-    export type AskMutationVariables = {data: PolicyQuestion}
+    export type AskMutationVariables = {data: PolicyQuestionIn}
 
     /**
  * @summary Ask

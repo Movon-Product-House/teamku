@@ -20,7 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AuditLogList,
+  AuditLogListOut,
   ErrorOut
 } from '../model';
 
@@ -58,9 +58,9 @@ export const getAuditLogsUrl = () => {
 /**
  * @summary Audit Logs
  */
-export const auditLogs = async ( options?: Parameters<typeof api>[1]): Promise<AuditLogList> => {
+export const auditLogs = async ( options?: Parameters<typeof api>[1]): Promise<AuditLogListOut> => {
 
-  return api<AuditLogList>(getAuditLogsUrl(),
+  return api<AuditLogListOut>(getAuditLogsUrl(),
   {
     ...options,
     method: 'GET'

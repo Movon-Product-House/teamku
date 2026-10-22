@@ -1,4 +1,4 @@
-import type { WeekOut as Week } from "@/shared/api/generated/model";
+import type { WeekOut } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { weekBars } from "../home";
 
@@ -16,7 +16,7 @@ const LEGEND = [
 ] as const;
 
 /** D1 "Jam kerja minggu ini": actual hours per weekday next to the daily target. */
-export function WeekCard({ week }: { week: Week }) {
+export function WeekCard({ week }: { week: WeekOut }) {
   const bars = weekBars(week);
   return (
     <section aria-labelledby="week-title" className="flex flex-col gap-5 rounded-card bg-card p-7">

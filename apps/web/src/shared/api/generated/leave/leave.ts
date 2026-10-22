@@ -24,12 +24,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ApprovalInput,
-  ApprovalList,
+  ApprovalIn,
+  ApprovalListOut,
   ErrorOut,
   LeaveDaysOut,
-  LeaveInput,
-  LeaveList,
+  LeaveIn,
+  LeaveListOut,
   LeaveOut
 } from '../model';
 
@@ -67,9 +67,9 @@ export const getListLeaveRequestsUrl = () => {
 /**
  * @summary List Leave Requests
  */
-export const listLeaveRequests = async ( options?: Parameters<typeof api>[1]): Promise<LeaveList> => {
+export const listLeaveRequests = async ( options?: Parameters<typeof api>[1]): Promise<LeaveListOut> => {
 
-  return api<LeaveList>(getListLeaveRequestsUrl(),
+  return api<LeaveListOut>(getListLeaveRequestsUrl(),
   {
     ...options,
     method: 'GET'
@@ -167,7 +167,7 @@ export const getSubmitLeaveUrl = () => {
 /**
  * @summary Submit Leave
  */
-export const submitLeave = async (leaveInput: LeaveInput, options?: Parameters<typeof api>[1]): Promise<LeaveDaysOut> => {
+export const submitLeave = async (leaveIn: LeaveIn, options?: Parameters<typeof api>[1]): Promise<LeaveDaysOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -188,7 +188,7 @@ return api<LeaveDaysOut>(getSubmitLeaveUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(leaveInput)
+    body: JSON.stringify(leaveIn)
   }
 );}
 
@@ -226,9 +226,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SubmitLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof submitLeave>>>
-    export type SubmitLeaveMutationBody = LeaveInput
+    export type SubmitLeaveMutationBody = LeaveIn
     export type SubmitLeaveMutationError = ErrorType<ErrorOut>
-    export type SubmitLeaveMutationVariables = {data: LeaveInput}
+    export type SubmitLeaveMutationVariables = {data: LeaveIn}
 
     /**
  * @summary Submit Leave
@@ -327,9 +327,9 @@ export const useCancelLeave = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Approvals
  */
-export const approvals = async ( options?: Parameters<typeof api>[1]): Promise<ApprovalList> => {
+export const approvals = async ( options?: Parameters<typeof api>[1]): Promise<ApprovalListOut> => {
 
-  return api<ApprovalList>(getApprovalsUrl(),
+  return api<ApprovalListOut>(getApprovalsUrl(),
   {
     ...options,
     method: 'GET'
@@ -428,7 +428,7 @@ export const getDecideUrl = (requestId: string,) => {
  * @summary Decide
  */
 export const decide = async (requestId: string,
-    approvalInput: ApprovalInput, options?: Parameters<typeof api>[1]): Promise<LeaveOut> => {
+    approvalIn: ApprovalIn, options?: Parameters<typeof api>[1]): Promise<LeaveOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -449,7 +449,7 @@ return api<LeaveOut>(getDecideUrl(requestId),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(approvalInput)
+    body: JSON.stringify(approvalIn)
   }
 );}
 
@@ -487,9 +487,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type DecideMutationResult = NonNullable<Awaited<ReturnType<typeof decide>>>
-    export type DecideMutationBody = ApprovalInput
+    export type DecideMutationBody = ApprovalIn
     export type DecideMutationError = ErrorType<ErrorOut>
-    export type DecideMutationVariables = {requestId: string;data: ApprovalInput}
+    export type DecideMutationVariables = {requestId: string;data: ApprovalIn}
 
     /**
  * @summary Decide

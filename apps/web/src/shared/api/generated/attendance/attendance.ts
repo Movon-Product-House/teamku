@@ -24,14 +24,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CheckIn,
+  CheckInIn,
   CheckInOut,
-  CheckOut,
+  CheckOutIn,
   CheckOutOut,
   ErrorOut,
   IdempotentOut,
-  LocationHistory,
-  ReverifyInput,
+  LocationHistoryOut,
+  ReverifyIn,
   SkippedEventOut,
   SkippedOut,
   TodayOut,
@@ -273,7 +273,7 @@ export const getCheckInUrl = () => {
 /**
  * @summary Check In
  */
-export const checkIn = async (checkInBody: CheckIn, options?: Parameters<typeof api>[1]): Promise<CheckInOut | IdempotentOut> => {
+export const checkIn = async (checkInIn: CheckInIn, options?: Parameters<typeof api>[1]): Promise<CheckInOut | IdempotentOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -294,7 +294,7 @@ return api<CheckInOut | IdempotentOut>(getCheckInUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(checkInBody)
+    body: JSON.stringify(checkInIn)
   }
 );}
 
@@ -332,9 +332,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CheckInMutationResult = NonNullable<Awaited<ReturnType<typeof checkIn>>>
-    export type CheckInMutationBody = CheckIn
+    export type CheckInMutationBody = CheckInIn
     export type CheckInMutationError = ErrorType<ErrorOut>
-    export type CheckInMutationVariables = {data: CheckIn}
+    export type CheckInMutationVariables = {data: CheckInIn}
 
     /**
  * @summary Check In
@@ -360,7 +360,7 @@ export const useCheckIn = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Check Out
  */
-export const checkOut = async (checkOutBody: CheckOut, options?: Parameters<typeof api>[1]): Promise<CheckOutOut> => {
+export const checkOut = async (checkOutIn: CheckOutIn, options?: Parameters<typeof api>[1]): Promise<CheckOutOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -381,7 +381,7 @@ return api<CheckOutOut>(getCheckOutUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(checkOutBody)
+    body: JSON.stringify(checkOutIn)
   }
 );}
 
@@ -419,9 +419,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CheckOutMutationResult = NonNullable<Awaited<ReturnType<typeof checkOut>>>
-    export type CheckOutMutationBody = CheckOut
+    export type CheckOutMutationBody = CheckOutIn
     export type CheckOutMutationError = ErrorType<ErrorOut>
-    export type CheckOutMutationVariables = {data: CheckOut}
+    export type CheckOutMutationVariables = {data: CheckOutIn}
 
     /**
  * @summary Check Out
@@ -447,7 +447,7 @@ export const useCheckOut = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Reverify
  */
-export const reverify = async (reverifyInput: ReverifyInput, options?: Parameters<typeof api>[1]): Promise<VerifiedEventOut | SkippedEventOut | SkippedOut> => {
+export const reverify = async (reverifyIn: ReverifyIn, options?: Parameters<typeof api>[1]): Promise<VerifiedEventOut | SkippedEventOut | SkippedOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -468,7 +468,7 @@ return api<VerifiedEventOut | SkippedEventOut | SkippedOut>(getReverifyUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(reverifyInput)
+    body: JSON.stringify(reverifyIn)
   }
 );}
 
@@ -506,9 +506,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ReverifyMutationResult = NonNullable<Awaited<ReturnType<typeof reverify>>>
-    export type ReverifyMutationBody = ReverifyInput
+    export type ReverifyMutationBody = ReverifyIn
     export type ReverifyMutationError = ErrorType<ErrorOut>
-    export type ReverifyMutationVariables = {data: ReverifyInput}
+    export type ReverifyMutationVariables = {data: ReverifyIn}
 
     /**
  * @summary Reverify
@@ -534,9 +534,9 @@ export const useReverify = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Location History
  */
-export const locationHistory = async (employeeId: string, options?: Parameters<typeof api>[1]): Promise<LocationHistory> => {
+export const locationHistory = async (employeeId: string, options?: Parameters<typeof api>[1]): Promise<LocationHistoryOut> => {
 
-  return api<LocationHistory>(getLocationHistoryUrl(employeeId),
+  return api<LocationHistoryOut>(getLocationHistoryUrl(employeeId),
   {
     ...options,
     method: 'GET'

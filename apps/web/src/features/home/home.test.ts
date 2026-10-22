@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SessionOut, TodayOut as Today } from "@/shared/api/generated/model";
+import type { SessionOut, TodayOut } from "@/shared/api/generated/model";
 import { formatDuration, greeting, timelineSlots, weekBars, workedMs } from "./home";
 
 const at = (hour: number, minute = 0) => new Date(2026, 8, 29, hour, minute);
@@ -22,7 +22,7 @@ describe("home", () => {
   });
 
   it("sums the closed sessions of today with the open one", () => {
-    const today = (state: Today["state"], checked_out_at: string | null): Today => ({
+    const today = (state: TodayOut["state"], checked_out_at: string | null): TodayOut => ({
       state,
       session: session(at(13).toISOString(), checked_out_at),
       pending_reverification: null,
@@ -34,7 +34,7 @@ describe("home", () => {
   });
 
   it("never lets the open session go negative or past midnight WIB", () => {
-    const open = (checked_in_at: string): Today => ({
+    const open = (checked_in_at: string): TodayOut => ({
       state: "checked_in",
       session: session(checked_in_at, null),
       pending_reverification: null,

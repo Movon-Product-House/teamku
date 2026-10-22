@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { MeOut as Me } from "@/shared/api/generated/model";
+import type { MeOut } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { BrandLogo } from "@/shared/ui/brand-logo";
 import { activeHref, type NavGroup } from "../nav";
@@ -17,7 +17,7 @@ export function Sidebar({
   stillWorking,
   onLogout,
 }: {
-  me: Me;
+  me: MeOut;
   groups: NavGroup[];
   pathname: string;
   pendingApprovals: number;

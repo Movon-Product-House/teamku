@@ -4,11 +4,11 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { FieldError } from './field-error';
+import type { FieldErrorOut } from './field-error-out';
 
 /**
  * Every 4xx body: an HTTPException message, or the field errors of a request 422.
  */
 export interface ErrorOut {
-  detail: string | FieldError[];
+  detail: string | FieldErrorOut[];
 }

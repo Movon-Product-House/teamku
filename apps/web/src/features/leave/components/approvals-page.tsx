@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { useApprovals } from "@/shared/api/generated";
-import type {
-  Decision as ApprovalDecision,
-  ApprovalOut as ApprovalRequest,
-} from "@/shared/api/generated/model";
+import type { ApprovalOut, Decision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import { notify } from "@/shared/ui/notifications";
@@ -25,8 +22,8 @@ export function ApprovalsPage() {
   const approvals = useApprovals();
   const [filter, setFilter] = useState<ApprovalFilter>("pending");
   const [selected, setSelected] = useState<{
-    request: ApprovalRequest;
-    decision: ApprovalDecision;
+    request: ApprovalOut;
+    decision: Decision;
   } | null>(null);
 
   useEffect(() => {

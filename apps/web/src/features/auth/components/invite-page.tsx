@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { useAcceptInvite } from "@/shared/api/generated";
-import type { InvitePreview } from "@/shared/api/generated/model";
+import type { InvitePreviewOut } from "@/shared/api/generated/model";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
@@ -86,7 +86,7 @@ export function InvitePage() {
   );
 }
 
-function InviteCard({ invite }: { invite: InvitePreview }) {
+function InviteCard({ invite }: { invite: InvitePreviewOut }) {
   return (
     <div className="flex items-center gap-3.5 rounded-card bg-card p-4">
       <span

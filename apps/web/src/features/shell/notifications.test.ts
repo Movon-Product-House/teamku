@@ -1,9 +1,9 @@
 import { Bell, CalendarDays, ReceiptText, ScanFace } from "lucide-react";
 import { describe, expect, it } from "vitest";
-import type { NotificationOut as Notification } from "@/shared/api/generated/model";
+import type { NotificationOut } from "@/shared/api/generated/model";
 import { groupByDay, notificationIcon } from "./notifications";
 
-const item = (id: string, created_at: string): Notification => ({
+const item = (id: string, created_at: string): NotificationOut => ({
   id,
   user_id: "u1",
   title: id,

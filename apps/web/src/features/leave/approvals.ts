@@ -1,22 +1,18 @@
-import type {
-  Decision as ApprovalDecision,
-  ApprovalOut as ApprovalRequest,
-  LeaveStatus,
-} from "@/shared/api/generated/model";
+import type { ApprovalOut, Decision, LeaveStatus } from "@/shared/api/generated/model";
 
 export type ApprovalFilter = LeaveStatus | "all";
 
 export const MIN_DECISION_COMMENT = 3;
 
-export function filterApprovals(items: ApprovalRequest[], filter: ApprovalFilter) {
+export function filterApprovals(items: ApprovalOut[], filter: ApprovalFilter) {
   return filter === "all" ? items : items.filter((item) => item.status === filter);
 }
 
-export function countApprovals(items: ApprovalRequest[], filter: ApprovalFilter) {
+export function countApprovals(items: ApprovalOut[], filter: ApprovalFilter) {
   return filterApprovals(items, filter).length;
 }
 
-export function defaultDecisionComment(decision: ApprovalDecision) {
+export function defaultDecisionComment(decision: Decision) {
   return decision === "approved" ? "Disetujui sesuai kebijakan dan saldo cuti." : "";
 }
 

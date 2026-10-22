@@ -24,20 +24,20 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AcceptInvite,
-  ChangePassword,
+  AcceptInviteIn,
+  ChangePasswordIn,
   ErrorOut,
-  ForgotPassword,
-  InviteInput,
+  ForgotPasswordIn,
+  InviteIn,
   InviteOut,
-  InvitePreview,
-  Login,
+  InvitePreviewOut,
+  LoginIn,
   MeOut,
-  Ok,
-  ResetPassword,
-  ResetPreview,
-  ResetPreviewInput,
-  Signup
+  OkOut,
+  ResetPasswordIn,
+  ResetPreviewIn,
+  ResetPreviewOut,
+  SignupIn
 } from '../model';
 
 import { api } from '../../client';
@@ -74,7 +74,7 @@ export const getSignupUrl = () => {
 /**
  * @summary Signup
  */
-export const signup = async (signupBody: Signup, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
+export const signup = async (signupIn: SignupIn, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -95,7 +95,7 @@ return api<MeOut>(getSignupUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(signupBody)
+    body: JSON.stringify(signupIn)
   }
 );}
 
@@ -133,9 +133,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SignupMutationResult = NonNullable<Awaited<ReturnType<typeof signup>>>
-    export type SignupMutationBody = Signup
+    export type SignupMutationBody = SignupIn
     export type SignupMutationError = ErrorType<ErrorOut>
-    export type SignupMutationVariables = {data: Signup}
+    export type SignupMutationVariables = {data: SignupIn}
 
     /**
  * @summary Signup
@@ -161,7 +161,7 @@ export const useSignup = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Login
  */
-export const login = async (loginBody: Login, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
+export const login = async (loginIn: LoginIn, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -182,7 +182,7 @@ return api<MeOut>(getLoginUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(loginBody)
+    body: JSON.stringify(loginIn)
   }
 );}
 
@@ -220,9 +220,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type LoginMutationResult = NonNullable<Awaited<ReturnType<typeof login>>>
-    export type LoginMutationBody = Login
+    export type LoginMutationBody = LoginIn
     export type LoginMutationError = ErrorType<ErrorOut>
-    export type LoginMutationVariables = {data: Login}
+    export type LoginMutationVariables = {data: LoginIn}
 
     /**
  * @summary Login
@@ -248,9 +248,9 @@ export const useLogin = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Logout
  */
-export const logout = async ( options?: Parameters<typeof api>[1]): Promise<Ok> => {
+export const logout = async ( options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
-  return api<Ok>(getLogoutUrl(),
+  return api<OkOut>(getLogoutUrl(),
   {
     ...options,
     method: 'POST'
@@ -321,7 +321,7 @@ export const useLogout = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Create Invite
  */
-export const createInvite = async (inviteInput: InviteInput, options?: Parameters<typeof api>[1]): Promise<InviteOut> => {
+export const createInvite = async (inviteIn: InviteIn, options?: Parameters<typeof api>[1]): Promise<InviteOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -342,7 +342,7 @@ return api<InviteOut>(getCreateInviteUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(inviteInput)
+    body: JSON.stringify(inviteIn)
   }
 );}
 
@@ -380,9 +380,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateInviteMutationResult = NonNullable<Awaited<ReturnType<typeof createInvite>>>
-    export type CreateInviteMutationBody = InviteInput
+    export type CreateInviteMutationBody = InviteIn
     export type CreateInviteMutationError = ErrorType<ErrorOut>
-    export type CreateInviteMutationVariables = {data: InviteInput}
+    export type CreateInviteMutationVariables = {data: InviteIn}
 
     /**
  * @summary Create Invite
@@ -408,9 +408,9 @@ export const useCreateInvite = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Preview Invite
  */
-export const previewInvite = async (token: string, options?: Parameters<typeof api>[1]): Promise<InvitePreview> => {
+export const previewInvite = async (token: string, options?: Parameters<typeof api>[1]): Promise<InvitePreviewOut> => {
 
-  return api<InvitePreview>(getPreviewInviteUrl(token),
+  return api<InvitePreviewOut>(getPreviewInviteUrl(token),
   {
     ...options,
     method: 'GET'
@@ -508,7 +508,7 @@ export const getAcceptInviteUrl = () => {
 /**
  * @summary Accept Invite
  */
-export const acceptInvite = async (acceptInviteBody: AcceptInvite, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
+export const acceptInvite = async (acceptInviteIn: AcceptInviteIn, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -529,7 +529,7 @@ return api<MeOut>(getAcceptInviteUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(acceptInviteBody)
+    body: JSON.stringify(acceptInviteIn)
   }
 );}
 
@@ -567,9 +567,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AcceptInviteMutationResult = NonNullable<Awaited<ReturnType<typeof acceptInvite>>>
-    export type AcceptInviteMutationBody = AcceptInvite
+    export type AcceptInviteMutationBody = AcceptInviteIn
     export type AcceptInviteMutationError = ErrorType<ErrorOut>
-    export type AcceptInviteMutationVariables = {data: AcceptInvite}
+    export type AcceptInviteMutationVariables = {data: AcceptInviteIn}
 
     /**
  * @summary Accept Invite
@@ -595,7 +595,7 @@ export const useAcceptInvite = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Forgot Password
  */
-export const forgotPassword = async (forgotPasswordBody: ForgotPassword, options?: Parameters<typeof api>[1]): Promise<Ok> => {
+export const forgotPassword = async (forgotPasswordIn: ForgotPasswordIn, options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -611,12 +611,12 @@ export const forgotPassword = async (forgotPasswordBody: ForgotPassword, options
     }
     return headers;
   };
-return api<Ok>(getForgotPasswordUrl(),
+return api<OkOut>(getForgotPasswordUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(forgotPasswordBody)
+    body: JSON.stringify(forgotPasswordIn)
   }
 );}
 
@@ -654,9 +654,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ForgotPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof forgotPassword>>>
-    export type ForgotPasswordMutationBody = ForgotPassword
+    export type ForgotPasswordMutationBody = ForgotPasswordIn
     export type ForgotPasswordMutationError = ErrorType<ErrorOut>
-    export type ForgotPasswordMutationVariables = {data: ForgotPassword}
+    export type ForgotPasswordMutationVariables = {data: ForgotPasswordIn}
 
     /**
  * @summary Forgot Password
@@ -682,7 +682,7 @@ export const useForgotPassword = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Preview Reset
  */
-export const previewReset = async (resetPreviewInput: ResetPreviewInput, options?: Parameters<typeof api>[1]): Promise<ResetPreview> => {
+export const previewReset = async (resetPreviewIn: ResetPreviewIn, options?: Parameters<typeof api>[1]): Promise<ResetPreviewOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -698,12 +698,12 @@ export const previewReset = async (resetPreviewInput: ResetPreviewInput, options
     }
     return headers;
   };
-return api<ResetPreview>(getPreviewResetUrl(),
+return api<ResetPreviewOut>(getPreviewResetUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(resetPreviewInput)
+    body: JSON.stringify(resetPreviewIn)
   }
 );}
 
@@ -741,9 +741,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PreviewResetMutationResult = NonNullable<Awaited<ReturnType<typeof previewReset>>>
-    export type PreviewResetMutationBody = ResetPreviewInput
+    export type PreviewResetMutationBody = ResetPreviewIn
     export type PreviewResetMutationError = ErrorType<ErrorOut>
-    export type PreviewResetMutationVariables = {data: ResetPreviewInput}
+    export type PreviewResetMutationVariables = {data: ResetPreviewIn}
 
     /**
  * @summary Preview Reset
@@ -769,7 +769,7 @@ export const usePreviewReset = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Reset Password
  */
-export const resetPassword = async (resetPasswordBody: ResetPassword, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
+export const resetPassword = async (resetPasswordIn: ResetPasswordIn, options?: Parameters<typeof api>[1]): Promise<MeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -790,7 +790,7 @@ return api<MeOut>(getResetPasswordUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(resetPasswordBody)
+    body: JSON.stringify(resetPasswordIn)
   }
 );}
 
@@ -828,9 +828,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetPassword>>>
-    export type ResetPasswordMutationBody = ResetPassword
+    export type ResetPasswordMutationBody = ResetPasswordIn
     export type ResetPasswordMutationError = ErrorType<ErrorOut>
-    export type ResetPasswordMutationVariables = {data: ResetPassword}
+    export type ResetPasswordMutationVariables = {data: ResetPasswordIn}
 
     /**
  * @summary Reset Password
@@ -856,7 +856,7 @@ export const useResetPassword = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Change Password
  */
-export const changePassword = async (changePasswordBody: ChangePassword, options?: Parameters<typeof api>[1]): Promise<Ok> => {
+export const changePassword = async (changePasswordIn: ChangePasswordIn, options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -872,12 +872,12 @@ export const changePassword = async (changePasswordBody: ChangePassword, options
     }
     return headers;
   };
-return api<Ok>(getChangePasswordUrl(),
+return api<OkOut>(getChangePasswordUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(changePasswordBody)
+    body: JSON.stringify(changePasswordIn)
   }
 );}
 
@@ -915,9 +915,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ChangePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof changePassword>>>
-    export type ChangePasswordMutationBody = ChangePassword
+    export type ChangePasswordMutationBody = ChangePasswordIn
     export type ChangePasswordMutationError = ErrorType<ErrorOut>
-    export type ChangePasswordMutationVariables = {data: ChangePassword}
+    export type ChangePasswordMutationVariables = {data: ChangePasswordIn}
 
     /**
  * @summary Change Password

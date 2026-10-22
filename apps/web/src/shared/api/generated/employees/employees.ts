@@ -25,10 +25,10 @@ import type {
 
 import type {
   CreatedEmployeeOut,
-  EmployeeInput,
-  EmployeeList,
+  EmployeeCreateIn,
+  EmployeeListOut,
   EmployeeOut,
-  EmployeeUpdate,
+  EmployeeUpdateIn,
   ErrorOut,
   NewEmployeeOut
 } from '../model';
@@ -67,9 +67,9 @@ export const getListEmployeesUrl = () => {
 /**
  * @summary List Employees
  */
-export const listEmployees = async ( options?: Parameters<typeof api>[1]): Promise<EmployeeList> => {
+export const listEmployees = async ( options?: Parameters<typeof api>[1]): Promise<EmployeeListOut> => {
 
-  return api<EmployeeList>(getListEmployeesUrl(),
+  return api<EmployeeListOut>(getListEmployeesUrl(),
   {
     ...options,
     method: 'GET'
@@ -167,7 +167,7 @@ export const getCreateEmployeeUrl = () => {
 /**
  * @summary Create Employee
  */
-export const createEmployee = async (employeeInput: EmployeeInput, options?: Parameters<typeof api>[1]): Promise<CreatedEmployeeOut | NewEmployeeOut> => {
+export const createEmployee = async (employeeCreateIn: EmployeeCreateIn, options?: Parameters<typeof api>[1]): Promise<CreatedEmployeeOut | NewEmployeeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -188,7 +188,7 @@ return api<CreatedEmployeeOut | NewEmployeeOut>(getCreateEmployeeUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(employeeInput)
+    body: JSON.stringify(employeeCreateIn)
   }
 );}
 
@@ -226,9 +226,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateEmployeeMutationResult = NonNullable<Awaited<ReturnType<typeof createEmployee>>>
-    export type CreateEmployeeMutationBody = EmployeeInput
+    export type CreateEmployeeMutationBody = EmployeeCreateIn
     export type CreateEmployeeMutationError = ErrorType<ErrorOut>
-    export type CreateEmployeeMutationVariables = {data: EmployeeInput}
+    export type CreateEmployeeMutationVariables = {data: EmployeeCreateIn}
 
     /**
  * @summary Create Employee
@@ -355,7 +355,7 @@ export const getUpdateEmployeeUrl = (employeeId: string,) => {
  * @summary Update Employee
  */
 export const updateEmployee = async (employeeId: string,
-    employeeUpdate: EmployeeUpdate, options?: Parameters<typeof api>[1]): Promise<EmployeeOut> => {
+    employeeUpdateIn: EmployeeUpdateIn, options?: Parameters<typeof api>[1]): Promise<EmployeeOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -376,7 +376,7 @@ return api<EmployeeOut>(getUpdateEmployeeUrl(employeeId),
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(employeeUpdate)
+    body: JSON.stringify(employeeUpdateIn)
   }
 );}
 
@@ -414,9 +414,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateEmployeeMutationResult = NonNullable<Awaited<ReturnType<typeof updateEmployee>>>
-    export type UpdateEmployeeMutationBody = EmployeeUpdate
+    export type UpdateEmployeeMutationBody = EmployeeUpdateIn
     export type UpdateEmployeeMutationError = ErrorType<ErrorOut>
-    export type UpdateEmployeeMutationVariables = {employeeId: string;data: EmployeeUpdate}
+    export type UpdateEmployeeMutationVariables = {employeeId: string;data: EmployeeUpdateIn}
 
     /**
  * @summary Update Employee

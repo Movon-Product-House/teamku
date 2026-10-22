@@ -25,8 +25,8 @@ import type {
 
 import type {
   ErrorOut,
-  NotificationList,
-  Ok
+  NotificationListOut,
+  OkOut
 } from '../model';
 
 import { api } from '../../client';
@@ -63,9 +63,9 @@ export const getNotificationsUrl = () => {
 /**
  * @summary Notifications
  */
-export const notifications = async ( options?: Parameters<typeof api>[1]): Promise<NotificationList> => {
+export const notifications = async ( options?: Parameters<typeof api>[1]): Promise<NotificationListOut> => {
 
-  return api<NotificationList>(getNotificationsUrl(),
+  return api<NotificationListOut>(getNotificationsUrl(),
   {
     ...options,
     method: 'GET'
@@ -163,9 +163,9 @@ export const getReadNotificationsUrl = () => {
 /**
  * @summary Read Notifications
  */
-export const readNotifications = async ( options?: Parameters<typeof api>[1]): Promise<Ok> => {
+export const readNotifications = async ( options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
-  return api<Ok>(getReadNotificationsUrl(),
+  return api<OkOut>(getReadNotificationsUrl(),
   {
     ...options,
     method: 'POST'
@@ -236,9 +236,9 @@ export const useReadNotifications = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Read Notification
  */
-export const readNotification = async (notificationId: string, options?: Parameters<typeof api>[1]): Promise<Ok> => {
+export const readNotification = async (notificationId: string, options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
-  return api<Ok>(getReadNotificationUrl(notificationId),
+  return api<OkOut>(getReadNotificationUrl(notificationId),
   {
     ...options,
     method: 'POST'

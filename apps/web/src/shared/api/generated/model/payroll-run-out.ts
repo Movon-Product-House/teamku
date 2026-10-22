@@ -4,14 +4,14 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { PayrollItem } from './payroll-item';
+import type { PayrollItemOut } from './payroll-item-out';
 import type { PayrollStatus } from './payroll-status';
 
 export interface PayrollRunOut {
   id: string;
   period: string;
   status: PayrollStatus;
-  items: PayrollItem[];
+  items: PayrollItemOut[];
   created_at: string;
   finalized_at: string | null;
   published_at: string | null;

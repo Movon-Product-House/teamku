@@ -4,9 +4,9 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { WeekDay } from './week-day';
+import type { WeekDayOut } from './week-day-out';
 
 export interface WeekOut {
   target_hours: number;
-  days: WeekDay[];
+  days: WeekDayOut[];
 }

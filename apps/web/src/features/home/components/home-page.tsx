@@ -20,11 +20,11 @@ import {
   useListLeaveRequests,
 } from "@/shared/api/generated";
 import type {
-  AgendaItemOut as AgendaItem,
-  LeaveList,
-  MeOut as Me,
-  PayslipOut as Payslip,
-  TodayOut as Today,
+  AgendaItemOut,
+  LeaveListOut,
+  MeOut,
+  PayslipOut,
+  TodayOut,
 } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { formatPeriod } from "@/shared/lib/format";
@@ -60,7 +60,7 @@ const leaveTones = {
 } as const;
 
 /** P1-E, P1-E2 (mobile) and D1 (desktop): Beranda for an Employee. */
-export function HomePage({ user }: { user: Me["user"] }) {
+export function HomePage({ user }: { user: MeOut["user"] }) {
   const today = useAttendanceToday();
   const week = useAttendanceWeek();
   const leave = useListLeaveRequests();
@@ -176,8 +176,8 @@ function Loaded<T>({
   return children(query.data);
 }
 
-function AgendaCard({ today }: { today: Today }) {
-  const items: AgendaItem[] = today.session?.agenda ?? [];
+function AgendaCard({ today }: { today: TodayOut }) {
+  const items: AgendaItemOut[] = today.session?.agenda ?? [];
   const done = items.filter((item) => item.status === "done").length;
   return (
     <section
@@ -234,7 +234,7 @@ function AgendaCard({ today }: { today: Today }) {
   );
 }
 
-function LeaveCard({ leave }: { leave: LeaveList }) {
+function LeaveCard({ leave }: { leave: LeaveListOut }) {
   return (
     <SummaryCard
       icon={Palmtree}
@@ -253,7 +253,7 @@ function LeaveCard({ leave }: { leave: LeaveList }) {
   );
 }
 
-function PayslipCard({ payslip }: { payslip: Payslip | null }) {
+function PayslipCard({ payslip }: { payslip: PayslipOut | null }) {
   if (!payslip)
     return (
       <SummaryCard
@@ -335,7 +335,7 @@ function SummaryCard({
   );
 }
 
-function LatestLeave({ item }: { item: LeaveList["items"][number] }) {
+function LatestLeave({ item }: { item: LeaveListOut["items"][number] }) {
   const start = new Date(`${item.start}T00:00:00`);
   const status = item.status;
   return (

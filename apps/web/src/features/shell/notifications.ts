@@ -1,12 +1,12 @@
 import { Bell, CalendarDays, type LucideIcon, ReceiptText, ScanFace } from "lucide-react";
-import type { NotificationOut as Notification } from "@/shared/api/generated/model";
+import type { NotificationOut } from "@/shared/api/generated/model";
 import { startOfToday } from "@/shared/lib/format";
 
 /** S4 groups: today's items, then everything older. Empty groups are dropped. */
 export function groupByDay(
-  items: Notification[],
+  items: NotificationOut[],
   now: Date = new Date(),
-): { label: string; items: Notification[] }[] {
+): { label: string; items: NotificationOut[] }[] {
   const midnight = startOfToday(now);
   const today = items.filter((item) => new Date(item.created_at).getTime() >= midnight);
   const earlier = items.filter((item) => new Date(item.created_at).getTime() < midnight);

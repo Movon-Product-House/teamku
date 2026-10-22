@@ -3,10 +3,7 @@
 import { type FormEvent, useId, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
 import { useDecide } from "@/shared/api/generated";
-import type {
-  Decision as ApprovalDecision,
-  ApprovalOut as ApprovalRequest,
-} from "@/shared/api/generated/model";
+import type { ApprovalOut, Decision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import {
@@ -23,7 +20,7 @@ import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
 
-type Props = { request: ApprovalRequest; decision: ApprovalDecision; onClose: () => void };
+type Props = { request: ApprovalOut; decision: Decision; onClose: () => void };
 
 export function DecisionDialog({ request, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));

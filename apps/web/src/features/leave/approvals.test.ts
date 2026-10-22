@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { ApprovalOut as ApprovalRequest } from "@/shared/api/generated/model";
+import type { ApprovalOut } from "@/shared/api/generated/model";
 import { countApprovals, filterApprovals, validateDecisionComment } from "./approvals";
 
-const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest => ({
+const request = (id: string, status: ApprovalOut["status"]): ApprovalOut => ({
   id,
   status,
   employee_id: "e1",

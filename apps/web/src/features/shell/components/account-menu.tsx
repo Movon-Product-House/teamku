@@ -2,7 +2,7 @@
 
 import { ChevronsUpDown, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import type { MeOut as Me } from "@/shared/api/generated/model";
+import type { MeOut } from "@/shared/api/generated/model";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ export function AccountMenu({
   stillWorking,
   onLogout,
 }: {
-  me: Me;
+  me: MeOut;
   stillWorking: boolean;
   onLogout: () => void;
 }) {

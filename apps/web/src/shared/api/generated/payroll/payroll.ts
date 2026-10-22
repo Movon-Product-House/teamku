@@ -25,10 +25,10 @@ import type {
 
 import type {
   ErrorOut,
-  PayrollInput,
-  PayrollRunList,
+  PayrollIn,
+  PayrollRunListOut,
   PayrollRunOut,
-  PayslipList
+  PayslipListOut
 } from '../model';
 
 import { api } from '../../client';
@@ -65,9 +65,9 @@ export const getListRunsUrl = () => {
 /**
  * @summary List Runs
  */
-export const listRuns = async ( options?: Parameters<typeof api>[1]): Promise<PayrollRunList> => {
+export const listRuns = async ( options?: Parameters<typeof api>[1]): Promise<PayrollRunListOut> => {
 
-  return api<PayrollRunList>(getListRunsUrl(),
+  return api<PayrollRunListOut>(getListRunsUrl(),
   {
     ...options,
     method: 'GET'
@@ -165,7 +165,7 @@ export const getCreateRunUrl = () => {
 /**
  * @summary Create Run
  */
-export const createRun = async (payrollInput: PayrollInput, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
+export const createRun = async (payrollIn: PayrollIn, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -186,7 +186,7 @@ return api<PayrollRunOut>(getCreateRunUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(payrollInput)
+    body: JSON.stringify(payrollIn)
   }
 );}
 
@@ -224,9 +224,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateRunMutationResult = NonNullable<Awaited<ReturnType<typeof createRun>>>
-    export type CreateRunMutationBody = PayrollInput
+    export type CreateRunMutationBody = PayrollIn
     export type CreateRunMutationError = ErrorType<ErrorOut>
-    export type CreateRunMutationVariables = {data: PayrollInput}
+    export type CreateRunMutationVariables = {data: PayrollIn}
 
     /**
  * @summary Create Run
@@ -398,9 +398,9 @@ export const usePublish = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Payslips
  */
-export const payslips = async ( options?: Parameters<typeof api>[1]): Promise<PayslipList> => {
+export const payslips = async ( options?: Parameters<typeof api>[1]): Promise<PayslipListOut> => {
 
-  return api<PayslipList>(getPayslipsUrl(),
+  return api<PayslipListOut>(getPayslipsUrl(),
   {
     ...options,
     method: 'GET'

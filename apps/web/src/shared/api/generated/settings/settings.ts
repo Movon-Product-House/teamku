@@ -24,17 +24,17 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AuthorizationUrl,
+  AuthorizationUrlOut,
   CalendarOut,
-  CalendarSettingsInput,
+  CalendarSettingsIn,
   ErrorOut,
-  GoogleCalendarList,
-  LocationList,
+  GoogleCalendarListOut,
+  LocationListOut,
   LocationOut,
-  MapsCoordinates,
-  MapsUrlInput,
-  OfficeSettingsInput,
-  WorkLocationInput
+  MapsCoordinatesOut,
+  MapsUrlIn,
+  OfficeSettingsIn,
+  WorkLocationIn
 } from '../model';
 
 import { api } from '../../client';
@@ -71,9 +71,9 @@ export const getListLocationsUrl = () => {
 /**
  * @summary List Locations
  */
-export const listLocations = async ( options?: Parameters<typeof api>[1]): Promise<LocationList> => {
+export const listLocations = async ( options?: Parameters<typeof api>[1]): Promise<LocationListOut> => {
 
-  return api<LocationList>(getListLocationsUrl(),
+  return api<LocationListOut>(getListLocationsUrl(),
   {
     ...options,
     method: 'GET'
@@ -171,7 +171,7 @@ export const getCreateLocationUrl = () => {
 /**
  * @summary Create Location
  */
-export const createLocation = async (workLocationInput: WorkLocationInput, options?: Parameters<typeof api>[1]): Promise<LocationOut> => {
+export const createLocation = async (workLocationIn: WorkLocationIn, options?: Parameters<typeof api>[1]): Promise<LocationOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -192,7 +192,7 @@ return api<LocationOut>(getCreateLocationUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(workLocationInput)
+    body: JSON.stringify(workLocationIn)
   }
 );}
 
@@ -230,9 +230,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateLocationMutationResult = NonNullable<Awaited<ReturnType<typeof createLocation>>>
-    export type CreateLocationMutationBody = WorkLocationInput
+    export type CreateLocationMutationBody = WorkLocationIn
     export type CreateLocationMutationError = ErrorType<ErrorOut>
-    export type CreateLocationMutationVariables = {data: WorkLocationInput}
+    export type CreateLocationMutationVariables = {data: WorkLocationIn}
 
     /**
  * @summary Create Location
@@ -358,7 +358,7 @@ export const getUpdateOfficeUrl = () => {
 /**
  * @summary Update Office
  */
-export const updateOffice = async (officeSettingsInput: OfficeSettingsInput, options?: Parameters<typeof api>[1]): Promise<LocationOut> => {
+export const updateOffice = async (officeSettingsIn: OfficeSettingsIn, options?: Parameters<typeof api>[1]): Promise<LocationOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -379,7 +379,7 @@ return api<LocationOut>(getUpdateOfficeUrl(),
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(officeSettingsInput)
+    body: JSON.stringify(officeSettingsIn)
   }
 );}
 
@@ -417,9 +417,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateOfficeMutationResult = NonNullable<Awaited<ReturnType<typeof updateOffice>>>
-    export type UpdateOfficeMutationBody = OfficeSettingsInput
+    export type UpdateOfficeMutationBody = OfficeSettingsIn
     export type UpdateOfficeMutationError = ErrorType<ErrorOut>
-    export type UpdateOfficeMutationVariables = {data: OfficeSettingsInput}
+    export type UpdateOfficeMutationVariables = {data: OfficeSettingsIn}
 
     /**
  * @summary Update Office
@@ -445,7 +445,7 @@ export const useUpdateOffice = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Office From Maps Url
  */
-export const officeFromMapsUrl = async (mapsUrlInput: MapsUrlInput, options?: Parameters<typeof api>[1]): Promise<MapsCoordinates> => {
+export const officeFromMapsUrl = async (mapsUrlIn: MapsUrlIn, options?: Parameters<typeof api>[1]): Promise<MapsCoordinatesOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -461,12 +461,12 @@ export const officeFromMapsUrl = async (mapsUrlInput: MapsUrlInput, options?: Pa
     }
     return headers;
   };
-return api<MapsCoordinates>(getOfficeFromMapsUrlUrl(),
+return api<MapsCoordinatesOut>(getOfficeFromMapsUrlUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(mapsUrlInput)
+    body: JSON.stringify(mapsUrlIn)
   }
 );}
 
@@ -504,9 +504,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type OfficeFromMapsUrlMutationResult = NonNullable<Awaited<ReturnType<typeof officeFromMapsUrl>>>
-    export type OfficeFromMapsUrlMutationBody = MapsUrlInput
+    export type OfficeFromMapsUrlMutationBody = MapsUrlIn
     export type OfficeFromMapsUrlMutationError = ErrorType<ErrorOut>
-    export type OfficeFromMapsUrlMutationVariables = {data: MapsUrlInput}
+    export type OfficeFromMapsUrlMutationVariables = {data: MapsUrlIn}
 
     /**
  * @summary Office From Maps Url
@@ -632,7 +632,7 @@ export const getUpdateCalendarUrl = () => {
 /**
  * @summary Update Calendar
  */
-export const updateCalendar = async (calendarSettingsInput: CalendarSettingsInput, options?: Parameters<typeof api>[1]): Promise<CalendarOut> => {
+export const updateCalendar = async (calendarSettingsIn: CalendarSettingsIn, options?: Parameters<typeof api>[1]): Promise<CalendarOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -653,7 +653,7 @@ return api<CalendarOut>(getUpdateCalendarUrl(),
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(calendarSettingsInput)
+    body: JSON.stringify(calendarSettingsIn)
   }
 );}
 
@@ -691,9 +691,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateCalendarMutationResult = NonNullable<Awaited<ReturnType<typeof updateCalendar>>>
-    export type UpdateCalendarMutationBody = CalendarSettingsInput
+    export type UpdateCalendarMutationBody = CalendarSettingsIn
     export type UpdateCalendarMutationError = ErrorType<ErrorOut>
-    export type UpdateCalendarMutationVariables = {data: CalendarSettingsInput}
+    export type UpdateCalendarMutationVariables = {data: CalendarSettingsIn}
 
     /**
  * @summary Update Calendar
@@ -719,9 +719,9 @@ export const useUpdateCalendar = <TError = ErrorType<ErrorOut>,
 /**
  * @summary Start Google Calendar
  */
-export const startGoogleCalendar = async ( options?: Parameters<typeof api>[1]): Promise<AuthorizationUrl> => {
+export const startGoogleCalendar = async ( options?: Parameters<typeof api>[1]): Promise<AuthorizationUrlOut> => {
 
-  return api<AuthorizationUrl>(getStartGoogleCalendarUrl(),
+  return api<AuthorizationUrlOut>(getStartGoogleCalendarUrl(),
   {
     ...options,
     method: 'GET'
@@ -819,9 +819,9 @@ export const getGoogleCalendarsUrl = () => {
 /**
  * @summary Google Calendars
  */
-export const googleCalendars = async ( options?: Parameters<typeof api>[1]): Promise<GoogleCalendarList> => {
+export const googleCalendars = async ( options?: Parameters<typeof api>[1]): Promise<GoogleCalendarListOut> => {
 
-  return api<GoogleCalendarList>(getGoogleCalendarsUrl(),
+  return api<GoogleCalendarListOut>(getGoogleCalendarsUrl(),
   {
     ...options,
     method: 'GET'
