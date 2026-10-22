@@ -23,7 +23,7 @@ export interface SkippedEventOut {
   inside_geofence: boolean | null;
   anomaly: Anomaly | null;
   due_at: string | null;
-  result?: 'skipped_slot';
+  result: 'skipped_slot';
   skipped: boolean;
   readonly maps_url: string | null;
 }

@@ -9,7 +9,7 @@
  * A replayed Idempotency-Key: the attendance the first request created.
  */
 export interface IdempotentOut {
-  result?: 'idempotent';
+  result: 'idempotent';
   id: string;
   idempotent: boolean;
 }

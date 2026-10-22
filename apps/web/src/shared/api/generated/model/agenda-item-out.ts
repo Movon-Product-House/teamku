@@ -6,6 +6,6 @@
  */
 
 export interface AgendaItemOut {
-  title?: string | null;
-  status?: string | null;
+  title: string | null;
+  status: string | null;
 }

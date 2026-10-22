@@ -9,7 +9,7 @@
  * A remote worker with no slot pending.
  */
 export interface SkippedOut {
-  result?: 'skipped';
+  result: 'skipped';
   skipped: boolean;
   /** @nullable */
   pending_reverification: null;

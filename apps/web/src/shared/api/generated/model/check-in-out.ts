@@ -7,7 +7,7 @@
 import type { Anomaly } from './anomaly';
 
 export interface CheckInOut {
-  result?: 'created';
+  result: 'created';
   id: string;
   checked_in_at: string;
   distance_meters: number;

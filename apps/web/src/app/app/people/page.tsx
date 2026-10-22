@@ -3,32 +3,24 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { api } from "@/shared/api/client";
+import {
+  createEmployee,
+  createInvite,
+  listEmployees,
+  listLocations,
+  me,
+  updateEmployee,
+} from "@/shared/api/generated";
+import type { EmployeeOut, LocationOut, Role } from "@/shared/api/generated/model";
 import { formatMoney } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
-
-type Employee = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  department: string;
-  title: string;
-  status: string;
-  salary?: number | null;
-  is_remote?: boolean;
-  work_location_id?: string | null;
-  work_location?: { name: string } | null;
-};
-type User = { id: string; role: string };
-type WorkLocation = { id: string; name: string; is_primary: boolean };
 
 const emptyForm = {
   name: "",
   email: "",
   department: "Engineering",
   title: "Staff",
-  role: "employee",
+  role: "employee" as Role,
   salary: "8000000",
   is_remote: false,
   work_location_id: "",
@@ -36,7 +28,7 @@ const emptyForm = {
 
 export default function People() {
   const router = useRouter();
-  const [items, setItems] = useState<Employee[]>([]);
+  const [items, setItems] = useState<EmployeeOut[]>([]);
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState("all");
   const [notification, setNotification] = useState<NotificationDialogState | null>(null);
@@ -45,15 +37,11 @@ export default function People() {
   const [form, setForm] = useState(emptyForm);
   const [role, setRole] = useState("");
   const [userId, setUserId] = useState("");
-  const [locations, setLocations] = useState<WorkLocation[]>([]);
+  const [locations, setLocations] = useState<LocationOut[]>([]);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    Promise.all([
-      api<{ items: Employee[] }>("/employees", {}),
-      api<{ user: User }>("/me", {}),
-      api<{ items: WorkLocation[] }>("/settings/locations", {}),
-    ])
+    Promise.all([listEmployees(), me(), listLocations()])
       .then(([people, profile, locationResult]) => {
         setItems(people.items);
         setRole(profile.user.role);
@@ -104,7 +92,7 @@ export default function People() {
     }
     setBusy(true);
     try {
-      await api("/employees", { method: "POST", body: JSON.stringify(payload()) });
+      await createEmployee(payload());
       setForm(emptyForm);
       setShowForm(false);
       notify("success", "Karyawan ditambahkan", "Karyawan baru berhasil ditambahkan.");
@@ -127,10 +115,7 @@ export default function People() {
     }
     setBusy(true);
     try {
-      const result = await api<{ invite_url: string }>("/invites", {
-        method: "POST",
-        body: JSON.stringify(payload()),
-      });
+      const result = await createInvite(payload());
       setForm(emptyForm);
       setShowForm(false);
       notify("success", "Undangan terkirim", `Tautan aktivasi: ${result.invite_url}`);
@@ -146,12 +131,11 @@ export default function People() {
     }
   }
 
-  async function toggleStatus(employee: Employee) {
+  async function toggleStatus(employee: EmployeeOut) {
     setBusy(true);
     try {
-      await api(`/employees/${employee.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: employee.status === "active" ? "suspended" : "active" }),
+      await updateEmployee(employee.id, {
+        status: employee.status === "active" ? "suspended" : "active",
       });
       notify("success", "Status diperbarui", `Status ${employee.name} berhasil diperbarui.`);
       await load();
@@ -356,7 +340,8 @@ export default function People() {
                 Peran
                 <select
                   value={form.role}
-                  onChange={(event) => setForm({ ...form, role: event.target.value })}
+                  // The options below are exactly the Role values.
+                  onChange={(event) => setForm({ ...form, role: event.target.value as Role })}
                 >
                   <option value="employee">Employee</option>
                   <option value="manager">Manager</option>

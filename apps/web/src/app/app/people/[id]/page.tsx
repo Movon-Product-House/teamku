@@ -2,39 +2,23 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { api } from "@/shared/api/client";
+import {
+  me as fetchMe,
+  getEmployee,
+  listLocations,
+  locationHistory,
+  updateEmployee,
+} from "@/shared/api/generated";
+import type {
+  EmployeeOut,
+  EventKind,
+  LocationEventOut,
+  LocationOut,
+} from "@/shared/api/generated/model";
 import { formatMoney } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type Employee = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  department: string;
-  title: string;
-  status: string;
-  salary?: number | null;
-  is_remote?: boolean;
-  work_location_id?: string | null;
-  work_location?: { id: string; name: string } | null;
-};
-type User = { id: string; role: string };
-type WorkLocation = { id: string; name: string; is_primary: boolean };
-type LocationEvent = {
-  id: string;
-  kind: string;
-  at: string;
-  lat: number | null;
-  lng: number | null;
-  accuracy: number | null;
-  distance_meters: number | null;
-  inside_geofence: boolean | null;
-  anomaly: string | null;
-  maps_url: string | null;
-};
-
-const kindLabel: Record<string, string> = {
+const kindLabel: Record<EventKind, string> = {
   check_in: "Check-in",
   reverify: "Re-verifikasi",
   check_out: "Check-out",
@@ -43,10 +27,10 @@ const kindLabel: Record<string, string> = {
 export default function EmployeeDetail() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [employee, setEmployee] = useState<Employee>();
-  const [events, setEvents] = useState<LocationEvent[] | null>(null);
+  const [employee, setEmployee] = useState<EmployeeOut>();
+  const [events, setEvents] = useState<LocationEventOut[] | null>(null);
   const [role, setRole] = useState("");
-  const [locations, setLocations] = useState<WorkLocation[]>([]);
+  const [locations, setLocations] = useState<LocationOut[]>([]);
   const [busy, setBusy] = useState(false);
   const [notification, setNotification] = useState<NotificationDialogState | null>(null);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
@@ -54,19 +38,13 @@ export default function EmployeeDetail() {
 
   const load = () => {
     const id = params.id;
-    Promise.all([
-      api<Employee>(`/employees/${id}`, {}),
-      api<{ user: User }>("/me", {}),
-      api<{ items: WorkLocation[] }>("/settings/locations", {}),
-    ])
+    Promise.all([getEmployee(id), fetchMe(), listLocations()])
       .then(([profile, me, locationResult]) => {
         setEmployee(profile);
         setRole(me.user.role);
         setLocations(locationResult.items);
         if (me.user.role === "manager" || me.user.role === "hr_admin") {
-          return api<{ items: LocationEvent[] }>(`/employees/${id}/location-history`, {}).then(
-            (history) => setEvents(history.items),
-          );
+          return locationHistory(id).then((history) => setEvents(history.items));
         }
         setEvents([]);
       })
@@ -87,10 +65,7 @@ export default function EmployeeDetail() {
     if (!employee || role !== "hr_admin") return;
     setBusy(true);
     try {
-      const updated = await api<Employee>(`/employees/${employee.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ is_remote: !employee.is_remote }),
-      });
+      const updated = await updateEmployee(employee.id, { is_remote: !employee.is_remote });
       setEmployee(updated);
       notify(
         "success",
@@ -114,10 +89,7 @@ export default function EmployeeDetail() {
     if (!employee || role !== "hr_admin") return;
     setBusy(true);
     try {
-      const updated = await api<Employee>(`/employees/${employee.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ work_location_id: workLocationId }),
-      });
+      const updated = await updateEmployee(employee.id, { work_location_id: workLocationId });
       setEmployee(updated);
       notify(
         "success",

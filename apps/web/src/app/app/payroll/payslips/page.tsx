@@ -1,26 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "@/shared/api/client";
+import { payslips } from "@/shared/api/generated";
+import type { PayslipOut } from "@/shared/api/generated/model";
 import { formatMoney, formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type Payslip = {
-  id: string;
-  period: string;
-  employee: string;
-  gross_rupiah: number;
-  deductions_rupiah: number;
-  net_rupiah: number;
-  published_at: string;
-};
-
 export default function Payslips() {
-  const [items, setItems] = useState<Payslip[]>([]),
+  const [items, setItems] = useState<PayslipOut[]>([]),
     [notification, setNotification] = useState<NotificationDialogState | null>(null);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    api<{ items: Payslip[] }>("/payroll/payslips", {})
+    payslips()
       .then((result) => setItems(result.items))
       .catch((reason) =>
         notify(
@@ -67,12 +58,16 @@ export default function Payslips() {
               <span>Penerimaan bersih</span>
               <strong>{formatMoney(item.net_rupiah)}</strong>
             </div>
-            <small>
-              Dipublikasikan{" "}
-              {new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short" }).format(
-                new Date(item.published_at),
-              )}
-            </small>
+            {/* Payslips only exist for published runs; the type allows null for other runs. */}
+            {item.published_at && (
+              <small>
+                Dipublikasikan{" "}
+                {new Intl.DateTimeFormat("id-ID", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(item.published_at))}
+              </small>
+            )}
           </article>
         ))}
         {items.length === 0 && (

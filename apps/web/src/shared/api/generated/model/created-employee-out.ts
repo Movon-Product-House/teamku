@@ -25,5 +25,5 @@ export interface CreatedEmployeeOut {
   work_location_id: string | null;
   work_mode: CreatedEmployeeOutWorkMode;
   work_location: LocationOut | null;
-  result?: 'password_set';
+  result: 'password_set';
 }

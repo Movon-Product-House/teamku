@@ -25,6 +25,6 @@ export interface NewEmployeeOut {
   work_location_id: string | null;
   work_mode: NewEmployeeOutWorkMode;
   work_location: LocationOut | null;
-  result?: 'temporary_password';
+  result: 'temporary_password';
   temporary_password: string;
 }

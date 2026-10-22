@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { AuthLink, AuthLinks, AuthShell } from "@/features/auth/components/auth-shell";
-import { api } from "@/shared/api/client";
+import { signup } from "@/shared/api/generated";
 import { waitForAuthTransition } from "@/shared/lib/auth-transition";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -21,15 +21,7 @@ export default function Signup() {
     const startedAt = Date.now();
     setBusy(true);
     try {
-      await api("/auth/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          company_name: companyName,
-          admin_name: adminName,
-          email,
-          password,
-        }),
-      });
+      await signup({ company_name: companyName, admin_name: adminName, email, password });
       await waitForAuthTransition(startedAt);
       router.replace("/app/overview");
     } catch (reason) {

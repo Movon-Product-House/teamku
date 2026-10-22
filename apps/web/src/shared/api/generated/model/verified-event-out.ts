@@ -23,6 +23,6 @@ export interface VerifiedEventOut {
   inside_geofence: boolean | null;
   anomaly: Anomaly | null;
   due_at: string | null;
-  result?: 'verified';
+  result: 'verified';
   readonly maps_url: string | null;
 }

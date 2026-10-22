@@ -3,28 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HomePage } from "@/features/home/components/home-page";
-import { api } from "@/shared/api/client";
-import { useMe } from "@/shared/api/generated";
+import { dashboard, getOffice, listLeaveRequests, payslips, useMe } from "@/shared/api/generated";
+import type { DashboardOut, LeaveListOut, PayslipOut } from "@/shared/api/generated/model";
 import { formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
-
-type Attendance = { checked_in_at: string; checked_out_at?: string; anomaly?: string };
-type Dashboard = {
-  current_user: { name: string; role: string };
-  headcount: number;
-  present: number;
-  absent: number;
-  on_leave: number;
-  late: number;
-  attendance_rate: number;
-  pending_approvals: number;
-  agenda_total: number;
-  agenda_completed: number;
-  attendance: Attendance[];
-};
-type Leave = { items: { status: string }[]; balance: { remaining_days: number } };
-type Payslip = { period: string; published_at: string };
-type Office = { name: string };
 
 // Employees get the v2 Beranda (#11); Manager and HR keep this page until their Beranda ships.
 export default function OverviewPage() {
@@ -35,19 +17,18 @@ export default function OverviewPage() {
 }
 
 function Overview() {
-  const [data, setData] = useState<Dashboard>();
-  const [leave, setLeave] = useState<Leave>();
-  const [payslip, setPayslip] = useState<Payslip>();
+  const [data, setData] = useState<DashboardOut>();
+  const [leave, setLeave] = useState<LeaveListOut>();
+  const [payslip, setPayslip] = useState<PayslipOut>();
   const [officeName, setOfficeName] = useState("Kantor");
   const [notification, setNotification] = useState<NotificationDialogState | null>(null);
   const load = async () => {
     try {
-      const dashboard = await api<Dashboard>("/dashboard", {});
-      setData(dashboard);
+      setData(await dashboard());
       const [leaveResult, payslipResult, officeResult] = await Promise.all([
-        api<Leave>("/leave-requests", {}).catch(() => undefined),
-        api<{ items: Payslip[] }>("/payroll/payslips", {}).catch(() => undefined),
-        api<Office>("/settings/office", {}).catch(() => undefined),
+        listLeaveRequests().catch(() => undefined),
+        payslips().catch(() => undefined),
+        getOffice().catch(() => undefined),
       ]);
       setLeave(leaveResult);
       setPayslip(payslipResult?.items[0]);
@@ -81,9 +62,9 @@ function Home({
   payslip,
   officeName,
 }: {
-  data: Dashboard;
-  leave: Leave | undefined;
-  payslip: Payslip | undefined;
+  data: DashboardOut;
+  leave: LeaveListOut | undefined;
+  payslip: PayslipOut | undefined;
   officeName: string;
 }) {
   const attendance = data.attendance[0];
@@ -271,7 +252,7 @@ function Home({
           label="Slip gaji terbaru"
           value={payslip ? formatPeriod(payslip.period) : "Belum ada slip"}
           detail={
-            payslip
+            payslip?.published_at
               ? `Diterbitkan ${formatShortDate(payslip.published_at)}`
               : "Slip akan tampil setelah dipublikasikan"
           }

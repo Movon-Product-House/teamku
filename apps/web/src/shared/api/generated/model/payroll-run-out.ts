@@ -15,8 +15,8 @@ export interface PayrollRunOut {
   created_at: string;
   finalized_at: string | null;
   published_at: string | null;
-  calculation_version?: string;
-  disclaimer?: string;
+  calculation_version: string;
+  disclaimer: string;
   readonly total_gross_rupiah: number;
   readonly total_deductions_rupiah: number;
   readonly total_net_rupiah: number;

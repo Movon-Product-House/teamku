@@ -2,30 +2,24 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { api } from "@/shared/api/client";
-import { getAttendanceTodayQueryKey } from "@/shared/api/generated";
+import {
+  attendanceToday,
+  checkIn,
+  checkOut,
+  getAttendanceTodayQueryKey,
+  me,
+  reverify,
+} from "@/shared/api/generated";
+import type { LocationOut, TodayOut } from "@/shared/api/generated/model";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type AttendanceState = {
-  state: "not_checked_in" | "checked_in" | "completed";
-  session: null | {
-    id: string;
-    checked_in_at: string;
-    checked_out_at: string | null;
-    anomaly: string | null;
-    agenda_count: number;
-    summary: string | null;
-  };
-  pending_reverification: null | { id: string; due_at: string; kind: string };
-  is_remote: boolean;
-};
 type CameraState = "idle" | "previewing" | "captured";
-type OfficeSettings = { name: string; latitude: number; longitude: number; radius_meters: number };
+type Office = Pick<LocationOut, "name" | "latitude" | "longitude" | "radius_meters">;
 
 export default function Today() {
-  const [attendance, setAttendance] = useState<AttendanceState>();
-  const [office, setOffice] = useState<OfficeSettings>({
+  const [attendance, setAttendance] = useState<TodayOut>();
+  const [office, setOffice] = useState<Office>({
     name: "Jakarta HQ",
     latitude: -6.2,
     longitude: 106.8166,
@@ -50,10 +44,7 @@ export default function Today() {
 
   const queryClient = useQueryClient();
   const load = () =>
-    Promise.all([
-      api<AttendanceState>("/attendance/today", {}),
-      api<{ user: { work_location: OfficeSettings | null } }>("/me", {}),
-    ])
+    Promise.all([attendanceToday(), me()])
       .then(([today, profile]) => {
         setAttendance(today);
         if (profile.user.work_location) setOffice(profile.user.work_location);
@@ -160,25 +151,24 @@ export default function Today() {
           maximumAge: 0,
         }),
       );
-      const result = await api<{ checked_in_at: string; anomaly: string | null }>(
-        "/attendance/check-in",
+      const result = await checkIn(
         {
-          method: "POST",
-          headers: { "Idempotency-Key": crypto.randomUUID() },
-          body: JSON.stringify({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy_meters: position.coords.accuracy,
-            selfie_captured: true,
-            location_share_approved: true,
-            agenda: [{ title: agendaTitle.trim(), priority: "high", status: "planned" }],
-          }),
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy_meters: position.coords.accuracy,
+          selfie_captured: true,
+          location_share_approved: true,
+          agenda: [{ title: agendaTitle.trim(), priority: "high", status: "planned" }],
         },
+        // The spec's header parameters are not generated; Orval passes extra headers through.
+        { headers: { "Idempotency-Key": crypto.randomUUID() } },
       );
       notify(
         "success",
         "Check-in berhasil",
-        `Presensi tercatat pukul ${new Date(result.checked_in_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}.`,
+        result.result === "idempotent"
+          ? "Presensi ini sudah tercatat sebelumnya."
+          : `Presensi tercatat pukul ${new Date(result.checked_in_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}.`,
       );
       setCameraState("idle");
       setSelfiePreview("");
@@ -232,14 +222,11 @@ export default function Today() {
           maximumAge: 0,
         }),
       );
-      await api("/attendance/reverify", {
-        method: "POST",
-        body: JSON.stringify({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy_meters: position.coords.accuracy,
-          selfie_captured: attendance?.is_remote ? true : cameraState === "captured",
-        }),
+      await reverify({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy_meters: position.coords.accuracy,
+        selfie_captured: attendance?.is_remote ? true : cameraState === "captured",
       });
       notify("success", "Lokasi tercatat", "Re-verifikasi lokasi berhasil dikirim.");
       setReverifyOpen(false);
@@ -286,14 +273,11 @@ export default function Today() {
           maximumAge: 0,
         }),
       );
-      const result = await api<{ effective_hours: number }>("/attendance/check-out", {
-        method: "POST",
-        body: JSON.stringify({
-          summary,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy_meters: position.coords.accuracy,
-        }),
+      const result = await checkOut({
+        summary,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy_meters: position.coords.accuracy,
       });
       notify(
         "success",
