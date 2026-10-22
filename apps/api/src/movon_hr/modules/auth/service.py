@@ -19,16 +19,16 @@ from movon_hr.core.settings import settings
 from movon_hr.modules.audit.service import audit
 from movon_hr.modules.auth.models import LoginAttempt, PasswordReset
 from movon_hr.modules.auth.schemas import (
-    AcceptInvite,
-    ChangePassword,
-    InviteInput,
+    AcceptInviteIn,
+    ChangePasswordIn,
+    InviteIn,
     InviteOut,
-    InvitePreview,
-    Login,
+    InvitePreviewOut,
+    LoginIn,
     MeOut,
-    ResetPassword,
-    ResetPreview,
-    Signup,
+    ResetPasswordIn,
+    ResetPreviewOut,
+    SignupIn,
     TenantOut,
 )
 from movon_hr.modules.employees import service as employees_service
@@ -131,7 +131,7 @@ def slugify_company(value: str) -> str:
     return slug[:40] or f"perusahaan-{uuid.uuid4().hex[:8]}"
 
 
-async def signup(db: AsyncSession, payload: Signup) -> tuple[MeOut, str]:
+async def signup(db: AsyncSession, payload: SignupIn) -> tuple[MeOut, str]:
     """New company: tenant, primary location, calendar settings and its HR admin."""
     email = payload.email.strip().lower()
     check_password_policy(payload.password)
@@ -196,7 +196,7 @@ async def clear_failed_attempts(db: AsyncSession, email: str) -> None:
     )
 
 
-async def login(db: AsyncSession, payload: Login) -> tuple[MeOut, str]:
+async def login(db: AsyncSession, payload: LoginIn) -> tuple[MeOut, str]:
     email = payload.email.strip().lower()
     await raise_if_locked_out(
         db, email, "Terlalu banyak percobaan masuk. Coba lagi dalam beberapa menit."
@@ -226,7 +226,7 @@ async def logout(db: AsyncSession, user: Employee, token: str) -> None:
 # --- Invitations ---
 
 
-async def create_invite(db: AsyncSession, user: Employee, payload: InviteInput) -> InviteOut:
+async def create_invite(db: AsyncSession, user: Employee, payload: InviteIn) -> InviteOut:
     """Commits before sending: the invitation stays even when the email fails (plan R4)."""
     email = payload.email.strip().lower()
     if await employees_service.email_taken(db, email):
@@ -294,11 +294,11 @@ async def open_invitation(db: AsyncSession, token: str) -> tuple[Invitation, str
     return invitation, company
 
 
-async def preview_invite(db: AsyncSession, token: str) -> InvitePreview:
+async def preview_invite(db: AsyncSession, token: str) -> InvitePreviewOut:
     invitation, company = await open_invitation(db, token)
     bind_tenant(db, invitation.tenant_id)
     inviter = await db.get(Employee, invitation.invited_by)
-    return InvitePreview(
+    return InvitePreviewOut(
         email=invitation.email,
         name=invitation.name,
         company=company,
@@ -310,7 +310,7 @@ async def preview_invite(db: AsyncSession, token: str) -> InvitePreview:
     )
 
 
-async def accept_invite(db: AsyncSession, payload: AcceptInvite) -> tuple[MeOut, str]:
+async def accept_invite(db: AsyncSession, payload: AcceptInviteIn) -> tuple[MeOut, str]:
     invitation, _ = await open_invitation(db, payload.token)
     check_password_policy(payload.password)
     if await employee_by_email(db, invitation.email):
@@ -388,12 +388,12 @@ async def open_reset(db: AsyncSession, token: str) -> tuple[PasswordReset, Emplo
     return reset, user
 
 
-async def preview_reset(db: AsyncSession, token: str) -> ResetPreview:
+async def preview_reset(db: AsyncSession, token: str) -> ResetPreviewOut:
     _, user = await open_reset(db, token)
-    return ResetPreview(email=user.email)
+    return ResetPreviewOut(email=user.email)
 
 
-async def reset_password(db: AsyncSession, payload: ResetPassword) -> tuple[MeOut, str]:
+async def reset_password(db: AsyncSession, payload: ResetPasswordIn) -> tuple[MeOut, str]:
     reset, user = await open_reset(db, payload.token)
     check_password_policy(payload.password)
     user.password_hash = await hash_password_async(payload.password)
@@ -407,7 +407,7 @@ async def reset_password(db: AsyncSession, payload: ResetPassword) -> tuple[MeOu
 
 
 async def change_password(
-    db: AsyncSession, user: Employee, token: str, payload: ChangePassword
+    db: AsyncSession, user: Employee, token: str, payload: ChangePasswordIn
 ) -> None:
     email = user.email.strip().lower()
     await raise_if_locked_out(

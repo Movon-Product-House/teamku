@@ -8,10 +8,10 @@ from movon_hr.core.identity import Employee
 from movon_hr.modules.policies import service
 from movon_hr.modules.policies.schemas import (
     AnswerOut,
-    PolicyInput,
-    PolicyList,
+    PolicyIn,
+    PolicyListOut,
     PolicyOut,
-    PolicyQuestion,
+    PolicyQuestionIn,
 )
 
 router = APIRouter(tags=["policies"])
@@ -19,17 +19,17 @@ HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 
 @router.get("/policies")
-async def list_policies(db: DB, _: HrAdmin) -> PolicyList:
-    return PolicyList.model_validate({"items": await service.list_policies(db)})
+async def list_policies(db: DB, _: HrAdmin) -> PolicyListOut:
+    return PolicyListOut.model_validate({"items": await service.list_policies(db)})
 
 
 @router.post("/policies")
-async def create_policy(db: DB, user: HrAdmin, payload: PolicyInput) -> PolicyOut:
+async def create_policy(db: DB, user: HrAdmin, payload: PolicyIn) -> PolicyOut:
     return PolicyOut.model_validate(await service.create_policy(db, user, payload))
 
 
 @router.put("/policies/{policy_id}")
-async def update_policy(db: DB, user: HrAdmin, policy_id: str, payload: PolicyInput) -> PolicyOut:
+async def update_policy(db: DB, user: HrAdmin, policy_id: str, payload: PolicyIn) -> PolicyOut:
     return PolicyOut.model_validate(await service.update_policy(db, user, policy_id, payload))
 
 
@@ -44,5 +44,5 @@ async def archive_policy(db: DB, user: HrAdmin, policy_id: str) -> PolicyOut:
 
 
 @router.post("/policy-assistant/questions")
-async def ask(db: DB, user: CurrentUser, payload: PolicyQuestion) -> AnswerOut:
+async def ask(db: DB, user: CurrentUser, payload: PolicyQuestionIn) -> AnswerOut:
     return await service.ask(db, user, payload.question)

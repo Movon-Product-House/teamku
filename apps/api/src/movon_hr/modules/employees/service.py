@@ -17,9 +17,9 @@ from movon_hr.modules.employees.models import Invitation
 from movon_hr.modules.employees.schemas import (
     CreatedEmployeeOut,
     EmployeeColumns,
-    EmployeeInput,
+    EmployeeCreateIn,
     EmployeeOut,
-    EmployeeUpdate,
+    EmployeeUpdateIn,
     NewEmployeeOut,
 )
 from movon_hr.modules.notifications.service import notify
@@ -122,7 +122,7 @@ async def revoke_sessions(
 
 
 async def create_employee(
-    db: AsyncSession, user: Employee, payload: EmployeeInput
+    db: AsyncSession, user: Employee, payload: EmployeeCreateIn
 ) -> CreatedEmployeeOut | NewEmployeeOut:
     if await email_taken(db, payload.email):
         raise HTTPException(409, "Email kerja sudah digunakan")
@@ -154,7 +154,7 @@ async def create_employee(
 
 
 async def update_employee(
-    db: AsyncSession, user: Employee, employee_id: str, payload: EmployeeUpdate
+    db: AsyncSession, user: Employee, employee_id: str, payload: EmployeeUpdateIn
 ) -> EmployeeOut:
     parsed = parse_id(employee_id)
     employee = await db.scalar(select(Employee).where(Employee.id == parsed)) if parsed else None

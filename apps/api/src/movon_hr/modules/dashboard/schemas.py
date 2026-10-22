@@ -6,7 +6,7 @@ from movon_hr.modules.attendance.models import Anomaly
 from movon_hr.modules.employees.schemas import EmployeeOut
 
 
-class DashboardAttendance(BaseModel):
+class DashboardAttendanceOut(BaseModel):
     employee: str
     department: str
     checked_in_at: datetime
@@ -25,4 +25,4 @@ class DashboardOut(BaseModel):
     pending_approvals: int
     agenda_total: int
     agenda_completed: int
-    attendance: list[DashboardAttendance]
+    attendance: list[DashboardAttendanceOut]

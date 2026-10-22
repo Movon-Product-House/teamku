@@ -7,23 +7,23 @@ from pydantic import BaseModel, ConfigDict, Field
 from movon_hr.modules.policies.models import Language, PolicyState
 
 
-class PolicySectionInput(BaseModel):
+class PolicySectionIn(BaseModel):
     # Kept only when it is the id of an existing section of the same policy.
     id: str | None = Field(default=None, max_length=80)
     heading: str = Field(min_length=1, max_length=160)
     body: str = Field(min_length=1, max_length=10_000)
 
 
-class PolicyInput(BaseModel):
+class PolicyIn(BaseModel):
     title: str = Field(min_length=2, max_length=160)
     category: str = Field(default="general", min_length=2, max_length=80)
     language: Language = "id"
     effective_date: date
     expiry_date: date | None = None
-    sections: list[PolicySectionInput] = Field(min_length=1, max_length=50)
+    sections: list[PolicySectionIn] = Field(min_length=1, max_length=50)
 
 
-class PolicyQuestion(BaseModel):
+class PolicyQuestionIn(BaseModel):
     question: str = Field(min_length=3, max_length=800)
 
 
@@ -53,11 +53,11 @@ class PolicyOut(BaseModel):
     updated_by: uuid.UUID
 
 
-class PolicyList(BaseModel):
+class PolicyListOut(BaseModel):
     items: list[PolicyOut]
 
 
-class Citation(BaseModel):
+class CitationOut(BaseModel):
     policy_id: uuid.UUID
     policy_title: str
     section_id: uuid.UUID
@@ -68,13 +68,13 @@ class Citation(BaseModel):
 
 
 # The assistant (core/policy_assistant.py) maps provider output onto these closed sets.
-class PersonalFact(BaseModel):
+class PersonalFactOut(BaseModel):
     type: Literal["leave_balance"]
     label: str
     value: int
 
 
-class SuggestedAction(BaseModel):
+class SuggestedActionOut(BaseModel):
     type: Literal["contact_hr", "open_leave_request"]
     href: str
 
@@ -82,6 +82,6 @@ class SuggestedAction(BaseModel):
 class AnswerOut(BaseModel):
     answer: str
     confidence: Literal["supported", "partially_supported", "insufficient_evidence"]
-    citations: list[Citation]
-    personal_facts: list[PersonalFact]
-    suggested_action: SuggestedAction
+    citations: list[CitationOut]
+    personal_facts: list[PersonalFactOut]
+    suggested_action: SuggestedActionOut

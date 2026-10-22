@@ -7,13 +7,13 @@ from movon_hr.core.time import working_days
 from movon_hr.modules.leave.models import CalendarSyncStatus, Decision, LeaveStatus, LeaveType
 
 
-class LeaveInput(BaseModel):
+class LeaveIn(BaseModel):
     start: date
     end: date
     reason: str = Field(min_length=4, max_length=500)
 
 
-class ApprovalInput(BaseModel):
+class ApprovalIn(BaseModel):
     decision: Decision
     comment: str = Field(min_length=3, max_length=500)
 
@@ -49,17 +49,17 @@ class ApprovalOut(LeaveDaysOut):
     department: str
 
 
-class LeaveBalance(BaseModel):
+class LeaveBalanceOut(BaseModel):
     annual_days: int
     used_days: int
     remaining_days: int
 
 
-class LeaveList(BaseModel):
+class LeaveListOut(BaseModel):
     items: list[LeaveDaysOut]
-    balance: LeaveBalance
+    balance: LeaveBalanceOut
 
 
-class ApprovalList(BaseModel):
+class ApprovalListOut(BaseModel):
     items: list[ApprovalOut]
     pending: int

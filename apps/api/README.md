@@ -84,6 +84,8 @@ Contoh terkecil: `modules/audit/`.
 ### HTTP
 1. Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`). `response_model=` hanya kalau handler me-return objek lain.
 2. Cek peran lewat dependency `require_role(...)` dari `core.auth`.
+3. Nama schema mengikuti arah data: body request `XIn` (`LeaveIn`, `EmployeeUpdateIn`), respons dan semua bagiannya `XOut` (`LeaveOut`, `LeaveListOut`, `CitationOut`). Enum tidak bersufiks: `type Role = Literal[...]` di `models.py` (lihat `one_of` di `core/db.py`). Nama ini menjadi nama type di client web.
+4. Union respons diberi field `result: Literal[...]` per varian dan `Field(discriminator="result")`.
 
 ### Bahasa
 Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan commit dalam bahasa Inggris. Teks untuk pengguna (pesan error API) dalam bahasa Indonesia. Dokumen tim di `docs/` dalam bahasa Indonesia.

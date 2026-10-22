@@ -16,11 +16,11 @@ from movon_hr.modules.settings import google_calendar, maps
 from movon_hr.modules.settings.models import CalendarSettings, OAuthState, WorkLocation
 from movon_hr.modules.settings.schemas import (
     HHMM,
-    CalendarSettingsInput,
+    CalendarSettingsIn,
     GoogleCalendarOut,
-    MapsCoordinates,
-    OfficeSettingsInput,
-    WorkLocationInput,
+    MapsCoordinatesOut,
+    OfficeSettingsIn,
+    WorkLocationIn,
 )
 
 OAUTH_STATE_TTL = timedelta(minutes=10)
@@ -57,7 +57,7 @@ async def list_locations(db: AsyncSession) -> list[WorkLocation]:
 
 
 async def create_location(
-    db: AsyncSession, user: Employee, payload: WorkLocationInput
+    db: AsyncSession, user: Employee, payload: WorkLocationIn
 ) -> WorkLocation:
     name = payload.name.strip().casefold()
     for item in await db.scalars(select(WorkLocation).order_by(WorkLocation.id)):
@@ -102,7 +102,7 @@ def validate_office_policy(data: dict[str, Any]) -> None:
 
 
 async def update_office(
-    db: AsyncSession, user: Employee, payload: OfficeSettingsInput
+    db: AsyncSession, user: Employee, payload: OfficeSettingsIn
 ) -> WorkLocation:
     office = await primary_location(db)
     merged = {field: getattr(office, field) for field in POLICY_FIELDS}
@@ -115,7 +115,7 @@ async def update_office(
     return office
 
 
-async def coordinates_from_maps(db: AsyncSession, user: Employee, url: str) -> MapsCoordinates:
+async def coordinates_from_maps(db: AsyncSession, user: Employee, url: str) -> MapsCoordinatesOut:
     source = url.strip()
     resolved = source
     if maps.is_short_link(source):
@@ -136,7 +136,7 @@ async def coordinates_from_maps(db: AsyncSession, user: Employee, url: str) -> M
         )
     latitude, longitude = coords
     await audit(db, "settings.office_maps_parsed", user, f"{latitude},{longitude}")
-    return MapsCoordinates(
+    return MapsCoordinatesOut(
         latitude=latitude,
         longitude=longitude,
         resolved_url=resolved,
@@ -153,7 +153,7 @@ async def get_calendar(db: AsyncSession) -> CalendarSettings:
 
 
 async def update_calendar(
-    db: AsyncSession, user: Employee, payload: CalendarSettingsInput
+    db: AsyncSession, user: Employee, payload: CalendarSettingsIn
 ) -> CalendarSettings:
     calendar = await get_calendar(db)
     # OAuth tokens are kept.

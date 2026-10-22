@@ -90,7 +90,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckIn"
+                "$ref": "#/components/schemas/CheckInIn"
               }
             }
           }
@@ -145,7 +145,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckOut"
+                "$ref": "#/components/schemas/CheckOutIn"
               }
             }
           },
@@ -186,7 +186,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReverifyInput"
+                "$ref": "#/components/schemas/ReverifyIn"
               }
             }
           },
@@ -259,7 +259,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationHistory"
+                  "$ref": "#/components/schemas/LocationHistoryOut"
                 }
               }
             }
@@ -290,7 +290,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuditLogList"
+                  "$ref": "#/components/schemas/AuditLogListOut"
                 }
               }
             }
@@ -319,7 +319,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Signup"
+                "$ref": "#/components/schemas/SignupIn"
               }
             }
           },
@@ -360,7 +360,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Login"
+                "$ref": "#/components/schemas/LoginIn"
               }
             }
           },
@@ -403,7 +403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Ok"
+                  "$ref": "#/components/schemas/OkOut"
                 }
               }
             }
@@ -432,7 +432,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InviteInput"
+                "$ref": "#/components/schemas/InviteIn"
               }
             }
           },
@@ -486,7 +486,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvitePreview"
+                  "$ref": "#/components/schemas/InvitePreviewOut"
                 }
               }
             }
@@ -515,7 +515,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AcceptInvite"
+                "$ref": "#/components/schemas/AcceptInviteIn"
               }
             }
           },
@@ -556,7 +556,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPassword"
+                "$ref": "#/components/schemas/ForgotPasswordIn"
               }
             }
           },
@@ -568,7 +568,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Ok"
+                  "$ref": "#/components/schemas/OkOut"
                 }
               }
             }
@@ -597,7 +597,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPreviewInput"
+                "$ref": "#/components/schemas/ResetPreviewIn"
               }
             }
           },
@@ -609,7 +609,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResetPreview"
+                  "$ref": "#/components/schemas/ResetPreviewOut"
                 }
               }
             }
@@ -638,7 +638,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPassword"
+                "$ref": "#/components/schemas/ResetPasswordIn"
               }
             }
           },
@@ -679,7 +679,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePassword"
+                "$ref": "#/components/schemas/ChangePasswordIn"
               }
             }
           },
@@ -691,7 +691,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Ok"
+                  "$ref": "#/components/schemas/OkOut"
                 }
               }
             }
@@ -784,7 +784,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmployeeList"
+                  "$ref": "#/components/schemas/EmployeeListOut"
                 }
               }
             }
@@ -811,7 +811,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmployeeInput"
+                "$ref": "#/components/schemas/EmployeeCreateIn"
               }
             }
           },
@@ -919,7 +919,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmployeeUpdate"
+                "$ref": "#/components/schemas/EmployeeUpdateIn"
               }
             }
           }
@@ -961,7 +961,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LeaveList"
+                  "$ref": "#/components/schemas/LeaveListOut"
                 }
               }
             }
@@ -988,7 +988,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LeaveInput"
+                "$ref": "#/components/schemas/LeaveIn"
               }
             }
           },
@@ -1073,7 +1073,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApprovalList"
+                  "$ref": "#/components/schemas/ApprovalListOut"
                 }
               }
             }
@@ -1114,7 +1114,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApprovalInput"
+                "$ref": "#/components/schemas/ApprovalIn"
               }
             }
           }
@@ -1156,7 +1156,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotificationList"
+                  "$ref": "#/components/schemas/NotificationListOut"
                 }
               }
             }
@@ -1187,7 +1187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Ok"
+                  "$ref": "#/components/schemas/OkOut"
                 }
               }
             }
@@ -1230,7 +1230,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Ok"
+                  "$ref": "#/components/schemas/OkOut"
                 }
               }
             }
@@ -1261,7 +1261,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PayrollRunList"
+                  "$ref": "#/components/schemas/PayrollRunListOut"
                 }
               }
             }
@@ -1288,7 +1288,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PayrollInput"
+                "$ref": "#/components/schemas/PayrollIn"
               }
             }
           },
@@ -1415,7 +1415,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PayslipList"
+                  "$ref": "#/components/schemas/PayslipListOut"
                 }
               }
             }
@@ -1446,7 +1446,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PolicyList"
+                  "$ref": "#/components/schemas/PolicyListOut"
                 }
               }
             }
@@ -1473,7 +1473,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PolicyInput"
+                "$ref": "#/components/schemas/PolicyIn"
               }
             }
           },
@@ -1526,7 +1526,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PolicyInput"
+                "$ref": "#/components/schemas/PolicyIn"
               }
             }
           }
@@ -1650,7 +1650,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PolicyQuestion"
+                "$ref": "#/components/schemas/PolicyQuestionIn"
               }
             }
           },
@@ -1693,7 +1693,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationList"
+                  "$ref": "#/components/schemas/LocationListOut"
                 }
               }
             }
@@ -1720,7 +1720,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkLocationInput"
+                "$ref": "#/components/schemas/WorkLocationIn"
               }
             }
           },
@@ -1790,7 +1790,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OfficeSettingsInput"
+                "$ref": "#/components/schemas/OfficeSettingsIn"
               }
             }
           },
@@ -1831,7 +1831,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MapsUrlInput"
+                "$ref": "#/components/schemas/MapsUrlIn"
               }
             }
           },
@@ -1843,7 +1843,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MapsCoordinates"
+                  "$ref": "#/components/schemas/MapsCoordinatesOut"
                 }
               }
             }
@@ -1901,7 +1901,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CalendarSettingsInput"
+                "$ref": "#/components/schemas/CalendarSettingsIn"
               }
             }
           },
@@ -1944,7 +1944,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthorizationUrl"
+                  "$ref": "#/components/schemas/AuthorizationUrlOut"
                 }
               }
             }
@@ -1975,7 +1975,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GoogleCalendarList"
+                  "$ref": "#/components/schemas/GoogleCalendarListOut"
                 }
               }
             }
@@ -1996,7 +1996,7 @@
   },
   "components": {
     "schemas": {
-      "AcceptInvite": {
+      "AcceptInviteIn": {
         "properties": {
           "token": {
             "type": "string",
@@ -2029,7 +2029,7 @@
           "token",
           "password"
         ],
-        "title": "AcceptInvite"
+        "title": "AcceptInviteIn"
       },
       "AgendaItemIn": {
         "properties": {
@@ -2123,20 +2123,20 @@
           },
           "citations": {
             "items": {
-              "$ref": "#/components/schemas/Citation"
+              "$ref": "#/components/schemas/CitationOut"
             },
             "type": "array",
             "title": "Citations"
           },
           "personal_facts": {
             "items": {
-              "$ref": "#/components/schemas/PersonalFact"
+              "$ref": "#/components/schemas/PersonalFactOut"
             },
             "type": "array",
             "title": "Personal Facts"
           },
           "suggested_action": {
-            "$ref": "#/components/schemas/SuggestedAction"
+            "$ref": "#/components/schemas/SuggestedActionOut"
           }
         },
         "type": "object",
@@ -2149,7 +2149,7 @@
         ],
         "title": "AnswerOut"
       },
-      "ApprovalInput": {
+      "ApprovalIn": {
         "properties": {
           "decision": {
             "$ref": "#/components/schemas/Decision"
@@ -2166,9 +2166,9 @@
           "decision",
           "comment"
         ],
-        "title": "ApprovalInput"
+        "title": "ApprovalIn"
       },
-      "ApprovalList": {
+      "ApprovalListOut": {
         "properties": {
           "items": {
             "items": {
@@ -2187,7 +2187,7 @@
           "items",
           "pending"
         ],
-        "title": "ApprovalList"
+        "title": "ApprovalListOut"
       },
       "ApprovalOut": {
         "properties": {
@@ -2296,7 +2296,7 @@
         ],
         "title": "ApprovalOut"
       },
-      "AuditLogList": {
+      "AuditLogListOut": {
         "properties": {
           "items": {
             "items": {
@@ -2310,7 +2310,7 @@
         "required": [
           "items"
         ],
-        "title": "AuditLogList"
+        "title": "AuditLogListOut"
       },
       "AuditLogOut": {
         "properties": {
@@ -2347,7 +2347,7 @@
         ],
         "title": "AuditLogOut"
       },
-      "AuthorizationUrl": {
+      "AuthorizationUrlOut": {
         "properties": {
           "authorization_url": {
             "type": "string",
@@ -2358,7 +2358,7 @@
         "required": [
           "authorization_url"
         ],
-        "title": "AuthorizationUrl"
+        "title": "AuthorizationUrlOut"
       },
       "CalendarOut": {
         "properties": {
@@ -2414,7 +2414,7 @@
           "division"
         ]
       },
-      "CalendarSettingsInput": {
+      "CalendarSettingsIn": {
         "properties": {
           "provider": {
             "$ref": "#/components/schemas/CalendarProvider"
@@ -2456,7 +2456,7 @@
           "provider",
           "team_calendar_id"
         ],
-        "title": "CalendarSettingsInput"
+        "title": "CalendarSettingsIn"
       },
       "CalendarSyncStatus": {
         "type": "string",
@@ -2468,7 +2468,7 @@
           "removed"
         ]
       },
-      "ChangePassword": {
+      "ChangePasswordIn": {
         "properties": {
           "current_password": {
             "type": "string",
@@ -2488,9 +2488,9 @@
           "current_password",
           "new_password"
         ],
-        "title": "ChangePassword"
+        "title": "ChangePasswordIn"
       },
-      "CheckIn": {
+      "CheckInIn": {
         "properties": {
           "latitude": {
             "type": "number",
@@ -2537,7 +2537,7 @@
           "location_share_approved",
           "agenda"
         ],
-        "title": "CheckIn"
+        "title": "CheckInIn"
       },
       "CheckInOut": {
         "properties": {
@@ -2591,7 +2591,7 @@
         ],
         "title": "CheckInOut"
       },
-      "CheckOut": {
+      "CheckOutIn": {
         "properties": {
           "summary": {
             "type": "string",
@@ -2643,7 +2643,7 @@
         "required": [
           "summary"
         ],
-        "title": "CheckOut"
+        "title": "CheckOutIn"
       },
       "CheckOutOut": {
         "properties": {
@@ -2670,7 +2670,7 @@
         ],
         "title": "CheckOutOut"
       },
-      "Citation": {
+      "CitationOut": {
         "properties": {
           "policy_id": {
             "type": "string",
@@ -2714,7 +2714,7 @@
           "excerpt",
           "score"
         ],
-        "title": "Citation"
+        "title": "CitationOut"
       },
       "CreatedEmployeeOut": {
         "properties": {
@@ -2815,7 +2815,7 @@
         "title": "CreatedEmployeeOut",
         "description": "Returned by POST /employees when HR set the password."
       },
-      "DashboardAttendance": {
+      "DashboardAttendanceOut": {
         "properties": {
           "employee": {
             "type": "string",
@@ -2861,7 +2861,7 @@
           "checked_out_at",
           "anomaly"
         ],
-        "title": "DashboardAttendance"
+        "title": "DashboardAttendanceOut"
       },
       "DashboardOut": {
         "properties": {
@@ -2906,7 +2906,7 @@
           },
           "attendance": {
             "items": {
-              "$ref": "#/components/schemas/DashboardAttendance"
+              "$ref": "#/components/schemas/DashboardAttendanceOut"
             },
             "type": "array",
             "title": "Attendance"
@@ -2943,7 +2943,7 @@
           "shared_and_email"
         ]
       },
-      "EmployeeInput": {
+      "EmployeeCreateIn": {
         "properties": {
           "name": {
             "type": "string",
@@ -3017,9 +3017,9 @@
           "role",
           "salary"
         ],
-        "title": "EmployeeInput"
+        "title": "EmployeeCreateIn"
       },
-      "EmployeeList": {
+      "EmployeeListOut": {
         "properties": {
           "items": {
             "items": {
@@ -3038,7 +3038,7 @@
           "items",
           "total"
         ],
-        "title": "EmployeeList"
+        "title": "EmployeeListOut"
       },
       "EmployeeOut": {
         "properties": {
@@ -3140,7 +3140,7 @@
           "terminated"
         ]
       },
-      "EmployeeUpdate": {
+      "EmployeeUpdateIn": {
         "properties": {
           "status": {
             "anyOf": [
@@ -3176,7 +3176,7 @@
           }
         },
         "type": "object",
-        "title": "EmployeeUpdate"
+        "title": "EmployeeUpdateIn"
       },
       "ErrorOut": {
         "properties": {
@@ -3187,7 +3187,7 @@
               },
               {
                 "items": {
-                  "$ref": "#/components/schemas/FieldError"
+                  "$ref": "#/components/schemas/FieldErrorOut"
                 },
                 "type": "array"
               }
@@ -3210,7 +3210,7 @@
           "reverify"
         ]
       },
-      "FieldError": {
+      "FieldErrorOut": {
         "properties": {
           "loc": {
             "items": {
@@ -3241,9 +3241,9 @@
           "msg",
           "type"
         ],
-        "title": "FieldError"
+        "title": "FieldErrorOut"
       },
-      "ForgotPassword": {
+      "ForgotPasswordIn": {
         "properties": {
           "email": {
             "type": "string",
@@ -3256,9 +3256,9 @@
         "required": [
           "email"
         ],
-        "title": "ForgotPassword"
+        "title": "ForgotPasswordIn"
       },
-      "GoogleCalendarList": {
+      "GoogleCalendarListOut": {
         "properties": {
           "items": {
             "items": {
@@ -3272,7 +3272,7 @@
         "required": [
           "items"
         ],
-        "title": "GoogleCalendarList"
+        "title": "GoogleCalendarListOut"
       },
       "GoogleCalendarOut": {
         "properties": {
@@ -3323,7 +3323,7 @@
         "title": "IdempotentOut",
         "description": "A replayed Idempotency-Key: the attendance the first request created."
       },
-      "InviteInput": {
+      "InviteIn": {
         "properties": {
           "name": {
             "type": "string",
@@ -3384,7 +3384,7 @@
           "department",
           "role"
         ],
-        "title": "InviteInput"
+        "title": "InviteIn"
       },
       "InviteOut": {
         "properties": {
@@ -3419,7 +3419,7 @@
         ],
         "title": "InviteOut"
       },
-      "InvitePreview": {
+      "InvitePreviewOut": {
         "properties": {
           "email": {
             "type": "string",
@@ -3472,7 +3472,7 @@
           "invited_by",
           "expires_at"
         ],
-        "title": "InvitePreview"
+        "title": "InvitePreviewOut"
       },
       "Language": {
         "type": "string",
@@ -3481,7 +3481,7 @@
           "en"
         ]
       },
-      "LeaveBalance": {
+      "LeaveBalanceOut": {
         "properties": {
           "annual_days": {
             "type": "integer",
@@ -3502,7 +3502,7 @@
           "used_days",
           "remaining_days"
         ],
-        "title": "LeaveBalance"
+        "title": "LeaveBalanceOut"
       },
       "LeaveDaysOut": {
         "properties": {
@@ -3601,7 +3601,7 @@
         ],
         "title": "LeaveDaysOut"
       },
-      "LeaveInput": {
+      "LeaveIn": {
         "properties": {
           "start": {
             "type": "string",
@@ -3626,9 +3626,9 @@
           "end",
           "reason"
         ],
-        "title": "LeaveInput"
+        "title": "LeaveIn"
       },
-      "LeaveList": {
+      "LeaveListOut": {
         "properties": {
           "items": {
             "items": {
@@ -3638,7 +3638,7 @@
             "title": "Items"
           },
           "balance": {
-            "$ref": "#/components/schemas/LeaveBalance"
+            "$ref": "#/components/schemas/LeaveBalanceOut"
           }
         },
         "type": "object",
@@ -3646,7 +3646,7 @@
           "items",
           "balance"
         ],
-        "title": "LeaveList"
+        "title": "LeaveListOut"
       },
       "LeaveOut": {
         "properties": {
@@ -3887,7 +3887,7 @@
         ],
         "title": "LocationEventOut"
       },
-      "LocationHistory": {
+      "LocationHistoryOut": {
         "properties": {
           "employee_id": {
             "type": "string",
@@ -3907,9 +3907,9 @@
           "employee_id",
           "items"
         ],
-        "title": "LocationHistory"
+        "title": "LocationHistoryOut"
       },
-      "LocationList": {
+      "LocationListOut": {
         "properties": {
           "items": {
             "items": {
@@ -3923,7 +3923,7 @@
         "required": [
           "items"
         ],
-        "title": "LocationList"
+        "title": "LocationListOut"
       },
       "LocationOut": {
         "properties": {
@@ -4009,7 +4009,7 @@
         ],
         "title": "LocationOut"
       },
-      "Login": {
+      "LoginIn": {
         "properties": {
           "email": {
             "type": "string",
@@ -4026,9 +4026,9 @@
           "email",
           "password"
         ],
-        "title": "Login"
+        "title": "LoginIn"
       },
-      "MapsCoordinates": {
+      "MapsCoordinatesOut": {
         "properties": {
           "latitude": {
             "type": "number",
@@ -4054,9 +4054,9 @@
           "resolved_url",
           "maps_url"
         ],
-        "title": "MapsCoordinates"
+        "title": "MapsCoordinatesOut"
       },
-      "MapsUrlInput": {
+      "MapsUrlIn": {
         "properties": {
           "url": {
             "type": "string",
@@ -4069,7 +4069,7 @@
         "required": [
           "url"
         ],
-        "title": "MapsUrlInput"
+        "title": "MapsUrlIn"
       },
       "MeOut": {
         "properties": {
@@ -4191,7 +4191,7 @@
         "title": "NewEmployeeOut",
         "description": "Returned once by POST /employees when HR did not set a password."
       },
-      "NotificationList": {
+      "NotificationListOut": {
         "properties": {
           "items": {
             "items": {
@@ -4210,7 +4210,7 @@
           "items",
           "unread"
         ],
-        "title": "NotificationList"
+        "title": "NotificationListOut"
       },
       "NotificationOut": {
         "properties": {
@@ -4258,7 +4258,7 @@
         ],
         "title": "NotificationOut"
       },
-      "OfficeSettingsInput": {
+      "OfficeSettingsIn": {
         "properties": {
           "name": {
             "type": "string",
@@ -4401,9 +4401,9 @@
           "longitude",
           "radius_meters"
         ],
-        "title": "OfficeSettingsInput"
+        "title": "OfficeSettingsIn"
       },
-      "Ok": {
+      "OkOut": {
         "properties": {
           "ok": {
             "type": "boolean",
@@ -4414,9 +4414,9 @@
         "required": [
           "ok"
         ],
-        "title": "Ok"
+        "title": "OkOut"
       },
-      "PayrollInput": {
+      "PayrollIn": {
         "properties": {
           "month": {
             "type": "string",
@@ -4428,9 +4428,9 @@
         "required": [
           "month"
         ],
-        "title": "PayrollInput"
+        "title": "PayrollIn"
       },
-      "PayrollItem": {
+      "PayrollItemOut": {
         "properties": {
           "employee_id": {
             "type": "string",
@@ -4461,9 +4461,9 @@
           "deductions_rupiah",
           "net_rupiah"
         ],
-        "title": "PayrollItem"
+        "title": "PayrollItemOut"
       },
-      "PayrollRunList": {
+      "PayrollRunListOut": {
         "properties": {
           "items": {
             "items": {
@@ -4477,7 +4477,7 @@
         "required": [
           "items"
         ],
-        "title": "PayrollRunList"
+        "title": "PayrollRunListOut"
       },
       "PayrollRunOut": {
         "properties": {
@@ -4495,7 +4495,7 @@
           },
           "items": {
             "items": {
-              "$ref": "#/components/schemas/PayrollItem"
+              "$ref": "#/components/schemas/PayrollItemOut"
             },
             "type": "array",
             "title": "Items"
@@ -4578,7 +4578,7 @@
           "published"
         ]
       },
-      "PayslipList": {
+      "PayslipListOut": {
         "properties": {
           "items": {
             "items": {
@@ -4592,7 +4592,7 @@
         "required": [
           "items"
         ],
-        "title": "PayslipList"
+        "title": "PayslipListOut"
       },
       "PayslipOut": {
         "properties": {
@@ -4682,7 +4682,7 @@
         ],
         "title": "PendingOut"
       },
-      "PersonalFact": {
+      "PersonalFactOut": {
         "properties": {
           "type": {
             "type": "string",
@@ -4704,9 +4704,9 @@
           "label",
           "value"
         ],
-        "title": "PersonalFact"
+        "title": "PersonalFactOut"
       },
-      "PolicyInput": {
+      "PolicyIn": {
         "properties": {
           "title": {
             "type": "string",
@@ -4744,7 +4744,7 @@
           },
           "sections": {
             "items": {
-              "$ref": "#/components/schemas/PolicySectionInput"
+              "$ref": "#/components/schemas/PolicySectionIn"
             },
             "type": "array",
             "maxItems": 50,
@@ -4758,9 +4758,9 @@
           "effective_date",
           "sections"
         ],
-        "title": "PolicyInput"
+        "title": "PolicyIn"
       },
-      "PolicyList": {
+      "PolicyListOut": {
         "properties": {
           "items": {
             "items": {
@@ -4774,7 +4774,7 @@
         "required": [
           "items"
         ],
-        "title": "PolicyList"
+        "title": "PolicyListOut"
       },
       "PolicyOut": {
         "properties": {
@@ -4859,7 +4859,7 @@
         ],
         "title": "PolicyOut"
       },
-      "PolicyQuestion": {
+      "PolicyQuestionIn": {
         "properties": {
           "question": {
             "type": "string",
@@ -4872,9 +4872,9 @@
         "required": [
           "question"
         ],
-        "title": "PolicyQuestion"
+        "title": "PolicyQuestionIn"
       },
-      "PolicySectionInput": {
+      "PolicySectionIn": {
         "properties": {
           "id": {
             "anyOf": [
@@ -4906,7 +4906,7 @@
           "heading",
           "body"
         ],
-        "title": "PolicySectionInput"
+        "title": "PolicySectionIn"
       },
       "PolicySectionOut": {
         "properties": {
@@ -4945,7 +4945,7 @@
           "archived"
         ]
       },
-      "ResetPassword": {
+      "ResetPasswordIn": {
         "properties": {
           "token": {
             "type": "string",
@@ -4965,22 +4965,9 @@
           "token",
           "password"
         ],
-        "title": "ResetPassword"
+        "title": "ResetPasswordIn"
       },
-      "ResetPreview": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "title": "Email"
-          }
-        },
-        "type": "object",
-        "required": [
-          "email"
-        ],
-        "title": "ResetPreview"
-      },
-      "ResetPreviewInput": {
+      "ResetPreviewIn": {
         "properties": {
           "token": {
             "type": "string",
@@ -4992,9 +4979,22 @@
         "required": [
           "token"
         ],
-        "title": "ResetPreviewInput"
+        "title": "ResetPreviewIn"
       },
-      "ReverifyInput": {
+      "ResetPreviewOut": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "ResetPreviewOut"
+      },
+      "ReverifyIn": {
         "properties": {
           "latitude": {
             "type": "number",
@@ -5026,7 +5026,7 @@
           "accuracy_meters",
           "selfie_captured"
         ],
-        "title": "ReverifyInput"
+        "title": "ReverifyIn"
       },
       "Role": {
         "type": "string",
@@ -5105,7 +5105,7 @@
         ],
         "title": "SessionOut"
       },
-      "Signup": {
+      "SignupIn": {
         "properties": {
           "company_name": {
             "type": "string",
@@ -5152,7 +5152,7 @@
           "email",
           "password"
         ],
-        "title": "Signup"
+        "title": "SignupIn"
       },
       "SkippedEventOut": {
         "properties": {
@@ -5332,7 +5332,7 @@
           "microsoft"
         ]
       },
-      "SuggestedAction": {
+      "SuggestedActionOut": {
         "properties": {
           "type": {
             "type": "string",
@@ -5352,7 +5352,7 @@
           "type",
           "href"
         ],
-        "title": "SuggestedAction"
+        "title": "SuggestedActionOut"
       },
       "TenantOut": {
         "properties": {
@@ -5568,7 +5568,7 @@
         "title": "VerifiedEventOut",
         "description": "The pending slot, answered."
       },
-      "WeekDay": {
+      "WeekDayOut": {
         "properties": {
           "date": {
             "type": "string",
@@ -5595,7 +5595,7 @@
           "late",
           "on_leave"
         ],
-        "title": "WeekDay"
+        "title": "WeekDayOut"
       },
       "WeekOut": {
         "properties": {
@@ -5605,7 +5605,7 @@
           },
           "days": {
             "items": {
-              "$ref": "#/components/schemas/WeekDay"
+              "$ref": "#/components/schemas/WeekDayOut"
             },
             "type": "array",
             "title": "Days"
@@ -5618,7 +5618,7 @@
         ],
         "title": "WeekOut"
       },
-      "WorkLocationInput": {
+      "WorkLocationIn": {
         "properties": {
           "name": {
             "type": "string",
@@ -5652,7 +5652,7 @@
           "latitude",
           "longitude"
         ],
-        "title": "WorkLocationInput"
+        "title": "WorkLocationIn"
       }
     }
   }

@@ -12,21 +12,21 @@ from movon_hr.core.time import jakarta_date
 from movon_hr.modules.attendance import rules
 from movon_hr.modules.attendance.models import Attendance, IdempotencyKey, LocationEvent
 from movon_hr.modules.attendance.schemas import (
-    CheckIn,
+    CheckInIn,
     CheckInOut,
-    CheckOut,
+    CheckOutIn,
     CheckOutOut,
     IdempotentOut,
     LocationEventOut,
-    LocationHistory,
+    LocationHistoryOut,
     PendingOut,
-    ReverifyInput,
+    ReverifyIn,
     SessionOut,
     SkippedEventOut,
     SkippedOut,
     TodayOut,
     VerifiedEventOut,
-    WeekDay,
+    WeekDayOut,
     WeekOut,
 )
 from movon_hr.modules.audit.service import audit
@@ -183,7 +183,7 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
     return WeekOut(
         target_hours=rules.TARGET_HOURS_PER_DAY,
         days=[
-            WeekDay(
+            WeekDayOut(
                 date=day,
                 hours=round(hours[day], 2),
                 late=late.get(day, False),
@@ -213,7 +213,7 @@ def schedule_reverify_slots(db: AsyncSession, record: Attendance, office: WorkLo
 
 
 async def check_in(
-    db: AsyncSession, user: Employee, payload: CheckIn, idempotency_key: str
+    db: AsyncSession, user: Employee, payload: CheckInIn, idempotency_key: str
 ) -> CheckInOut | IdempotentOut:
     replay = await db.scalar(
         select(IdempotencyKey.attendance_id).where(IdempotencyKey.key == idempotency_key)
@@ -291,7 +291,7 @@ async def check_in(
     )
 
 
-async def check_out(db: AsyncSession, user: Employee, payload: CheckOut) -> CheckOutOut:
+async def check_out(db: AsyncSession, user: Employee, payload: CheckOutIn) -> CheckOutOut:
     record = await open_session(db, user.id)
     if record is None:
         raise HTTPException(409, NO_OPEN_SESSION)
@@ -336,7 +336,7 @@ async def check_out(db: AsyncSession, user: Employee, payload: CheckOut) -> Chec
 
 
 async def reverify(
-    db: AsyncSession, user: Employee, payload: ReverifyInput
+    db: AsyncSession, user: Employee, payload: ReverifyIn
 ) -> VerifiedEventOut | SkippedEventOut | SkippedOut:
     record = next(
         (
@@ -380,13 +380,15 @@ async def reverify(
     return VerifiedEventOut(**event)
 
 
-async def location_history(db: AsyncSession, user: Employee, employee_id: str) -> LocationHistory:
+async def location_history(
+    db: AsyncSession, user: Employee, employee_id: str
+) -> LocationHistoryOut:
     employee = await employees_service.visible_or_404(db, user, employee_id)
     found = await db.scalars(
         select(LocationEvent)
         .where(LocationEvent.employee_id == employee.id)
         .order_by(LocationEvent.at, LocationEvent.id)
     )
-    return LocationHistory(
+    return LocationHistoryOut(
         employee_id=employee.id, items=[LocationEventOut.model_validate(item) for item in found]
     )

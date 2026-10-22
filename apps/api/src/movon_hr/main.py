@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 
-class FieldError(BaseModel):
+class FieldErrorOut(BaseModel):
     loc: list[str | int]
     msg: str
     type: str
@@ -45,7 +45,7 @@ class FieldError(BaseModel):
 class ErrorOut(BaseModel):
     """Every 4xx body: an HTTPException message, or the field errors of a request 422."""
 
-    detail: str | list[FieldError]
+    detail: str | list[FieldErrorOut]
 
 
 # "4XX" replaces FastAPI's own 422 entry, so ErrorOut covers validation errors too.

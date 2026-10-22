@@ -19,7 +19,7 @@ class AuditLogOut(BaseModel):
         return value.astimezone(UTC).isoformat(timespec="microseconds")
 
 
-class AuditLogList(BaseModel):
+class AuditLogListOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     items: list[AuditLogOut]

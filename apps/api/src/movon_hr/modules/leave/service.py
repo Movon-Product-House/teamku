@@ -14,11 +14,11 @@ from movon_hr.modules.audit.service import audit
 from movon_hr.modules.employees.service import parse_id
 from movon_hr.modules.leave.models import LeaveRequest
 from movon_hr.modules.leave.schemas import (
-    ApprovalInput,
-    ApprovalList,
+    ApprovalIn,
+    ApprovalListOut,
     ApprovalOut,
-    LeaveBalance,
-    LeaveInput,
+    LeaveBalanceOut,
+    LeaveIn,
     LeaveOut,
 )
 from movon_hr.modules.notifications.service import notify
@@ -47,14 +47,14 @@ async def has_approved_leave(db: AsyncSession, employee_id: uuid.UUID, day: date
     return found is not None
 
 
-async def leave_balance(db: AsyncSession, employee_id: uuid.UUID) -> LeaveBalance:
+async def leave_balance(db: AsyncSession, employee_id: uuid.UUID) -> LeaveBalanceOut:
     approved = await db.execute(
         select(LeaveRequest.start_date, LeaveRequest.end_date).where(
             LeaveRequest.employee_id == employee_id, LeaveRequest.status == "approved"
         )
     )
     used = sum(working_days(start, end) for start, end in approved)
-    return LeaveBalance(
+    return LeaveBalanceOut(
         annual_days=ANNUAL_DAYS, used_days=used, remaining_days=max(ANNUAL_DAYS - used, 0)
     )
 
@@ -69,7 +69,7 @@ async def own_requests(db: AsyncSession, user: Employee) -> list[LeaveRequest]:
     return list(found)
 
 
-async def approvals(db: AsyncSession, user: Employee) -> ApprovalList:
+async def approvals(db: AsyncSession, user: Employee) -> ApprovalListOut:
     """HR sees every request, a manager those of their department."""
     query = (
         select(LeaveRequest, Employee)
@@ -86,7 +86,7 @@ async def approvals(db: AsyncSession, user: Employee) -> ApprovalList:
         )
         for request, employee in (await db.execute(query)).tuples()
     ]
-    return ApprovalList(items=items, pending=sum(item.status == "pending" for item in items))
+    return ApprovalListOut(items=items, pending=sum(item.status == "pending" for item in items))
 
 
 # --- Emails (sent after the commit through BackgroundTasks) ---
@@ -168,7 +168,7 @@ async def remove_calendar(db: AsyncSession, request: LeaveRequest) -> None:
 
 
 async def submit(
-    db: AsyncSession, user: Employee, payload: LeaveInput, background_tasks: BackgroundTasks
+    db: AsyncSession, user: Employee, payload: LeaveIn, background_tasks: BackgroundTasks
 ) -> LeaveRequest:
     if payload.end < payload.start:
         raise HTTPException(422, "Tanggal selesai harus setelah tanggal mulai")
@@ -250,7 +250,7 @@ async def decide(
     db: AsyncSession,
     user: Employee,
     request_id: str,
-    payload: ApprovalInput,
+    payload: ApprovalIn,
     background_tasks: BackgroundTasks,
 ) -> LeaveRequest:
     parsed = parse_id(request_id)

@@ -7,11 +7,11 @@ from movon_hr.core.db import DB
 from movon_hr.core.identity import Employee
 from movon_hr.modules.leave import service
 from movon_hr.modules.leave.schemas import (
-    ApprovalInput,
-    ApprovalList,
+    ApprovalIn,
+    ApprovalListOut,
     LeaveDaysOut,
-    LeaveInput,
-    LeaveList,
+    LeaveIn,
+    LeaveListOut,
     LeaveOut,
 )
 
@@ -20,14 +20,14 @@ Approver = Annotated[Employee, Depends(require_role("manager", "hr_admin"))]
 
 
 @router.get("/leave-requests")
-async def list_leave_requests(db: DB, user: CurrentUser) -> LeaveList:
+async def list_leave_requests(db: DB, user: CurrentUser) -> LeaveListOut:
     items = [LeaveDaysOut.model_validate(item) for item in await service.own_requests(db, user)]
-    return LeaveList(items=items, balance=await service.leave_balance(db, user.id))
+    return LeaveListOut(items=items, balance=await service.leave_balance(db, user.id))
 
 
 @router.post("/leave-requests")
 async def submit_leave(
-    db: DB, user: CurrentUser, payload: LeaveInput, background_tasks: BackgroundTasks
+    db: DB, user: CurrentUser, payload: LeaveIn, background_tasks: BackgroundTasks
 ) -> LeaveDaysOut:
     return LeaveDaysOut.model_validate(await service.submit(db, user, payload, background_tasks))
 
@@ -40,7 +40,7 @@ async def cancel_leave(
 
 
 @router.get("/approvals")
-async def approvals(db: DB, user: Approver) -> ApprovalList:
+async def approvals(db: DB, user: Approver) -> ApprovalListOut:
     return await service.approvals(db, user)
 
 
@@ -49,7 +49,7 @@ async def decide(
     db: DB,
     user: Approver,
     request_id: str,
-    payload: ApprovalInput,
+    payload: ApprovalIn,
     background_tasks: BackgroundTasks,
 ) -> LeaveOut:
     request = await service.decide(db, user, request_id, payload, background_tasks)

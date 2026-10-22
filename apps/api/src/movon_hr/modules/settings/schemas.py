@@ -12,7 +12,7 @@ from movon_hr.modules.settings.models import (
 HHMM = r"^([01]\d|2[0-3]):[0-5]\d$"
 
 
-class OfficeSettingsInput(BaseModel):
+class OfficeSettingsIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -28,14 +28,14 @@ class OfficeSettingsInput(BaseModel):
     alert_managers: bool | None = None
 
 
-class WorkLocationInput(BaseModel):
+class WorkLocationIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     radius_meters: float = Field(default=300, ge=50, le=5_000)
 
 
-class CalendarSettingsInput(BaseModel):
+class CalendarSettingsIn(BaseModel):
     provider: CalendarProvider
     team_calendar_id: str = Field(min_length=2, max_length=300)
     connected: bool = False
@@ -45,7 +45,7 @@ class CalendarSettingsInput(BaseModel):
     delivery_mode: DeliveryMode = "shared_and_email"
 
 
-class MapsUrlInput(BaseModel):
+class MapsUrlIn(BaseModel):
     url: str = Field(min_length=4, max_length=2_000)
 
 
@@ -69,7 +69,7 @@ class LocationOut(BaseModel):
     is_primary: bool
 
 
-class LocationList(BaseModel):
+class LocationListOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     items: list[LocationOut]
@@ -87,7 +87,7 @@ class CalendarOut(BaseModel):
     delivery_mode: DeliveryMode
 
 
-class AuthorizationUrl(BaseModel):
+class AuthorizationUrlOut(BaseModel):
     authorization_url: str
 
 
@@ -97,11 +97,11 @@ class GoogleCalendarOut(BaseModel):
     primary: bool
 
 
-class GoogleCalendarList(BaseModel):
+class GoogleCalendarListOut(BaseModel):
     items: list[GoogleCalendarOut]
 
 
-class MapsCoordinates(BaseModel):
+class MapsCoordinatesOut(BaseModel):
     latitude: float
     longitude: float
     resolved_url: str

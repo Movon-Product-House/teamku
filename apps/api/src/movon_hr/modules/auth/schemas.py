@@ -8,13 +8,13 @@ from movon_hr.core.identity import Role
 from movon_hr.modules.employees.schemas import EmployeeOut
 
 
-class Login(BaseModel):
+class LoginIn(BaseModel):
     email: str
     # No min_length: a short wrong password must be a 401 that counts toward the lockout.
     password: str = Field(max_length=128)
 
 
-class Signup(BaseModel):
+class SignupIn(BaseModel):
     company_name: str = Field(min_length=2, max_length=120)
     slug: str | None = Field(default=None, min_length=3, max_length=40)
     admin_name: str = Field(min_length=2, max_length=100)
@@ -22,7 +22,7 @@ class Signup(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
-class InviteInput(BaseModel):
+class InviteIn(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     email: str = Field(min_length=5, max_length=150)
     department: str = Field(min_length=2, max_length=100)
@@ -34,27 +34,27 @@ class InviteInput(BaseModel):
     work_location_id: str | None = None
 
 
-class AcceptInvite(BaseModel):
+class AcceptInviteIn(BaseModel):
     token: str = Field(min_length=8, max_length=200)
     password: str = Field(min_length=8, max_length=128)
     name: str | None = Field(default=None, min_length=2, max_length=100)
 
 
-class ForgotPassword(BaseModel):
+class ForgotPasswordIn(BaseModel):
     email: str = Field(min_length=5, max_length=150)
 
 
-class ResetPassword(BaseModel):
+class ResetPasswordIn(BaseModel):
     token: str = Field(min_length=8, max_length=200)
     password: str = Field(min_length=8, max_length=128)
 
 
-class ResetPreviewInput(BaseModel):
+class ResetPreviewIn(BaseModel):
     # No min_length: a cut-off link must 404 (dead link), not 422.
     token: str = Field(max_length=200)
 
 
-class ChangePassword(BaseModel):
+class ChangePasswordIn(BaseModel):
     # Only checked against the hash, not the policy: a short current password is just wrong.
     current_password: str = Field(min_length=1, max_length=128)
     new_password: str = Field(min_length=8, max_length=128)
@@ -80,7 +80,7 @@ class InviteOut(BaseModel):
     email_status: Literal["sent", "failed"]
 
 
-class InvitePreview(BaseModel):
+class InvitePreviewOut(BaseModel):
     email: str
     name: str
     company: str
@@ -91,5 +91,5 @@ class InvitePreview(BaseModel):
     expires_at: datetime
 
 
-class ResetPreview(BaseModel):
+class ResetPreviewOut(BaseModel):
     email: str

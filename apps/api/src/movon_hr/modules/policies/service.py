@@ -14,7 +14,7 @@ from movon_hr.modules.audit.service import audit
 from movon_hr.modules.employees.service import parse_id
 from movon_hr.modules.leave.service import leave_balance
 from movon_hr.modules.policies.models import Policy, PolicyAnswerAudit, PolicySection, PolicyState
-from movon_hr.modules.policies.schemas import AnswerOut, PolicyInput
+from movon_hr.modules.policies.schemas import AnswerOut, PolicyIn
 
 NOT_FOUND = "Kebijakan tidak ditemukan"
 INCOMPLETE = "Kebijakan memerlukan judul dan setidaknya satu bagian yang terisi"
@@ -29,7 +29,7 @@ def validate_policy(title: str, sections: Sequence[PolicySection]) -> None:
 
 
 def build_sections(
-    payload: PolicyInput, existing: Sequence[PolicySection] = ()
+    payload: PolicyIn, existing: Sequence[PolicySection] = ()
 ) -> list[PolicySection]:
     """A client-sent id is kept only when it names an existing section; otherwise a new uuid."""
     by_id: dict[uuid.UUID, PolicySection] = {item.id: item for item in existing}
@@ -43,7 +43,7 @@ def build_sections(
     return sections
 
 
-def check_dates(payload: PolicyInput) -> None:
+def check_dates(payload: PolicyIn) -> None:
     if payload.expiry_date and payload.expiry_date < payload.effective_date:
         raise HTTPException(422, "Tanggal berakhir harus setelah tanggal berlaku")
 
@@ -67,7 +67,7 @@ async def policy_or_404(db: AsyncSession, policy_id: str) -> Policy:
     return policy
 
 
-async def create_policy(db: AsyncSession, user: Employee, payload: PolicyInput) -> Policy:
+async def create_policy(db: AsyncSession, user: Employee, payload: PolicyIn) -> Policy:
     check_dates(payload)
     sections = build_sections(payload)
     validate_policy(payload.title, sections)
@@ -89,7 +89,7 @@ async def create_policy(db: AsyncSession, user: Employee, payload: PolicyInput) 
 
 
 async def update_policy(
-    db: AsyncSession, user: Employee, policy_id: str, payload: PolicyInput
+    db: AsyncSession, user: Employee, policy_id: str, payload: PolicyIn
 ) -> Policy:
     policy = await policy_or_404(db, policy_id)
     check_dates(payload)

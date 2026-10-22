@@ -13,7 +13,7 @@ class AgendaItemIn(BaseModel):
     status: str | None = Field(default=None, max_length=20)
 
 
-class CheckIn(BaseModel):
+class CheckInIn(BaseModel):
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     accuracy_meters: float = Field(ge=0, le=10_000)
@@ -22,14 +22,14 @@ class CheckIn(BaseModel):
     agenda: list[AgendaItemIn] = Field(min_length=1, max_length=5)
 
 
-class CheckOut(BaseModel):
+class CheckOutIn(BaseModel):
     summary: str = Field(min_length=4, max_length=1000)
     latitude: float | None = Field(default=None, ge=-90, le=90)
     longitude: float | None = Field(default=None, ge=-180, le=180)
     accuracy_meters: float | None = Field(default=None, ge=0, le=10_000)
 
 
-class ReverifyInput(BaseModel):
+class ReverifyIn(BaseModel):
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     accuracy_meters: float = Field(ge=0, le=10_000)
@@ -74,7 +74,7 @@ class TodayOut(BaseModel):
     closed_hours_today: float
 
 
-class WeekDay(BaseModel):
+class WeekDayOut(BaseModel):
     date: date
     hours: float
     late: bool
@@ -83,7 +83,7 @@ class WeekDay(BaseModel):
 
 class WeekOut(BaseModel):
     target_hours: int
-    days: list[WeekDay]
+    days: list[WeekDayOut]
 
 
 class CheckInOut(BaseModel):
@@ -163,6 +163,6 @@ ReverifyResult = Annotated[
 ]
 
 
-class LocationHistory(BaseModel):
+class LocationHistoryOut(BaseModel):
     employee_id: uuid.UUID
     items: list[LocationEventOut]

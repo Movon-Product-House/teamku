@@ -9,7 +9,7 @@ from movon_hr.core.identity import Employee
 from movon_hr.core.time import JAKARTA, jakarta_date
 from movon_hr.modules.attendance.models import Attendance
 from movon_hr.modules.attendance.rules import is_late
-from movon_hr.modules.dashboard.schemas import DashboardAttendance, DashboardOut
+from movon_hr.modules.dashboard.schemas import DashboardAttendanceOut, DashboardOut
 from movon_hr.modules.employees import service as employees_service
 from movon_hr.modules.leave.models import LeaveRequest
 
@@ -66,7 +66,7 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
         agenda_total=len(agenda),
         agenda_completed=sum(1 for entry in agenda if entry.get("status") == "done"),
         attendance=[
-            DashboardAttendance(
+            DashboardAttendanceOut(
                 employee=employees[item.employee_id].name,
                 department=employees[item.employee_id].department,
                 checked_in_at=item.checked_in_at,

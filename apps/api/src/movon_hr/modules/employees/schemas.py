@@ -7,7 +7,7 @@ from movon_hr.core.identity import EmployeeStatus, Role
 from movon_hr.modules.settings.schemas import LocationOut
 
 
-class EmployeeInput(BaseModel):
+class EmployeeCreateIn(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     email: str = Field(min_length=5, max_length=150)
     department: str = Field(min_length=2, max_length=100)
@@ -21,7 +21,7 @@ class EmployeeInput(BaseModel):
     work_location_id: str | None = None
 
 
-class EmployeeUpdate(BaseModel):
+class EmployeeUpdateIn(BaseModel):
     status: EmployeeStatus | None = None
     is_remote: bool | None = None
     # Plain str, so an unknown or malformed id gets the old 422 message.
@@ -66,6 +66,6 @@ class NewEmployeeOut(EmployeeOut):
 CreateEmployeeResult = Annotated[CreatedEmployeeOut | NewEmployeeOut, Field(discriminator="result")]
 
 
-class EmployeeList(BaseModel):
+class EmployeeListOut(BaseModel):
     items: list[EmployeeOut]
     total: int

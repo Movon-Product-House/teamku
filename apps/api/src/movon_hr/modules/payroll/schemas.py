@@ -6,11 +6,11 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from movon_hr.modules.payroll.models import PayrollStatus
 
 
-class PayrollInput(BaseModel):
+class PayrollIn(BaseModel):
     month: str = Field(pattern=r"^\d{4}-\d{2}$")
 
 
-class PayrollItem(BaseModel):
+class PayrollItemOut(BaseModel):
     employee_id: str
     employee: str
     gross_rupiah: int
@@ -24,7 +24,7 @@ class PayrollRunOut(BaseModel):
     id: uuid.UUID
     period: str
     status: PayrollStatus
-    items: list[PayrollItem]
+    items: list[PayrollItemOut]
     created_at: datetime
     finalized_at: datetime | None
     published_at: datetime | None
@@ -47,15 +47,15 @@ class PayrollRunOut(BaseModel):
         return sum(item.net_rupiah for item in self.items)
 
 
-class PayrollRunList(BaseModel):
+class PayrollRunListOut(BaseModel):
     items: list[PayrollRunOut]
 
 
-class PayslipOut(PayrollItem):
+class PayslipOut(PayrollItemOut):
     id: uuid.UUID
     period: str
     published_at: datetime | None
 
 
-class PayslipList(BaseModel):
+class PayslipListOut(BaseModel):
     items: list[PayslipOut]
