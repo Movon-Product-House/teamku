@@ -12,6 +12,7 @@ from pathlib import Path
 
 import httpx
 import pytest
+import time_machine
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import select
@@ -31,6 +32,13 @@ from movon_hr.core.tenancy import TenantSession
 from movon_hr.main import app
 from movon_hr.seed import seed_demo
 
+# Every test starts at this moment: Wednesday 10:00 WIB, after the seed's 08:50-09:14
+# check-ins and far from midnight, so UTC and Jakarta agree on "today".
+# Always pass UTC to the clock: time-machine also sets the process time zone from the
+# destination's tzinfo, and prod/CI run in UTC (a Jakarta TZ would hide local-time bugs).
+# Postgres now() (server defaults) still reads the real clock, so keep this in the past.
+TEST_NOW = datetime(2026, 10, 21, 3, 0, tzinfo=UTC)
+
 TEST_DATABASE_URL = os.environ.get(
     "MOVON_TEST_DATABASE_URL", "postgresql+psycopg://movon:movon@localhost:5432/movon_test"
 )
@@ -41,6 +49,13 @@ engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
 @pytest.fixture
 def anyio_backend() -> str:
     return "asyncio"
+
+
+@pytest.fixture(autouse=True)
+def clock(time_machine: time_machine.TimeMachineFixture) -> time_machine.TimeMachineFixture:
+    """Simulated clock; a test that needs another moment calls ``clock.move_to(...)``."""
+    time_machine.move_to(TEST_NOW)  # ticks by default: time still advances from here
+    return time_machine
 
 
 @pytest.fixture(autouse=True)

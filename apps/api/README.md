@@ -20,6 +20,8 @@ Semua dijalankan dari `apps/api`. Postgres lokal: `docker compose -f ../../infra
 
 Jalankan `scripts/check.sh` sebelum push. Tes butuh database kosong terpisah: sekali saja jalankan `docker compose -f ../../infra/compose/docker-compose.yml exec postgres createdb -U movon movon_test`, atau arahkan `MOVON_TEST_DATABASE_URL` ke DB lain. CI (`.github/workflows/api.yml`) menjalankan `check.sh` ditambah `alembic upgrade head`, `alembic check`, dan cek satu head.
 
+Tes berjalan di jam simulasi (`time-machine`): fixture autouse `clock` di `tests/conftest.py` memulai setiap tes pada `TEST_NOW` (Rabu 10:00 WIB), jadi hasilnya tidak bergantung kapan CI jalan. Butuh momen lain: `clock.move_to(...)` dengan datetime ber-tzinfo UTC (time-machine ikut memasang zona waktu proses dari tzinfo itu; prod dan CI berjalan di UTC). Kolom `server_default=func.now()` tetap diisi jam asli Postgres, jadi jangan bandingkan kolom itu dengan jam aplikasi di tes. Yang terdampak saat ini: jendela lockout login (`LoginAttempt.attempted_at` di `raise_if_locked_out`, `modules/auth/service.py`), cleanup login attempt di `jobs.py`, dan urutan `list_policies` (`Policy.updated_at`). Contoh: `clock.move_to` melewati `LOGIN_ATTEMPT_WINDOW` tidak membuka lockout.
+
 ## Struktur
 
 ```
@@ -97,5 +99,5 @@ Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan com
 
 - `tests/conftest.py` menjalankan `alembic upgrade head` sekali per sesi ke `MOVON_TEST_DATABASE_URL` (default `postgresql+psycopg://movon:movon@localhost:5432/movon_test`).
 - Setiap tes berjalan di dalam satu transaksi yang di-rollback di akhir tes. Semua session yang dibuka kode (`get_db`, job, seed) ikut transaksi itu lewat SAVEPOINT, dan seed demo dijalankan di dalamnya.
-- Fixture utama: `client` (`httpx.AsyncClient` di atas ASGI), `db` (session dengan demo ter-seed dan tenant ter-bind), `login_headers(email)`, `employee_id(email)`. Helper DB ada di `tests/helpers.py`.
+- Fixture utama: `client` (`httpx.AsyncClient` di atas ASGI), `db` (session dengan demo ter-seed dan tenant ter-bind), `login_headers(email)`, `employee_id(email)`, `clock` (autouse, jam simulasi; lihat di atas). Helper DB ada di `tests/helpers.py`.
 - Tes ditulis `async def` dengan `@pytest.mark.anyio`. Email selalu dipaksa ke transport `console`.

@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from helpers import add_leave, location_events, set_employee
 
+from movon_hr.core.time import jakarta_date
 from movon_hr.modules.settings.models import WorkLocation
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
@@ -111,7 +112,7 @@ async def test_field_employee_checkout_records_location_and_dashboard_summarizes
     assert [event.kind for event in events] == ["check_in", "check_out"]
     assert events[-1].lat == -6.91
 
-    today = datetime.now(UTC).astimezone().date()
+    today = jakarta_date()  # the dashboard's day, not the runner's time zone
     await add_leave(db, "dian@movon.test", today, today, "Cuti", status="approved")
     dashboard = (
         await client.get("/api/v1/dashboard", headers=await login_headers("hr@movon.test"))
@@ -124,4 +125,18 @@ async def test_field_employee_checkout_records_location_and_dashboard_summarizes
         "late",
         "attendance_rate",
     } <= dashboard.keys()
+    assert dashboard["on_leave"] == 1
+
+
+async def test_dashboard_counts_the_jakarta_day_just_after_midnight(
+    client, db, clock, login_headers
+) -> None:
+    # 00:30 WIB Thursday is still Wednesday in UTC; leave only on Thursday must count.
+    clock.move_to(datetime(2026, 10, 21, 17, 30, tzinfo=UTC))  # 00:30 WIB Thursday
+    thursday = jakarta_date()
+    await add_leave(db, "dian@movon.test", thursday, thursday, "Cuti", status="approved")
+
+    dashboard = (
+        await client.get("/api/v1/dashboard", headers=await login_headers("hr@movon.test"))
+    ).json()
     assert dashboard["on_leave"] == 1
