@@ -4,10 +4,12 @@ import uuid
 from datetime import date, datetime
 from typing import Any
 
+import httpx
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
+from movon_hr.core.settings import settings
 from movon_hr.modules.attendance.models import Attendance, LocationEvent
 from movon_hr.modules.leave.models import LeaveRequest
 from movon_hr.modules.notifications.models import Notification
@@ -15,6 +17,16 @@ from movon_hr.modules.settings.models import WorkLocation
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE
 
 FRESH = {"populate_existing": True}  # read what requests wrote, not the identity map
+
+
+def session_cookie(token: str) -> dict[str, str]:
+    """Request headers sending ``token`` as the session cookie; wins over the client's jar."""
+    return {"Cookie": f"{settings.session_cookie_name}={token}"}
+
+
+def session_of(response: httpx.Response) -> dict[str, str]:
+    """``session_cookie`` for the session an auth response just set."""
+    return session_cookie(response.cookies[settings.session_cookie_name])
 
 
 async def employee(db: AsyncSession, email: str) -> Employee:

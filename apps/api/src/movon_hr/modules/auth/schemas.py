@@ -71,10 +71,6 @@ class MeOut(BaseModel):
     tenant: TenantOut
 
 
-class AuthOut(MeOut):
-    access_token: str
-
-
 class InviteOut(BaseModel):
     email: str
     expires_at: datetime

@@ -28,7 +28,7 @@ app.add_middleware(
     allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "PUT"],
-    allow_headers=["Content-Type", "Idempotency-Key", "X-CSRF-Token", "X-Demo-User"],
+    allow_headers=["Content-Type", "Idempotency-Key"],
 )
 
 app.include_router(attendance_router, prefix="/api/v1")

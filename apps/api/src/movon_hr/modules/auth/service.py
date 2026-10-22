@@ -20,7 +20,6 @@ from movon_hr.modules.audit.service import audit
 from movon_hr.modules.auth.models import LoginAttempt, PasswordReset
 from movon_hr.modules.auth.schemas import (
     AcceptInvite,
-    AuthOut,
     ChangePassword,
     InviteInput,
     InviteOut,
@@ -124,10 +123,6 @@ async def me(db: AsyncSession, user: Employee) -> MeOut:
     return MeOut(user=user_out, tenant=TenantOut.model_validate(tenant))
 
 
-async def auth_out(db: AsyncSession, user: Employee, token: str) -> AuthOut:
-    return AuthOut(**(await me(db, user)).model_dump(), access_token=token)
-
-
 # --- Signup and login ---
 
 
@@ -136,7 +131,7 @@ def slugify_company(value: str) -> str:
     return slug[:40] or f"perusahaan-{uuid.uuid4().hex[:8]}"
 
 
-async def signup(db: AsyncSession, payload: Signup) -> AuthOut:
+async def signup(db: AsyncSession, payload: Signup) -> tuple[MeOut, str]:
     """New company: tenant, primary location, calendar settings and its HR admin."""
     email = payload.email.strip().lower()
     check_password_policy(payload.password)
@@ -172,7 +167,7 @@ async def signup(db: AsyncSession, payload: Signup) -> AuthOut:
     await db.flush()
     token = create_session(db, admin)
     await audit(db, "auth.signup", admin, str(tenant.id))
-    return await auth_out(db, admin, token)
+    return await me(db, admin), token
 
 
 async def raise_if_locked_out(db: AsyncSession, email: str, message: str) -> None:
@@ -201,7 +196,7 @@ async def clear_failed_attempts(db: AsyncSession, email: str) -> None:
     )
 
 
-async def login(db: AsyncSession, payload: Login) -> AuthOut:
+async def login(db: AsyncSession, payload: Login) -> tuple[MeOut, str]:
     email = payload.email.strip().lower()
     await raise_if_locked_out(
         db, email, "Terlalu banyak percobaan masuk. Coba lagi dalam beberapa menit."
@@ -220,7 +215,7 @@ async def login(db: AsyncSession, payload: Login) -> AuthOut:
         user.password_hash = await hash_password_async(payload.password)
     token = create_session(db, user)
     await audit(db, "auth.login", user, str(user.id))
-    return await auth_out(db, user, token)
+    return await me(db, user), token
 
 
 async def logout(db: AsyncSession, user: Employee, token: str) -> None:
@@ -315,7 +310,7 @@ async def preview_invite(db: AsyncSession, token: str) -> InvitePreview:
     )
 
 
-async def accept_invite(db: AsyncSession, payload: AcceptInvite) -> AuthOut:
+async def accept_invite(db: AsyncSession, payload: AcceptInvite) -> tuple[MeOut, str]:
     invitation, _ = await open_invitation(db, payload.token)
     check_password_policy(payload.password)
     if await employee_by_email(db, invitation.email):
@@ -345,7 +340,7 @@ async def accept_invite(db: AsyncSession, payload: AcceptInvite) -> AuthOut:
         "/app/overview",
     )
     await audit(db, "invite.accepted", employee, invitation.email)
-    return await auth_out(db, employee, token)
+    return await me(db, employee), token
 
 
 # --- Passwords ---
@@ -398,7 +393,7 @@ async def preview_reset(db: AsyncSession, token: str) -> ResetPreview:
     return ResetPreview(email=user.email)
 
 
-async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
+async def reset_password(db: AsyncSession, payload: ResetPassword) -> tuple[MeOut, str]:
     reset, user = await open_reset(db, payload.token)
     check_password_policy(payload.password)
     user.password_hash = await hash_password_async(payload.password)
@@ -408,7 +403,7 @@ async def reset_password(db: AsyncSession, payload: ResetPassword) -> AuthOut:
     await employees_service.revoke_sessions(db, user.id)
     token = create_session(db, user)
     await audit(db, "auth.password_reset", user, str(user.id))
-    return await auth_out(db, user, token)
+    return await me(db, user), token
 
 
 async def change_password(

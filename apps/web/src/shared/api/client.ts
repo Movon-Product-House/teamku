@@ -1,5 +1,3 @@
-import { clearDemoToken, demoAuthHeaders } from "./demo-session";
-
 // Browser requests stay same-origin. Next.js forwards this prefix to FastAPI,
 // avoiding localhost/IPv6 mismatches and keeping CORS out of the UI contract.
 const BASE = "/api";
@@ -35,7 +33,6 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
       signal: init.signal || controller?.signal,
       headers: {
         "Content-Type": "application/json",
-        ...demoAuthHeaders(),
         ...(init.headers || {}),
       },
     });
@@ -49,7 +46,6 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
   if (!response.ok) {
     if (response.status === 401 && shouldRedirectToLogin(path)) {
-      clearDemoToken();
       window.location.assign("/login");
     }
     const body = await response.json().catch(() => ({}));

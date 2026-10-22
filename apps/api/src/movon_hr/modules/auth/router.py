@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Header, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
 
 from movon_hr.core.auth import CurrentUser, require_role
 from movon_hr.core.db import DB
@@ -9,7 +9,6 @@ from movon_hr.core.settings import settings
 from movon_hr.modules.auth import service
 from movon_hr.modules.auth.schemas import (
     AcceptInvite,
-    AuthOut,
     ChangePassword,
     ForgotPassword,
     InviteInput,
@@ -28,27 +27,25 @@ router = APIRouter()
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 
-async def session_token(
-    request: Request, x_demo_user: Annotated[str | None, Header()] = None
-) -> str:
+async def session_token(request: Request) -> str:
     """The caller's token, read the same way as ``current_user`` (which already checked it)."""
-    return x_demo_user or request.cookies.get(settings.session_cookie_name) or ""
+    return request.cookies.get(settings.session_cookie_name) or ""
 
 
 SessionToken = Annotated[str, Depends(session_token)]
 
 
 @router.post("/auth/signup")
-async def signup(db: DB, payload: Signup, response: Response) -> AuthOut:
-    out = await service.signup(db, payload)
-    service.set_session_cookie(response, out.access_token)
+async def signup(db: DB, payload: Signup, response: Response) -> MeOut:
+    out, token = await service.signup(db, payload)
+    service.set_session_cookie(response, token)
     return out
 
 
 @router.post("/auth/login")
-async def login(db: DB, payload: Login, response: Response) -> AuthOut:
-    out = await service.login(db, payload)
-    service.set_session_cookie(response, out.access_token)
+async def login(db: DB, payload: Login, response: Response) -> MeOut:
+    out, token = await service.login(db, payload)
+    service.set_session_cookie(response, token)
     return out
 
 
@@ -70,9 +67,9 @@ async def preview_invite(db: DB, token: str) -> InvitePreview:
 
 
 @router.post("/auth/accept-invite")
-async def accept_invite(db: DB, payload: AcceptInvite, response: Response) -> AuthOut:
-    out = await service.accept_invite(db, payload)
-    service.set_session_cookie(response, out.access_token)
+async def accept_invite(db: DB, payload: AcceptInvite, response: Response) -> MeOut:
+    out, token = await service.accept_invite(db, payload)
+    service.set_session_cookie(response, token)
     return out
 
 
@@ -89,9 +86,9 @@ async def preview_reset(db: DB, payload: ResetPreviewInput) -> ResetPreview:
 
 
 @router.post("/auth/reset-password")
-async def reset_password(db: DB, payload: ResetPassword, response: Response) -> AuthOut:
-    out = await service.reset_password(db, payload)
-    service.set_session_cookie(response, out.access_token)
+async def reset_password(db: DB, payload: ResetPassword, response: Response) -> MeOut:
+    out, token = await service.reset_password(db, payload)
+    service.set_session_cookie(response, token)
     return out
 
 

@@ -7,6 +7,7 @@ from typing import Annotated
 import httpx
 import pytest
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
+from helpers import session_cookie
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Mapped, aliased, mapped_column
@@ -250,25 +251,27 @@ def auth_app() -> FastAPI:
     return app
 
 
-async def test_current_user_from_header_or_cookie(
+async def test_current_user_reads_only_the_session_cookie(
     sessions: async_sessionmaker, tokens: dict[str, str]
 ) -> None:
     async with client(auth_app()) as http:
+        # The old X-Demo-User header is no longer a way in.
         by_header = await http.get("/me", headers={"X-Demo-User": tokens["employee"]})
-        assert by_header.json() == {"role": "employee", "tenant_bound": True, "w": []}
-        http.cookies.set("teamku_session", tokens["hr_admin"])
-        assert (await http.get("/me")).json()["role"] == "hr_admin"
+        assert by_header.status_code == 401
+        http.cookies.set("teamku_session", tokens["employee"])
+        by_cookie = await http.get("/me")
+        assert by_cookie.json() == {"role": "employee", "tenant_bound": True, "w": []}
 
 
 async def test_current_user_rejects_bad_sessions(
     sessions: async_sessionmaker, tokens: dict[str, str]
 ) -> None:
     async with client(auth_app()) as http:
-        for headers in ({}, {"X-Demo-User": "nope"}, {"X-Demo-User": tokens["suspended"]}):
+        for headers in ({}, session_cookie("nope"), session_cookie(tokens["suspended"])):
             response = await http.get("/me", headers=headers)
             assert response.status_code == 401
             assert response.json() == {"detail": "Sesi tidak valid"}
-        expired = await http.get("/me", headers={"X-Demo-User": tokens["expired"]})
+        expired = await http.get("/me", headers=session_cookie(tokens["expired"]))
         assert expired.status_code == 401
         assert expired.json() == {"detail": "Sesi telah berakhir. Silakan masuk kembali."}
     async with sessions() as db:
@@ -280,8 +283,8 @@ async def test_current_user_rejects_bad_sessions(
 
 async def test_require_role(sessions: async_sessionmaker, tokens: dict[str, str]) -> None:
     async with client(auth_app()) as http:
-        allowed = await http.get("/hr-only", headers={"X-Demo-User": tokens["hr_admin"]})
+        allowed = await http.get("/hr-only", headers=session_cookie(tokens["hr_admin"]))
         assert allowed.json() == {"role": "hr_admin"}
-        denied = await http.get("/hr-only", headers={"X-Demo-User": tokens["employee"]})
+        denied = await http.get("/hr-only", headers=session_cookie(tokens["employee"]))
         assert denied.status_code == 403
         assert denied.json() == {"detail": "Anda tidak memiliki izin untuk aksi ini"}

@@ -1,5 +1,5 @@
 // DEMO-ONLY: pemilih akun seed. Untuk menghapus mode demo, hapus file ini dan
-// pemakaiannya di halaman login (cari "DemoAccountPicker"), plus shared/api/demo-session.ts.
+// pemakaiannya di halaman login (cari "DemoAccountPicker").
 import { cn } from "@/shared/lib/cn";
 
 const DEMO_PASSWORD = "Demo123!";

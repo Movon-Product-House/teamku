@@ -15,7 +15,7 @@
 - **shadcn/ui (Radix)** sebagai primitive UI di `shared/ui/`. Komponen ditambahkan hanya saat dibutuhkan; warna lewat token semantik di `globals.css`. Layer `ui-reset` melindungi komponen ini dari CSS legacy selama preflight dimatikan.
 - **Batas 600 baris per file** dan **nama file kebab-case**, dipaksa oleh `scripts/check-file-lines.mjs` dan Biome.
 - **Biome** menggantikan ESLint + Prettier. **Vitest** untuk logika murni. CI GitHub Actions menjalankan `npm run check` + build.
-- **Auth**: cookie httpOnly `teamku_session` menjadi sumber kebenaran, dan `middleware.ts` menjaga `/app/*`. Token demo di localStorage/`X-Demo-User` dipertahankan sementara, tetapi diisolasi di dua file (lihat `apps/web/README.md`).
+- **Auth**: cookie httpOnly `teamku_session` menjadi sumber kebenaran, dan `middleware.ts` menjaga `/app/*`. Token tidak pernah disimpan di JS: salinan demo di localStorage/header `X-Demo-User` dihapus (#41), akun demo pun login lewat cookie.
 
 ## Alternatif yang ditolak
 
