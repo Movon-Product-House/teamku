@@ -13,30 +13,30 @@ from movon_hr.modules.payroll.schemas import (
     PayslipListOut,
 )
 
-router = APIRouter(prefix="/payroll", tags=["payroll"])
+router = APIRouter(tags=["payroll"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 
-@router.get("/runs")
+@router.get("/payroll/runs")
 async def list_runs(db: DB, _: HrAdmin) -> PayrollRunListOut:
     return PayrollRunListOut.model_validate({"items": await service.list_runs(db)})
 
 
-@router.post("/runs")
+@router.post("/payroll/runs")
 async def create_run(db: DB, user: HrAdmin, payload: PayrollIn) -> PayrollRunOut:
     return PayrollRunOut.model_validate(await service.create_run(db, user, payload.month))
 
 
-@router.post("/runs/{run_id}/finalize")
+@router.post("/payroll/runs/{run_id}/finalize")
 async def finalize(db: DB, user: HrAdmin, run_id: str) -> PayrollRunOut:
     return PayrollRunOut.model_validate(await service.finalize(db, user, run_id))
 
 
-@router.post("/runs/{run_id}/publish")
+@router.post("/payroll/runs/{run_id}/publish")
 async def publish(db: DB, user: HrAdmin, run_id: str) -> PayrollRunOut:
     return PayrollRunOut.model_validate(await service.publish(db, user, run_id))
 
 
-@router.get("/payslips")
+@router.get("/payroll/payslips")
 async def payslips(db: DB, user: CurrentUser) -> PayslipListOut:
     return PayslipListOut(items=await service.payslips(db, user))

@@ -95,8 +95,8 @@ Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan com
 1. Buat `src/movon_hr/modules/<domain>/` dengan `__init__.py`, `models.py`, `schemas.py`, `service.py`, `router.py`. Tabel tenant memakai `Base` dari `core.db` dan mixin `TenantScoped`; PK `uuid` dengan `server_default=text("uuidv7()")`.
 2. Import `models.py` baru di `alembic/env.py`, supaya tabelnya masuk `Base.metadata`.
 3. `uv run alembic upgrade head`, lalu `uv run alembic revision --autogenerate -m "<domain>"`. Review hasilnya (`uuidv7()`, index parsial, nama constraint), lalu `uv run alembic upgrade head && uv run alembic check`.
-4. Daftarkan router di `main.py` dengan `prefix="/api/v1"`.
-5. Tambah tes di `tests/`, lalu `scripts/check.sh`.
+4. `router = APIRouter(tags=["<domain>"])` tanpa `prefix`: tulis path lengkap di setiap route (`@router.get("/payroll/runs")`), karena satu modul bisa melayani lebih dari satu akar path. Tambahkan router ke daftar di `main.py`, yang memasang `/api/v1` dan respons `4XX`.
+5. Tambah tes di `tests/`, `uv run python -m movon_hr.openapi`, lalu `scripts/check.sh`.
 
 ## Tes
 
