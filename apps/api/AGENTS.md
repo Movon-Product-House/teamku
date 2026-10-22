@@ -55,7 +55,7 @@ Spec (`openapi.json`) adalah kontrak tempat client web di-generate. Setiap nama 
 - Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`); `response_model=` hanya bila handler me-return objek lain.
 - Peran dicek lewat dependency `require_role(...)` dari `core/auth.py`.
 - Schema: body request `XIn` (`LeaveIn`, `EmployeeUpdateIn`); respons dan semua bagiannya `XOut` (`LeaveOut`, `LeaveListOut`, `CitationOut`). `XOut` yang dibangun dari model ORM memakai `from_attributes=True`. Field respons yang punya default tetap `required` di spec (`json_schema_serialization_defaults_required=True`, dijaga `tests/test_openapi.py`).
-- Enum: `type <Resource><Atribut> = Literal[...]` di `models.py`, tanpa sufiks (`EmployeeRole`, `LeaveDecision`, `PayrollRunStatus`).
+- Enum: `type <Resource><Atribut> = Literal[...]` di `models.py` resource-nya (atau di `core/` bila dipakai lintas resource, mis. `EmployeeRole` di `core/identity.py`), tanpa sufiks (`EmployeeRole`, `LeaveDecision`, `PayrollRunStatus`).
 - Nama fungsi handler = operationId, diturunkan dari method + path dengan nama resource lengkap (`payroll_run`, bukan `run`):
 
   | Endpoint | Nama | Contoh |

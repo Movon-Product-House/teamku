@@ -1,6 +1,6 @@
 # Aturan kode web (`apps/web`)
 
-Next.js 15 (App Router) + React 19 + TanStack Query + Tailwind v4 + shadcn/ui. Path di file ini relatif ke `apps/web/src`, kecuali yang diawali `apps/`, `docs/`, `scripts/`, atau nama file root (`biome.json`, `DESIGN.md`). Perintah dan struktur folder: `apps/web/README.md`. Keputusan arsitektur dan alasannya: `docs/adr/0001-web-frontend-architecture.md`. Gerbang sebelum push: `npm run check`.
+Next.js 15 (App Router) + React 19 + TanStack Query + Tailwind v4 + shadcn/ui. Path di file ini relatif ke `apps/web/src`, kecuali yang diawali `apps/` atau `docs/` dan `DESIGN.md` (dari root repo), serta `scripts/` dan `biome.json` (di `apps/web/`). Perintah dan struktur folder: `apps/web/README.md`. Keputusan arsitektur dan alasannya: `docs/adr/0001-web-frontend-architecture.md`. Gerbang sebelum push: `npm run check`.
 
 **Pola acuan: `features/leave/`** (halaman Persetujuan: query, mutation, logika murni + test, Dialog shadcn). Salin polanya untuk layar baru.
 
@@ -47,7 +47,7 @@ Client API di `shared/api/generated/` di-generate Orval dari `apps/api/openapi.j
 
 Sebelum menulis `className` atau token baru, baca `DESIGN.md`: aturan token-only untuk warna, utility tipografi, `data-surface="v2"` di akar setiap halaman/shell v2, dan `cn` dari `@/shared/lib/cn`. Yang tidak tercakup di sana:
 
-- Mengubah token: edit `@theme` di `app/globals.css`, lalu `npm run design:sync`.
+- Mengubah token: edit `@theme` di `app/globals.css`, lalu `npm run design:sync`. Token ukuran teks serif wajib memuat kata `serif` di komentarnya: `scripts/sync-design-tokens.mjs` membaca penanda itu, dan tanpanya `DESIGN.md` diam-diam menulis font sans.
 - `styles/legacy.css` dibekukan. Urutan `@layer`: `legacy` < `ui-reset` < `utilities`, jadi utility selalu menang atas CSS lama. Preflight Tailwind masih mati sampai revamp v2 selesai; `ui-reset` yang mencegah style elemen legacy bocor ke shadcn dan permukaan v2.
 
 ## Memigrasi satu halaman lama
