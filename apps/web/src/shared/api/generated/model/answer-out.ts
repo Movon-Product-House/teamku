@@ -4,14 +4,14 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { AnswerOutConfidence } from './answer-out-confidence';
 import type { CitationOut } from './citation-out';
 import type { PersonalFactOut } from './personal-fact-out';
+import type { PolicyAnswerConfidence } from './policy-answer-confidence';
 import type { SuggestedActionOut } from './suggested-action-out';
 
 export interface AnswerOut {
   answer: string;
-  confidence: AnswerOutConfidence;
+  confidence: PolicyAnswerConfidence;
   citations: CitationOut[];
   personal_facts: PersonalFactOut[];
   suggested_action: SuggestedActionOut;

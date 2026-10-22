@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type NewEmployeeOutWorkMode = typeof NewEmployeeOutWorkMode[keyof typeof NewEmployeeOutWorkMode];
+export type EmployeeWorkMode = typeof EmployeeWorkMode[keyof typeof EmployeeWorkMode];
 
 
-export const NewEmployeeOutWorkMode = {
+export const EmployeeWorkMode = {
   office: 'office',
   field: 'field',
 } as const;

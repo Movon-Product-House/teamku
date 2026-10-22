@@ -6,8 +6,8 @@
  */
 import type { EmployeeRole } from './employee-role';
 import type { EmployeeStatus } from './employee-status';
+import type { EmployeeWorkMode } from './employee-work-mode';
 import type { LocationOut } from './location-out';
-import type { NewEmployeeOutWorkMode } from './new-employee-out-work-mode';
 
 /**
  * Returned once by POST /employees when HR did not set a password.
@@ -23,7 +23,7 @@ export interface NewEmployeeOut {
   salary: number | null;
   is_remote: boolean;
   work_location_id: string | null;
-  work_mode: NewEmployeeOutWorkMode;
+  work_mode: EmployeeWorkMode;
   work_location: LocationOut | null;
   result: 'temporary_password';
   temporary_password: string;

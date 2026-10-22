@@ -4,9 +4,10 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
+import type { PolicyFactType } from './policy-fact-type';
 
 export interface PersonalFactOut {
-  type: 'leave_balance';
+  type: PolicyFactType;
   label: string;
   value: number;
 }

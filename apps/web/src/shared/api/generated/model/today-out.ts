@@ -4,12 +4,12 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
+import type { AttendanceTodayState } from './attendance-today-state';
 import type { PendingOut } from './pending-out';
 import type { SessionOut } from './session-out';
-import type { TodayOutState } from './today-out-state';
 
 export interface TodayOut {
-  state: TodayOutState;
+  state: AttendanceTodayState;
   session: SessionOut | null;
   pending_reverification: PendingOut | null;
   is_remote: boolean;

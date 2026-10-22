@@ -47,8 +47,11 @@ class EmployeeColumns(BaseModel):
     work_location_id: uuid.UUID | None
 
 
+type EmployeeWorkMode = Literal["office", "field"]
+
+
 class EmployeeOut(EmployeeColumns):
-    work_mode: Literal["office", "field"]
+    work_mode: EmployeeWorkMode
     work_location: LocationOut | None  # None for remote (field) employees
 
 

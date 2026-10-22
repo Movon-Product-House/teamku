@@ -4,9 +4,9 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { SuggestedActionOutType } from './suggested-action-out-type';
+import type { PolicyActionType } from './policy-action-type';
 
 export interface SuggestedActionOut {
-  type: SuggestedActionOutType;
+  type: PolicyActionType;
   href: string;
 }

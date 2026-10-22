@@ -4,11 +4,11 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { InviteOutEmailStatus } from './invite-out-email-status';
+import type { InviteEmailStatus } from './invite-email-status';
 
 export interface InviteOut {
   email: string;
   expires_at: string;
   invite_url: string;
-  email_status: InviteOutEmailStatus;
+  email_status: InviteEmailStatus;
 }

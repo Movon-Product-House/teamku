@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TodayOutState = typeof TodayOutState[keyof typeof TodayOutState];
+export type AttendanceTodayState = typeof AttendanceTodayState[keyof typeof AttendanceTodayState];
 
 
-export const TodayOutState = {
+export const AttendanceTodayState = {
   not_checked_in: 'not_checked_in',
   checked_in: 'checked_in',
   completed: 'completed',

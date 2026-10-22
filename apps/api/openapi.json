@@ -2109,13 +2109,7 @@
             "title": "Answer"
           },
           "confidence": {
-            "type": "string",
-            "enum": [
-              "supported",
-              "partially_supported",
-              "insufficient_evidence"
-            ],
-            "title": "Confidence"
+            "$ref": "#/components/schemas/PolicyAnswerConfidence"
           },
           "citations": {
             "items": {
@@ -2298,6 +2292,14 @@
           "low_accuracy",
           "missed_reverify",
           "outside_geofence"
+        ]
+      },
+      "AttendanceTodayState": {
+        "type": "string",
+        "enum": [
+          "not_checked_in",
+          "checked_in",
+          "completed"
         ]
       },
       "AuditLogListOut": {
@@ -2785,12 +2787,7 @@
             "title": "Work Location Id"
           },
           "work_mode": {
-            "type": "string",
-            "enum": [
-              "office",
-              "field"
-            ],
-            "title": "Work Mode"
+            "$ref": "#/components/schemas/EmployeeWorkMode"
           },
           "work_location": {
             "anyOf": [
@@ -3095,12 +3092,7 @@
             "title": "Work Location Id"
           },
           "work_mode": {
-            "type": "string",
-            "enum": [
-              "office",
-              "field"
-            ],
-            "title": "Work Mode"
+            "$ref": "#/components/schemas/EmployeeWorkMode"
           },
           "work_location": {
             "anyOf": [
@@ -3183,6 +3175,13 @@
         },
         "type": "object",
         "title": "EmployeeUpdateIn"
+      },
+      "EmployeeWorkMode": {
+        "type": "string",
+        "enum": [
+          "office",
+          "field"
+        ]
       },
       "ErrorOut": {
         "properties": {
@@ -3322,6 +3321,13 @@
         "title": "IdempotentOut",
         "description": "A replayed Idempotency-Key: the attendance the first request created."
       },
+      "InviteEmailStatus": {
+        "type": "string",
+        "enum": [
+          "sent",
+          "failed"
+        ]
+      },
       "InviteIn": {
         "properties": {
           "name": {
@@ -3401,12 +3407,7 @@
             "title": "Invite Url"
           },
           "email_status": {
-            "type": "string",
-            "enum": [
-              "sent",
-              "failed"
-            ],
-            "title": "Email Status"
+            "$ref": "#/components/schemas/InviteEmailStatus"
           }
         },
         "type": "object",
@@ -4152,12 +4153,7 @@
             "title": "Work Location Id"
           },
           "work_mode": {
-            "type": "string",
-            "enum": [
-              "office",
-              "field"
-            ],
-            "title": "Work Mode"
+            "$ref": "#/components/schemas/EmployeeWorkMode"
           },
           "work_location": {
             "anyOf": [
@@ -4696,9 +4692,7 @@
       "PersonalFactOut": {
         "properties": {
           "type": {
-            "type": "string",
-            "const": "leave_balance",
-            "title": "Type"
+            "$ref": "#/components/schemas/PolicyFactType"
           },
           "label": {
             "type": "string",
@@ -4716,6 +4710,25 @@
           "value"
         ],
         "title": "PersonalFactOut"
+      },
+      "PolicyActionType": {
+        "type": "string",
+        "enum": [
+          "contact_hr",
+          "open_leave_request"
+        ]
+      },
+      "PolicyAnswerConfidence": {
+        "type": "string",
+        "enum": [
+          "supported",
+          "partially_supported",
+          "insufficient_evidence"
+        ]
+      },
+      "PolicyFactType": {
+        "type": "string",
+        "const": "leave_balance"
       },
       "PolicyIn": {
         "properties": {
@@ -5347,12 +5360,7 @@
       "SuggestedActionOut": {
         "properties": {
           "type": {
-            "type": "string",
-            "enum": [
-              "contact_hr",
-              "open_leave_request"
-            ],
-            "title": "Type"
+            "$ref": "#/components/schemas/PolicyActionType"
           },
           "href": {
             "type": "string",
@@ -5393,13 +5401,7 @@
       "TodayOut": {
         "properties": {
           "state": {
-            "type": "string",
-            "enum": [
-              "not_checked_in",
-              "checked_in",
-              "completed"
-            ],
-            "title": "State"
+            "$ref": "#/components/schemas/AttendanceTodayState"
           },
           "session": {
             "anyOf": [

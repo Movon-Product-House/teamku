@@ -70,8 +70,11 @@ class PendingOut(BaseModel):
     kind: LocationEventKind
 
 
+type AttendanceTodayState = Literal["not_checked_in", "checked_in", "completed"]
+
+
 class TodayOut(BaseModel):
-    state: Literal["not_checked_in", "checked_in", "completed"]
+    state: AttendanceTodayState
     session: SessionOut | None
     pending_reverification: PendingOut | None
     is_remote: bool

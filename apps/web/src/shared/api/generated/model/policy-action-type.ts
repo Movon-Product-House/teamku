@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SuggestedActionOutType = typeof SuggestedActionOutType[keyof typeof SuggestedActionOutType];
+export type PolicyActionType = typeof PolicyActionType[keyof typeof PolicyActionType];
 
 
-export const SuggestedActionOutType = {
+export const PolicyActionType = {
   contact_hr: 'contact_hr',
   open_leave_request: 'open_leave_request',
 } as const;

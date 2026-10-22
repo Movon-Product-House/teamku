@@ -68,20 +68,25 @@ class CitationOut(BaseModel):
 
 
 # The assistant (core/policy_assistant.py) maps provider output onto these closed sets.
+type PolicyFactType = Literal["leave_balance"]
+type PolicyActionType = Literal["contact_hr", "open_leave_request"]
+type PolicyAnswerConfidence = Literal["supported", "partially_supported", "insufficient_evidence"]
+
+
 class PersonalFactOut(BaseModel):
-    type: Literal["leave_balance"]
+    type: PolicyFactType
     label: str
     value: int
 
 
 class SuggestedActionOut(BaseModel):
-    type: Literal["contact_hr", "open_leave_request"]
+    type: PolicyActionType
     href: str
 
 
 class AnswerOut(BaseModel):
     answer: str
-    confidence: Literal["supported", "partially_supported", "insufficient_evidence"]
+    confidence: PolicyAnswerConfidence
     citations: list[CitationOut]
     personal_facts: list[PersonalFactOut]
     suggested_action: SuggestedActionOut

@@ -73,11 +73,14 @@ class MeOut(BaseModel):
     tenant: TenantOut
 
 
+type InviteEmailStatus = Literal["sent", "failed"]
+
+
 class InviteOut(BaseModel):
     email: str
     expires_at: datetime
     invite_url: str
-    email_status: Literal["sent", "failed"]
+    email_status: InviteEmailStatus
 
 
 class InvitePreviewOut(BaseModel):

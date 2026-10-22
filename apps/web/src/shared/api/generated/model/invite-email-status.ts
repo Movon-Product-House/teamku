@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type InviteOutEmailStatus = typeof InviteOutEmailStatus[keyof typeof InviteOutEmailStatus];
+export type InviteEmailStatus = typeof InviteEmailStatus[keyof typeof InviteEmailStatus];
 
 
-export const InviteOutEmailStatus = {
+export const InviteEmailStatus = {
   sent: 'sent',
   failed: 'failed',
 } as const;

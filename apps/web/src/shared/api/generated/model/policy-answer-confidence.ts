@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type AnswerOutConfidence = typeof AnswerOutConfidence[keyof typeof AnswerOutConfidence];
+export type PolicyAnswerConfidence = typeof PolicyAnswerConfidence[keyof typeof PolicyAnswerConfidence];
 
 
-export const AnswerOutConfidence = {
+export const PolicyAnswerConfidence = {
   supported: 'supported',
   partially_supported: 'partially_supported',
   insufficient_evidence: 'insufficient_evidence',
