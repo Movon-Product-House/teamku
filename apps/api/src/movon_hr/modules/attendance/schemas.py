@@ -36,7 +36,12 @@ class ReverifyIn(BaseModel):
     selfie_captured: bool
 
 
+# Response fields with a default are always sent, so the spec must list them as required
+# (tests/test_openapi.py): json_schema_serialization_defaults_required on every Out model
+# that has defaults.
 class AgendaItemOut(BaseModel):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     title: str | None = None
     status: str | None = None
 
@@ -87,6 +92,8 @@ class WeekOut(BaseModel):
 
 
 class CheckInOut(BaseModel):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     result: Literal["created"] = "created"
     id: uuid.UUID
     checked_in_at: datetime
@@ -98,6 +105,8 @@ class CheckInOut(BaseModel):
 
 class IdempotentOut(BaseModel):
     """A replayed Idempotency-Key: the attendance the first request created."""
+
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
 
     result: Literal["idempotent"] = "idempotent"
     id: uuid.UUID
@@ -114,7 +123,9 @@ class CheckOutOut(BaseModel):
 
 
 class LocationEventOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True, json_schema_serialization_defaults_required=True
+    )
 
     id: uuid.UUID
     employee_id: uuid.UUID
@@ -152,6 +163,8 @@ class SkippedEventOut(LocationEventOut):
 
 class SkippedOut(BaseModel):
     """A remote worker with no slot pending."""
+
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
 
     result: Literal["skipped"] = "skipped"
     skipped: bool

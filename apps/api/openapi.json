@@ -2096,6 +2096,10 @@
           }
         },
         "type": "object",
+        "required": [
+          "title",
+          "status"
+        ],
         "title": "AgendaItemOut"
       },
       "Anomaly": {
@@ -2582,6 +2586,7 @@
         },
         "type": "object",
         "required": [
+          "result",
           "id",
           "checked_in_at",
           "distance_meters",
@@ -2810,7 +2815,8 @@
           "is_remote",
           "work_location_id",
           "work_mode",
-          "work_location"
+          "work_location",
+          "result"
         ],
         "title": "CreatedEmployeeOut",
         "description": "Returned by POST /employees when HR set the password."
@@ -3317,6 +3323,7 @@
         },
         "type": "object",
         "required": [
+          "result",
           "id",
           "idempotent"
         ],
@@ -4186,6 +4193,7 @@
           "work_location_id",
           "work_mode",
           "work_location",
+          "result",
           "temporary_password"
         ],
         "title": "NewEmployeeOut",
@@ -4564,6 +4572,8 @@
           "created_at",
           "finalized_at",
           "published_at",
+          "calculation_version",
+          "disclaimer",
           "total_gross_rupiah",
           "total_deductions_rupiah",
           "total_net_rupiah"
@@ -5293,6 +5303,7 @@
           "inside_geofence",
           "anomaly",
           "due_at",
+          "result",
           "skipped",
           "maps_url"
         ],
@@ -5318,6 +5329,7 @@
         },
         "type": "object",
         "required": [
+          "result",
           "skipped",
           "pending_reverification"
         ],
@@ -5563,6 +5575,7 @@
           "inside_geofence",
           "anomaly",
           "due_at",
+          "result",
           "maps_url"
         ],
         "title": "VerifiedEventOut",

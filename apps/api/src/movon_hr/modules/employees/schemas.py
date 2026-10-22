@@ -31,7 +31,9 @@ class EmployeeUpdateIn(BaseModel):
 class EmployeeColumns(BaseModel):
     """The employee columns that are safe to send; password_hash and tenant_id never are."""
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True, json_schema_serialization_defaults_required=True
+    )
 
     id: uuid.UUID
     name: str
