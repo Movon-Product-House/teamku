@@ -36,7 +36,7 @@ Demo credentials: `hr@movon.test` / `Demo123!`, `manager@movon.test` / `Demo123!
 
 ## Architecture and boundaries
 
-The web app only renders UI and calls `/api/v1`; authorization, calculation, validation, audit events, and persistence belong to the Python API. The API is a modular monolith with one module per domain; see [docs/adr/0002-backend-api-architecture.md](docs/adr/0002-backend-api-architecture.md) and [apps/api/README.md](apps/api/README.md).
+The web app only renders UI and calls `/api/v1`; authorization, calculation, validation, audit events, and persistence belong to the Python API. The API is a modular monolith with one module per domain; see [docs/adr/0002-backend-api-architecture.md](docs/adr/0002-backend-api-architecture.md) and the module rules in [apps/api/AGENTS.md](apps/api/AGENTS.md).
 
 Implemented demo features: authenticated role-aware dashboards; searchable employee directory with HR create/status actions; camera/location attendance with server-side Haversine validation, idempotency and agenda; leave request history, balance impact, cancellation and manager/HR decisions; in-app notifications; and a decimal-safe payroll calculation, finalization, locking and publishing flow.
 

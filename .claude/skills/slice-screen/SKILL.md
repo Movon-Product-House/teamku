@@ -6,7 +6,7 @@ description: Slice one Teamku v2 revamp screen (kode seperti D3, M6, HM4, P2a) d
 # Slice screen
 
 Satu run = satu kode layar beserta varian STATE-nya = satu branch = satu PR.
-Aturan kode ada di `apps/web/AGENTS.md` dan dipaksa CI; baca seluruhnya sebelum mulai. Pola acuan: `apps/web/src/features/leave/`.
+Aturan kode: `apps/web/AGENTS.md` (sebagian dipaksa `npm run check`, sisanya dijaga review). Pola acuan: `apps/web/src/features/leave/`.
 
 ## 0. Ambil tiket
 

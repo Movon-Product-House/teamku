@@ -3,7 +3,7 @@
 FastAPI (full async) + SQLAlchemy 2 + psycopg 3 + PostgreSQL 18 + Alembic, dikelola dengan uv.
 Keputusan arsitekturnya ada di [`docs/adr/0002-backend-api-architecture.md`](../../docs/adr/0002-backend-api-architecture.md); operasional prod di [`docs/runbook.md`](../../docs/runbook.md).
 
-**Aturan kode** (batas modul, async, transaksi, tenancy, kontrak HTTP dan penamaan, tes, cara menambah modul) ada di [`AGENTS.md`](AGENTS.md). File itu juga dimuat otomatis oleh agent AI saat bekerja di `apps/api`.
+**Aturan kode** (batas modul, async, transaksi, tenancy, kontrak HTTP dan penamaan, tes, cara menambah modul) ada di [`AGENTS.md`](AGENTS.md), file yang juga dibaca agent AI (Claude Code memuatnya lewat `CLAUDE.md` saat bekerja di `apps/api`).
 
 ## Perintah
 

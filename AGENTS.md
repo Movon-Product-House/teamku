@@ -18,13 +18,13 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/ag
 
 ## Front-end (`apps/web`)
 
-Code rules and the page-migration recipe: `apps/web/AGENTS.md` (read it before changing anything in `apps/web`). Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
+Code rules: `apps/web/AGENTS.md`; read it before changing anything in `apps/web`. Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
 FE PRs put their screenshot evidence in the PR description (mockup next to each state, desktop + mobile), uploaded with `scripts/pr-evidence.sh`; see step 6 of the `slice-screen` skill.
 Visual tokens and rules: `DESIGN.md`; product context (users, tone, principles): `PRODUCT.md`.
 
 ## API (`apps/api`)
 
-Code rules (module boundaries, full async, transactions, tenancy, HTTP contract and naming, tests) and how to add a module + migration: `apps/api/AGENTS.md` (read it before changing anything in `apps/api`). Run `scripts/check.sh` in `apps/api` before pushing (needs PostgreSQL; setup in `apps/api/README.md`).
+Code rules: `apps/api/AGENTS.md`; read it before changing anything in `apps/api`. Run `scripts/check.sh` in `apps/api` before pushing (needs PostgreSQL; setup in `apps/api/README.md`).
 
 ## Claude Code plugins
 

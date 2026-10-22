@@ -3,7 +3,7 @@
 Next.js 15 (App Router) + React 19 + TanStack Query + Zustand + Tailwind v4 + shadcn/ui (Radix) + Biome + Vitest.
 Keputusan arsitekturnya ada di [`docs/adr/0001-web-frontend-architecture.md`](../../docs/adr/0001-web-frontend-architecture.md).
 
-**Aturan kode** (arsitektur, server state dan client generate, komponen, styling, cara memigrasi halaman lama) ada di [`AGENTS.md`](AGENTS.md). File itu juga dimuat otomatis oleh agent AI saat bekerja di `apps/web`. Token dan aturan visual: [`DESIGN.md`](../../DESIGN.md); contoh hidup semua komponen di `/design-system` (lokal dan preview Vercel).
+**Aturan kode** (arsitektur, server state dan client generate, komponen, styling, cara memigrasi halaman lama) ada di [`AGENTS.md`](AGENTS.md), file yang juga dibaca agent AI (Claude Code memuatnya lewat `CLAUDE.md` saat bekerja di `apps/web`). Token dan aturan visual: [`DESIGN.md`](../../DESIGN.md); contoh hidup semua komponen di `/design-system` (lokal dan preview Vercel).
 
 ## Perintah
 

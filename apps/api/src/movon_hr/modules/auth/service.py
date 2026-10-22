@@ -251,6 +251,8 @@ async def create_invite(db: AsyncSession, user: Employee, payload: InviteIn) -> 
     db.add(invitation)
     await audit(db, "invite.created", user, email)
     company = (await db.get_one(Tenant, user.tenant_id)).name
+    # Commit before sending (ADR 0002): the response reports email_status, so the email is
+    # awaited here instead of a BackgroundTask, and it must only go out for a saved invite.
     await db.commit()
     invite_url = app_url(f"/invite?token={invitation.token}")
     ok = await send_email(
