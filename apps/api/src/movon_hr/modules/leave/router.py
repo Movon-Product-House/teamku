@@ -15,7 +15,7 @@ from movon_hr.modules.leave.schemas import (
     LeaveOut,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["leave"])
 Approver = Annotated[Employee, Depends(require_role("manager", "hr_admin"))]
 
 

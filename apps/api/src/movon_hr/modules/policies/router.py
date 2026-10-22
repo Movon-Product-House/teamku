@@ -14,7 +14,7 @@ from movon_hr.modules.policies.schemas import (
     PolicyQuestion,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["policies"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 

@@ -5,7 +5,7 @@ from movon_hr.core.db import DB
 from movon_hr.modules.dashboard import service
 from movon_hr.modules.dashboard.schemas import DashboardOut
 
-router = APIRouter()
+router = APIRouter(tags=["dashboard"])
 
 
 @router.get("/dashboard")

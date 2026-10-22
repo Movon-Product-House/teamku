@@ -21,7 +21,7 @@ from movon_hr.modules.attendance.schemas import (
     WeekOut,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["attendance"])
 HrOrManager = Annotated[Employee, Depends(require_role("manager", "hr_admin"))]
 
 

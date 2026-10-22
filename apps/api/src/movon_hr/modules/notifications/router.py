@@ -7,7 +7,7 @@ from movon_hr.core.db import DB
 from movon_hr.modules.notifications import service
 from movon_hr.modules.notifications.schemas import NotificationList, NotificationOut, Ok
 
-router = APIRouter()
+router = APIRouter(tags=["notifications"])
 
 
 @router.get("/notifications")

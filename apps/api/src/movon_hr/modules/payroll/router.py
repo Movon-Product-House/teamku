@@ -13,7 +13,7 @@ from movon_hr.modules.payroll.schemas import (
     PayslipList,
 )
 
-router = APIRouter(prefix="/payroll")
+router = APIRouter(prefix="/payroll", tags=["payroll"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 

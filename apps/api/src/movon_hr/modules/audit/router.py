@@ -8,7 +8,7 @@ from movon_hr.core.identity import Employee
 from movon_hr.modules.audit import service
 from movon_hr.modules.audit.schemas import AuditLogList
 
-router = APIRouter()
+router = APIRouter(tags=["audit"])
 
 
 @router.get("/audit-logs")

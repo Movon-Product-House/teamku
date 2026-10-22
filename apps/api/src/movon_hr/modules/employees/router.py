@@ -14,7 +14,7 @@ from movon_hr.modules.employees.schemas import (
     NewEmployeeOut,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["employees"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 HrOrManager = Annotated[Employee, Depends(require_role("hr_admin", "manager"))]
 

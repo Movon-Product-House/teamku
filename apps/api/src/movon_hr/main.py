@@ -21,7 +21,10 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(
     title="Teamku API",
     version="0.1.0",
-    openapi_url="/api/v1/openapi.json",
+    # Off in production; the committed openapi.json is dumped from app.openapi() directly.
+    openapi_url=None if settings.environment == "production" else "/api/v1/openapi.json",
+    # Operation ids are the handler names, so the generated web client reads like the API.
+    generate_unique_id_function=lambda route: route.name,
 )
 app.add_middleware(
     CORSMiddleware,
@@ -43,11 +46,11 @@ app.include_router(policies_router, prefix="/api/v1")
 app.include_router(settings_router, prefix="/api/v1")
 
 
-@app.get("/health/live")
+@app.get("/health/live", include_in_schema=False)
 async def live() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/health/ready")
+@app.get("/health/ready", include_in_schema=False)
 async def ready() -> dict[str, str]:
     return {"status": "ready"}

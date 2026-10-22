@@ -19,7 +19,7 @@ from movon_hr.modules.settings.schemas import (
     WorkLocationInput,
 )
 
-router = APIRouter(prefix="/settings")
+router = APIRouter(prefix="/settings", tags=["settings"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 
@@ -63,7 +63,7 @@ async def start_google_calendar(db: DB, user: HrAdmin) -> AuthorizationUrl:
     return AuthorizationUrl(authorization_url=await service.start_google(db, user))
 
 
-@router.get("/calendar/google/callback")
+@router.get("/calendar/google/callback", include_in_schema=False)
 async def google_calendar_callback(
     db: DB, code: str | None = None, state: str | None = None, error: str | None = None
 ) -> Response:

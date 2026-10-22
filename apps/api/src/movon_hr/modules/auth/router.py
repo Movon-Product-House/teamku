@@ -23,7 +23,7 @@ from movon_hr.modules.auth.schemas import (
 )
 from movon_hr.modules.notifications.schemas import Ok
 
-router = APIRouter()
+router = APIRouter(tags=["auth"])
 HrAdmin = Annotated[Employee, Depends(require_role("hr_admin"))]
 
 
