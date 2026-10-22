@@ -2,7 +2,6 @@
 
 import { type FormEvent, useId, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
-import { useDecideApproval } from "@/shared/api/generated";
 import type { ApprovalOut, LeaveDecision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
@@ -18,6 +17,7 @@ import {
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
 import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
+import { useDecideAndRefresh } from "../api";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
 
 type Props = { approval: ApprovalOut; decision: LeaveDecision; onClose: () => void };
@@ -25,7 +25,7 @@ type Props = { approval: ApprovalOut; decision: LeaveDecision; onClose: () => vo
 export function DecisionDialog({ approval, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));
   const [error, setError] = useState<string | null>(null);
-  const decide = useDecideApproval();
+  const decide = useDecideAndRefresh();
   const commentId = useId();
   const errorId = useId();
   const approving = decision === "approved";

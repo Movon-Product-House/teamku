@@ -17,15 +17,25 @@ def test_operation_ids_are_unique() -> None:
 
 
 def test_operation_ids_follow_the_method() -> None:
-    # Naming rule in the README (HTTP 4): a GET reads, list_/get_/create_/update_ say which.
-    expected = {"get": ("list_", "get_"), "put": ("update_",), "patch": ("update_",)}
-    reserved = ("list_", "get_", "update_")
+    # Naming rule in the README (HTTP 4). GET/PUT/PATCH must use their prefix; a reserved
+    # prefix only appears on the method it belongs to (POST actions are free-form).
+    allowed = {
+        "get": ("list_", "get_"),
+        "post": ("create_",),
+        "put": ("update_",),
+        "patch": ("update_",),
+    }
+    required = {"get", "put", "patch"}
+    reserved = ("list_", "get_", "create_", "update_")
     wrong = [
-        f"{method.upper()} {path}: {op['operationId']}"
+        f"{method.upper()} {path}: {name}"
         for path, ops in app.openapi()["paths"].items()
         for method, op in ops.items()
-        if not op["operationId"].startswith(expected.get(method, ()))
-        if method in expected or op["operationId"].startswith(reserved)
+        if (name := op["operationId"])
+        and (
+            (method in required and not name.startswith(allowed[method]))
+            or (name.startswith(reserved) and not name.startswith(allowed.get(method, ())))
+        )
     ]
     assert not wrong, wrong
 

@@ -91,12 +91,12 @@ Contoh terkecil: `modules/audit/`.
    |---|---|---|
    | `GET` koleksi | `list_<jamak>` | `list_approvals` |
    | `GET` satu item / singleton | `get_<tunggal>` | `get_me`, `get_dashboard` |
-   | `POST` koleksi | `create_<tunggal>` | `create_leave_request` |
+   | `POST` koleksi yang menyimpan resource baru | `create_<tunggal>` | `create_leave_request` |
    | `PUT`/`PATCH` | `update_<tunggal>` | `update_office` |
-   | `POST …/{id}/<aksi>` | `<aksi>_<tunggal>` | `publish_payroll_run` |
-   | `POST /<modul>/<kata-kerja>` | `<kata-kerja>` | `check_in`, `login` |
+   | `POST` aksi lain (dengan atau tanpa segmen aksi di path) | `<aksi>_<resource>` | `publish_payroll_run`, `decide_approval`, `read_all_notifications`, `ask_policy_question` |
+   | `POST /auth/…`, `POST /attendance/…` (modul bukan nama resource) | `<aksi>` | `login`, `check_in` |
 
-   `tests/test_openapi.py` menjaga awalan `list_`/`get_`/`create_`/`update_` cocok dengan method-nya.
+   `tests/test_openapi.py` menjaga awalan: GET wajib `list_`/`get_`, PUT/PATCH wajib `update_`, dan `create_` hanya untuk POST. Nama aksi POST dijaga review.
 5. Union respons diberi field `result: Literal[...]` per varian dan `Field(discriminator="result")`.
 
 ### Bahasa
