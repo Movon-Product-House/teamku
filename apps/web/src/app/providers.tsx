@@ -1,12 +1,20 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { ApiError } from "@/shared/api/client";
 import { NotificationHost } from "@/shared/ui/notifications";
 
 function createQueryClient() {
-  return new QueryClient({
+  const queryClient: QueryClient = new QueryClient({
+    // Setiap mutation yang sukses menandai semua cache basi: query yang tampil di layar
+    // langsung refetch, sisanya saat dibuka lagi. Tidak ada peta "mutation X mengubah
+    // query Y" yang bisa lupa diperbarui.
+    // ponytail: refetch ekstra untuk query aktif; persempit lewat `meta.invalidates` per
+    // mutation bila terasa berat.
+    mutationCache: new MutationCache({
+      onSuccess: () => queryClient.invalidateQueries(),
+    }),
     defaultOptions: {
       queries: {
         staleTime: 30_000,
@@ -17,6 +25,7 @@ function createQueryClient() {
       },
     },
   });
+  return queryClient;
 }
 
 export function Providers({ children }: { children: ReactNode }) {

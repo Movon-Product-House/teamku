@@ -7,7 +7,7 @@
     "root": "../.."
   },
   "files": {
-    "includes": ["**", "!next-env.d.ts"]
+    "includes": ["**", "!next-env.d.ts", "!src/shared/api/generated"]
   },
   "formatter": {
     "enabled": true,
