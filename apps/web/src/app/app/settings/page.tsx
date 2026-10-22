@@ -8,7 +8,6 @@ import {
   isGoogleMapsShortUrl,
   parseGoogleMapsLocation,
 } from "@/features/settings/google-maps";
-import type { AttendanceSettings } from "@/features/settings/types";
 import {
   createLocation,
   getCalendar,
@@ -21,9 +20,13 @@ import {
   updateCalendar,
   updateOffice,
 } from "@/shared/api/generated";
-import type { CalendarOut, GoogleCalendarOut } from "@/shared/api/generated/model";
+import type { CalendarOut, GoogleCalendarOut, LocationOut } from "@/shared/api/generated/model";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
+
+/** Form state for a work location: a LocationOut whose id is unknown until it is saved. */
+type AttendanceSettings = Omit<LocationOut, "id" | "is_primary"> &
+  Partial<Pick<LocationOut, "id" | "is_primary">>;
 
 const empty: AttendanceSettings = {
   name: "Jakarta HQ",
