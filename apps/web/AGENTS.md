@@ -30,7 +30,7 @@ Client API di `shared/api/generated/` di-generate Orval dari `apps/api/openapi.j
 - Setiap query punya state loading, error, dan kosong di UI; state kosong tampil hanya setelah `isSuccess`.
 - Error: `errorMessage(error, fallback)` dari `@/shared/api/client`. `error` di setiap hook ber-type `ApiError<ErrorOut>`: `status` membedakan 403/404, `body.detail` berisi pesan atau daftar error field (422).
 - Notifikasi lewat `notify({...})` dari `@/shared/ui/notifications`.
-- API berubah: `npm run api:gen`, lalu ikuti error `tsc` ke setiap pemakaian.
+- API berubah: `npm run api:gen` (juga dijalankan `npm run check`), ikuti error `tsc` ke setiap pemakaian, lalu commit `shared/api/generated/` bersama perubahannya. CI gagal bila folder itu berbeda dari hasil generate.
 
 ## Komponen
 
