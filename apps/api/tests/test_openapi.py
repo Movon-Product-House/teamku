@@ -9,6 +9,13 @@ def test_committed_spec_matches_the_app() -> None:
     )
 
 
+def test_operation_ids_are_unique() -> None:
+    # Ids are handler names (main.py); FastAPI only warns on a duplicate, and the web client
+    # would then export two functions with the same name.
+    ids = [op["operationId"] for path in app.openapi()["paths"].values() for op in path.values()]
+    assert len(ids) == len(set(ids)), sorted({i for i in ids if ids.count(i) > 1})
+
+
 def test_response_fields_are_required() -> None:
     # A response always carries every field; an optional one becomes `field?:` in the web
     # client and breaks narrowing on the `result` discriminator.
