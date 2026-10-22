@@ -14,9 +14,8 @@
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run api:check && biome ci . && node scripts/check-file-lines.mjs && node scripts/sync-design-tokens.mjs --check && tsc --noEmit && vitest run",
+    "check": "orval && biome ci . && node scripts/check-file-lines.mjs && node scripts/sync-design-tokens.mjs --check && tsc --noEmit && vitest run",
     "api:gen": "orval",
-    "api:check": "orval && git diff --quiet HEAD -- src/shared/api/generated && test -z \"$(git ls-files --others --exclude-standard src/shared/api/generated)\" || (echo 'src/shared/api/generated tidak cocok dengan apps/api/openapi.json: jalankan npm run api:gen lalu commit hasilnya' && exit 1)",
     "lint:size": "node scripts/check-file-lines.mjs",
     "design:sync": "node scripts/sync-design-tokens.mjs"
   },

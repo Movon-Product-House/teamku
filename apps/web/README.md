@@ -8,16 +8,15 @@ Keputusan arsitekturnya ada di [`docs/adr/0001-web-frontend-architecture.md`](..
 | Perintah | Fungsi |
 |---|---|
 | `npm run dev` | Dev server. Request `/api/*` di-proxy ke `MOVON_API_ORIGIN` (default `http://127.0.0.1:8000`) |
-| `npm run check` | Gerbang yang sama dengan CI: `api:check` + `biome ci` + batas panjang file + `tsc` + `vitest` |
+| `npm run check` | Gerbang sebelum push: generate ulang client API + `biome ci` + batas panjang file + `tsc` + `vitest`. File generate yang berubah muncul di `git status` untuk di-commit |
 | `npm run api:gen` | Generate ulang client API (`src/shared/api/generated/`) dari `apps/api/openapi.json` dengan Orval. Jalankan setelah spec API berubah, lalu commit hasilnya |
-| `npm run api:check` | Generate ulang lalu gagal bila hasilnya beda dengan yang di-commit |
 | `npm run lint:fix` | Format + organize imports + fix lint yang aman |
 | `npm run lint:size` | Cek batas 600 baris per file |
 | `npm run design:sync` | Salin token `@theme` ke `DESIGN.md` + `shared/lib/text-sizes.ts` |
 | `npm test` | Vitest |
 | `npx shadcn add <nama>` | Menambah komponen shadcn ke `src/shared/ui/` (lihat aturan Komponen) |
 
-Jalankan `npm run check` sebelum push. CI (`.github/workflows/web.yml`) menjalankan perintah yang sama, ditambah `build`.
+Jalankan `npm run check` sebelum push. CI (`.github/workflows/web.yml`) menjalankan perintah yang sama, lalu gagal bila client generate berubah (lupa di-commit), ditambah `build`.
 
 ## Struktur
 
