@@ -10,7 +10,7 @@ from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
-type Language = Literal["id", "en"]
+type PolicyLanguage = Literal["id", "en"]
 type PolicyState = Literal["draft", "published", "archived"]
 
 
@@ -20,7 +20,7 @@ class Policy(TenantScoped, Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=UUIDV7)
     title: Mapped[str]
     category: Mapped[str]
-    language: Mapped[Language]
+    language: Mapped[PolicyLanguage]
     effective_date: Mapped[date]
     expiry_date: Mapped[date | None]
     state: Mapped[PolicyState] = mapped_column(default="draft")
@@ -36,7 +36,7 @@ class Policy(TenantScoped, Base):
         passive_deletes=True,
     )
 
-    __table_args__ = (one_of("language", Language), one_of("state", PolicyState))
+    __table_args__ = (one_of("language", PolicyLanguage), one_of("state", PolicyState))
 
 
 class PolicySection(TenantScoped, Base):

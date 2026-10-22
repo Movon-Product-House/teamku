@@ -12,7 +12,7 @@ router = APIRouter(tags=["audit"])
 
 
 @router.get("/audit-logs")
-async def audit_logs(
+async def list_audit_logs(
     db: DB, _: Annotated[Employee, Depends(require_role("hr_admin"))]
 ) -> AuditLogListOut:
     return AuditLogListOut.model_validate({"items": await service.list_audit_logs(db)})

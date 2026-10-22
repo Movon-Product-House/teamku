@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { payslips } from "@/shared/api/generated";
+import { listPayslips } from "@/shared/api/generated";
 import type { PayslipOut } from "@/shared/api/generated/model";
 import { formatMoney, formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -11,7 +11,7 @@ export default function Payslips() {
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    payslips()
+    listPayslips()
       .then((result) => setItems(result.items))
       .catch((reason) =>
         notify(

@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type Anomaly = typeof Anomaly[keyof typeof Anomaly];
+export type AttendanceAnomaly = typeof AttendanceAnomaly[keyof typeof AttendanceAnomaly];
 
 
-export const Anomaly = {
+export const AttendanceAnomaly = {
   low_accuracy: 'low_accuracy',
   missed_reverify: 'missed_reverify',
   outside_geofence: 'outside_geofence',

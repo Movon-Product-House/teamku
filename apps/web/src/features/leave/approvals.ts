@@ -1,4 +1,4 @@
-import type { ApprovalOut, Decision, LeaveStatus } from "@/shared/api/generated/model";
+import type { ApprovalOut, LeaveDecision, LeaveStatus } from "@/shared/api/generated/model";
 
 export type ApprovalFilter = LeaveStatus | "all";
 
@@ -12,7 +12,7 @@ export function countApprovals(items: ApprovalOut[], filter: ApprovalFilter) {
   return filterApprovals(items, filter).length;
 }
 
-export function defaultDecisionComment(decision: Decision) {
+export function defaultDecisionComment(decision: LeaveDecision) {
   return decision === "approved" ? "Disetujui sesuai kebijakan dan saldo cuti." : "";
 }
 

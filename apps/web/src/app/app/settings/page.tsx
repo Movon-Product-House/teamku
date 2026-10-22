@@ -12,12 +12,12 @@ import type { AttendanceSettings } from "@/features/settings/types";
 import {
   createLocation,
   getCalendar,
+  getGoogleCalendarAuth,
+  getMe,
   getOffice,
-  googleCalendars,
+  listGoogleCalendars,
   listLocations,
-  me,
-  officeFromMapsUrl,
-  startGoogleCalendar,
+  resolveMapsUrl,
   updateCalendar,
   updateOffice,
 } from "@/shared/api/generated";
@@ -108,7 +108,7 @@ export default function SettingsPage() {
   const embedUrl = googleMapsEmbedUrl(form.latitude, form.longitude);
 
   useEffect(() => {
-    Promise.all([me(), getOffice(), getCalendar(), listLocations()])
+    Promise.all([getMe(), getOffice(), getCalendar(), listLocations()])
       .then(([profile, office, calendarSettings, locationResult]) => {
         if (profile.user.role !== "hr_admin") {
           router.replace("/app/overview");
@@ -135,7 +135,7 @@ export default function SettingsPage() {
   async function connectGoogle() {
     setCalendarBusy(true);
     try {
-      const result = await startGoogleCalendar();
+      const result = await getGoogleCalendarAuth();
       window.location.assign(result.authorization_url);
     } catch (reason) {
       notify(
@@ -149,7 +149,7 @@ export default function SettingsPage() {
 
   async function loadGoogleCalendars() {
     try {
-      const result = await googleCalendars();
+      const result = await listGoogleCalendars();
       setCalendars(result.items);
     } catch (reason) {
       notify(
@@ -372,7 +372,7 @@ export default function SettingsPage() {
         );
         return;
       }
-      const parsed = await officeFromMapsUrl({ url: value });
+      const parsed = await resolveMapsUrl({ url: value });
       setForm((current) => ({
         ...current,
         latitude: parsed.latitude,

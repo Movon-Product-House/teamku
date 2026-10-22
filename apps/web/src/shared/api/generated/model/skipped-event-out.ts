@@ -4,8 +4,8 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Anomaly } from './anomaly';
-import type { EventKind } from './event-kind';
+import type { AttendanceAnomaly } from './attendance-anomaly';
+import type { LocationEventKind } from './location-event-kind';
 
 /**
  * A remote worker answering a slot scheduled before they became remote.
@@ -14,14 +14,14 @@ export interface SkippedEventOut {
   id: string;
   employee_id: string;
   attendance_id: string;
-  kind: EventKind;
+  kind: LocationEventKind;
   at: string;
   lat: number | null;
   lng: number | null;
   accuracy: number | null;
   distance_meters: number | null;
   inside_geofence: boolean | null;
-  anomaly: Anomaly | null;
+  anomaly: AttendanceAnomaly | null;
   due_at: string | null;
   result: 'skipped_slot';
   skipped: boolean;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useReadNotifications } from "@/shared/api/generated";
+import { useReadAllNotifications } from "@/shared/api/generated";
 import { Button } from "@/shared/ui/button";
 import { usePolledNotifications } from "../api";
 import { groupByDay } from "../notifications";
@@ -9,7 +9,7 @@ import { NotificationCard, NotificationStates } from "./notification-item";
 /** S4: every notification, newest first, grouped into Hari ini and Sebelumnya. */
 export function NotificationsPage() {
   const notifications = usePolledNotifications();
-  const markAllRead = useReadNotifications();
+  const markAllRead = useReadAllNotifications();
   const unread = notifications.data?.unread ?? 0;
 
   return (

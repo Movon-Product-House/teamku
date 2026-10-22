@@ -84,8 +84,20 @@ Contoh terkecil: `modules/audit/`.
 ### HTTP
 1. Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`). `response_model=` hanya kalau handler me-return objek lain.
 2. Cek peran lewat dependency `require_role(...)` dari `core.auth`.
-3. Nama schema mengikuti arah data: body request `XIn` (`LeaveIn`, `EmployeeUpdateIn`), respons dan semua bagiannya `XOut` (`LeaveOut`, `LeaveListOut`, `CitationOut`). Enum tidak bersufiks: `type Role = Literal[...]` di `models.py` (lihat `one_of` di `core/db.py`). Nama ini menjadi nama type di client web.
-4. Union respons diberi field `result: Literal[...]` per varian dan `Field(discriminator="result")`.
+3. Nama schema mengikuti arah data: body request `XIn` (`LeaveIn`, `EmployeeUpdateIn`), respons dan semua bagiannya `XOut` (`LeaveOut`, `LeaveListOut`, `CitationOut`). Enum tidak bersufiks dan selalu `<Resource><Atribut>`: `type EmployeeRole = Literal[...]` di `models.py` (lihat `one_of` di `core/db.py`), bukan `Role`. Nama ini menjadi nama type di client web.
+4. Nama fungsi handler = operationId = nama fungsi/hook di client web, jadi diturunkan dari method + path, dengan nama resource lengkap (`payroll_run`, bukan `run`):
+
+   | Endpoint | Nama | Contoh |
+   |---|---|---|
+   | `GET` koleksi | `list_<jamak>` | `list_approvals` |
+   | `GET` satu item / singleton | `get_<tunggal>` | `get_me`, `get_dashboard` |
+   | `POST` koleksi | `create_<tunggal>` | `create_leave_request` |
+   | `PUT`/`PATCH` | `update_<tunggal>` | `update_office` |
+   | `POST …/{id}/<aksi>` | `<aksi>_<tunggal>` | `publish_payroll_run` |
+   | `POST /<modul>/<kata-kerja>` | `<kata-kerja>` | `check_in`, `login` |
+
+   `tests/test_openapi.py` menjaga awalan `list_`/`get_`/`create_`/`update_` cocok dengan method-nya.
+5. Union respons diberi field `result: Literal[...]` per varian dan `Field(discriminator="result")`.
 
 ### Bahasa
 Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan commit dalam bahasa Inggris. Teks untuk pengguna (pesan error API) dalam bahasa Indonesia. Dokumen tim di `docs/` dalam bahasa Indonesia.

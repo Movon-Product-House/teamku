@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type EventKind = typeof EventKind[keyof typeof EventKind];
+export type LocationEventKind = typeof LocationEventKind[keyof typeof LocationEventKind];
 
 
-export const EventKind = {
+export const LocationEventKind = {
   check_in: 'check_in',
   check_out: 'check_out',
   reverify: 'reverify',

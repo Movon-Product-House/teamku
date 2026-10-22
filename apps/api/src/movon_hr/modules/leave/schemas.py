@@ -4,7 +4,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from movon_hr.core.time import working_days
-from movon_hr.modules.leave.models import CalendarSyncStatus, Decision, LeaveStatus, LeaveType
+from movon_hr.modules.leave.models import CalendarSyncStatus, LeaveDecision, LeaveStatus, LeaveType
 
 
 class LeaveIn(BaseModel):
@@ -14,7 +14,7 @@ class LeaveIn(BaseModel):
 
 
 class ApprovalIn(BaseModel):
-    decision: Decision
+    decision: LeaveDecision
     comment: str = Field(min_length=3, max_length=500)
 
 

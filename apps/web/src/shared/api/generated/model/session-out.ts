@@ -5,13 +5,13 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AgendaItemOut } from './agenda-item-out';
-import type { Anomaly } from './anomaly';
+import type { AttendanceAnomaly } from './attendance-anomaly';
 
 export interface SessionOut {
   id: string;
   checked_in_at: string;
   checked_out_at: string | null;
-  anomaly: Anomaly | null;
+  anomaly: AttendanceAnomaly | null;
   agenda_count: number;
   agenda: AgendaItemOut[];
   summary: string | null;

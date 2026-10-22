@@ -44,7 +44,7 @@ async def update_office(db: DB, user: HrAdmin, payload: OfficeSettingsIn) -> Loc
 
 
 @router.post("/settings/office/from-maps-url")
-async def office_from_maps_url(db: DB, user: HrAdmin, payload: MapsUrlIn) -> MapsCoordinatesOut:
+async def resolve_maps_url(db: DB, user: HrAdmin, payload: MapsUrlIn) -> MapsCoordinatesOut:
     return await service.coordinates_from_maps(db, user, payload.url)
 
 
@@ -59,7 +59,7 @@ async def update_calendar(db: DB, user: HrAdmin, payload: CalendarSettingsIn) ->
 
 
 @router.get("/settings/calendar/google/start")
-async def start_google_calendar(db: DB, user: HrAdmin) -> AuthorizationUrlOut:
+async def get_google_calendar_auth(db: DB, user: HrAdmin) -> AuthorizationUrlOut:
     return AuthorizationUrlOut(authorization_url=await service.start_google(db, user))
 
 
@@ -72,5 +72,5 @@ async def google_calendar_callback(
 
 
 @router.get("/settings/calendar/google/calendars")
-async def google_calendars(db: DB, _: HrAdmin) -> GoogleCalendarListOut:
+async def list_google_calendars(db: DB, _: HrAdmin) -> GoogleCalendarListOut:
     return GoogleCalendarListOut(items=await service.list_google_calendars(db))

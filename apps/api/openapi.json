@@ -10,8 +10,8 @@
         "tags": [
           "attendance"
         ],
-        "summary": "Attendance Today",
-        "operationId": "attendance_today",
+        "summary": "Get Attendance Today",
+        "operationId": "get_attendance_today",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -41,8 +41,8 @@
         "tags": [
           "attendance"
         ],
-        "summary": "Attendance Week",
-        "operationId": "attendance_week",
+        "summary": "Get Attendance Week",
+        "operationId": "get_attendance_week",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -240,8 +240,8 @@
         "tags": [
           "attendance"
         ],
-        "summary": "Location History",
-        "operationId": "location_history",
+        "summary": "Get Location History",
+        "operationId": "get_location_history",
         "parameters": [
           {
             "name": "employee_id",
@@ -282,8 +282,8 @@
         "tags": [
           "audit"
         ],
-        "summary": "Audit Logs",
-        "operationId": "audit_logs",
+        "summary": "List Audit Logs",
+        "operationId": "list_audit_logs",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -467,8 +467,8 @@
         "tags": [
           "auth"
         ],
-        "summary": "Preview Invite",
-        "operationId": "preview_invite",
+        "summary": "Get Invite",
+        "operationId": "get_invite",
         "parameters": [
           {
             "name": "token",
@@ -591,8 +591,8 @@
         "tags": [
           "auth"
         ],
-        "summary": "Preview Reset",
-        "operationId": "preview_reset",
+        "summary": "Preview Reset Password",
+        "operationId": "preview_reset_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -714,8 +714,8 @@
         "tags": [
           "auth"
         ],
-        "summary": "Me",
-        "operationId": "me",
+        "summary": "Get Me",
+        "operationId": "get_me",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -745,8 +745,8 @@
         "tags": [
           "dashboard"
         ],
-        "summary": "Dashboard",
-        "operationId": "dashboard",
+        "summary": "Get Dashboard",
+        "operationId": "get_dashboard",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -982,8 +982,8 @@
         "tags": [
           "leave"
         ],
-        "summary": "Submit Leave",
-        "operationId": "submit_leave",
+        "summary": "Create Leave Request",
+        "operationId": "create_leave_request",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1023,8 +1023,8 @@
         "tags": [
           "leave"
         ],
-        "summary": "Cancel Leave",
-        "operationId": "cancel_leave",
+        "summary": "Cancel Leave Request",
+        "operationId": "cancel_leave_request",
         "parameters": [
           {
             "name": "request_id",
@@ -1065,8 +1065,8 @@
         "tags": [
           "leave"
         ],
-        "summary": "Approvals",
-        "operationId": "approvals",
+        "summary": "List Approvals",
+        "operationId": "list_approvals",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1096,8 +1096,8 @@
         "tags": [
           "leave"
         ],
-        "summary": "Decide",
-        "operationId": "decide",
+        "summary": "Decide Approval",
+        "operationId": "decide_approval",
         "parameters": [
           {
             "name": "request_id",
@@ -1148,8 +1148,8 @@
         "tags": [
           "notifications"
         ],
-        "summary": "Notifications",
-        "operationId": "notifications",
+        "summary": "List Notifications",
+        "operationId": "list_notifications",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1179,8 +1179,8 @@
         "tags": [
           "notifications"
         ],
-        "summary": "Read Notifications",
-        "operationId": "read_notifications",
+        "summary": "Read All Notifications",
+        "operationId": "read_all_notifications",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1253,8 +1253,8 @@
         "tags": [
           "payroll"
         ],
-        "summary": "List Runs",
-        "operationId": "list_runs",
+        "summary": "List Payroll Runs",
+        "operationId": "list_payroll_runs",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1282,8 +1282,8 @@
         "tags": [
           "payroll"
         ],
-        "summary": "Create Run",
-        "operationId": "create_run",
+        "summary": "Create Payroll Run",
+        "operationId": "create_payroll_run",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1323,8 +1323,8 @@
         "tags": [
           "payroll"
         ],
-        "summary": "Finalize",
-        "operationId": "finalize",
+        "summary": "Finalize Payroll Run",
+        "operationId": "finalize_payroll_run",
         "parameters": [
           {
             "name": "run_id",
@@ -1365,8 +1365,8 @@
         "tags": [
           "payroll"
         ],
-        "summary": "Publish",
-        "operationId": "publish",
+        "summary": "Publish Payroll Run",
+        "operationId": "publish_payroll_run",
         "parameters": [
           {
             "name": "run_id",
@@ -1407,8 +1407,8 @@
         "tags": [
           "payroll"
         ],
-        "summary": "Payslips",
-        "operationId": "payslips",
+        "summary": "List Payslips",
+        "operationId": "list_payslips",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1644,8 +1644,8 @@
         "tags": [
           "policies"
         ],
-        "summary": "Ask",
-        "operationId": "ask",
+        "summary": "Ask Policy Question",
+        "operationId": "ask_policy_question",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1825,8 +1825,8 @@
         "tags": [
           "settings"
         ],
-        "summary": "Office From Maps Url",
-        "operationId": "office_from_maps_url",
+        "summary": "Resolve Maps Url",
+        "operationId": "resolve_maps_url",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1936,8 +1936,8 @@
         "tags": [
           "settings"
         ],
-        "summary": "Start Google Calendar",
-        "operationId": "start_google_calendar",
+        "summary": "Get Google Calendar Auth",
+        "operationId": "get_google_calendar_auth",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1967,8 +1967,8 @@
         "tags": [
           "settings"
         ],
-        "summary": "Google Calendars",
-        "operationId": "google_calendars",
+        "summary": "List Google Calendars",
+        "operationId": "list_google_calendars",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2102,14 +2102,6 @@
         ],
         "title": "AgendaItemOut"
       },
-      "Anomaly": {
-        "type": "string",
-        "enum": [
-          "low_accuracy",
-          "missed_reverify",
-          "outside_geofence"
-        ]
-      },
       "AnswerOut": {
         "properties": {
           "answer": {
@@ -2156,7 +2148,7 @@
       "ApprovalIn": {
         "properties": {
           "decision": {
-            "$ref": "#/components/schemas/Decision"
+            "$ref": "#/components/schemas/LeaveDecision"
           },
           "comment": {
             "type": "string",
@@ -2300,6 +2292,14 @@
         ],
         "title": "ApprovalOut"
       },
+      "AttendanceAnomaly": {
+        "type": "string",
+        "enum": [
+          "low_accuracy",
+          "missed_reverify",
+          "outside_geofence"
+        ]
+      },
       "AuditLogListOut": {
         "properties": {
           "items": {
@@ -2364,6 +2364,13 @@
         ],
         "title": "AuthorizationUrlOut"
       },
+      "CalendarDeliveryMode": {
+        "type": "string",
+        "enum": [
+          "shared",
+          "shared_and_email"
+        ]
+      },
       "CalendarOut": {
         "properties": {
           "provider": {
@@ -2389,7 +2396,7 @@
             "title": "Division"
           },
           "delivery_mode": {
-            "$ref": "#/components/schemas/DeliveryMode"
+            "$ref": "#/components/schemas/CalendarDeliveryMode"
           }
         },
         "type": "object",
@@ -2451,7 +2458,7 @@
             "default": ""
           },
           "delivery_mode": {
-            "$ref": "#/components/schemas/DeliveryMode",
+            "$ref": "#/components/schemas/CalendarDeliveryMode",
             "default": "shared_and_email"
           }
         },
@@ -2572,7 +2579,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"
@@ -2737,7 +2744,7 @@
             "title": "Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "department": {
             "type": "string",
@@ -2851,7 +2858,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"
@@ -2934,21 +2941,6 @@
         ],
         "title": "DashboardOut"
       },
-      "Decision": {
-        "type": "string",
-        "enum": [
-          "approved",
-          "rejected",
-          "revision_requested"
-        ]
-      },
-      "DeliveryMode": {
-        "type": "string",
-        "enum": [
-          "shared",
-          "shared_and_email"
-        ]
-      },
       "EmployeeCreateIn": {
         "properties": {
           "name": {
@@ -2970,7 +2962,7 @@
             "title": "Department"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "title": {
             "type": "string",
@@ -3062,7 +3054,7 @@
             "title": "Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "department": {
             "type": "string",
@@ -3138,6 +3130,14 @@
         ],
         "title": "EmployeeOut"
       },
+      "EmployeeRole": {
+        "type": "string",
+        "enum": [
+          "employee",
+          "manager",
+          "hr_admin"
+        ]
+      },
       "EmployeeStatus": {
         "type": "string",
         "enum": [
@@ -3207,14 +3207,6 @@
         ],
         "title": "ErrorOut",
         "description": "Every 4xx body: an HTTPException message, or the field errors of a request 422."
-      },
-      "EventKind": {
-        "type": "string",
-        "enum": [
-          "check_in",
-          "check_out",
-          "reverify"
-        ]
       },
       "FieldErrorOut": {
         "properties": {
@@ -3351,7 +3343,7 @@
             "title": "Department"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "title": {
             "type": "string",
@@ -3441,7 +3433,7 @@
             "title": "Company"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "department": {
             "type": "string",
@@ -3480,13 +3472,6 @@
           "expires_at"
         ],
         "title": "InvitePreviewOut"
-      },
-      "Language": {
-        "type": "string",
-        "enum": [
-          "id",
-          "en"
-        ]
       },
       "LeaveBalanceOut": {
         "properties": {
@@ -3607,6 +3592,14 @@
           "days"
         ],
         "title": "LeaveDaysOut"
+      },
+      "LeaveDecision": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "rejected",
+          "revision_requested"
+        ]
       },
       "LeaveIn": {
         "properties": {
@@ -3761,6 +3754,14 @@
         "type": "string",
         "const": "time_off"
       },
+      "LocationEventKind": {
+        "type": "string",
+        "enum": [
+          "check_in",
+          "check_out",
+          "reverify"
+        ]
+      },
       "LocationEventOut": {
         "properties": {
           "id": {
@@ -3779,7 +3780,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "$ref": "#/components/schemas/EventKind"
+            "$ref": "#/components/schemas/LocationEventKind"
           },
           "at": {
             "type": "string",
@@ -3844,7 +3845,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"
@@ -4110,7 +4111,7 @@
             "title": "Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "department": {
             "type": "string",
@@ -4499,7 +4500,7 @@
             "title": "Period"
           },
           "status": {
-            "$ref": "#/components/schemas/PayrollStatus"
+            "$ref": "#/components/schemas/PayrollRunStatus"
           },
           "items": {
             "items": {
@@ -4580,7 +4581,7 @@
         ],
         "title": "PayrollRunOut"
       },
-      "PayrollStatus": {
+      "PayrollRunStatus": {
         "type": "string",
         "enum": [
           "draft",
@@ -4681,7 +4682,7 @@
             "title": "Due At"
           },
           "kind": {
-            "$ref": "#/components/schemas/EventKind"
+            "$ref": "#/components/schemas/LocationEventKind"
           }
         },
         "type": "object",
@@ -4732,7 +4733,7 @@
             "default": "general"
           },
           "language": {
-            "$ref": "#/components/schemas/Language",
+            "$ref": "#/components/schemas/PolicyLanguage",
             "default": "id"
           },
           "effective_date": {
@@ -4770,6 +4771,13 @@
         ],
         "title": "PolicyIn"
       },
+      "PolicyLanguage": {
+        "type": "string",
+        "enum": [
+          "id",
+          "en"
+        ]
+      },
       "PolicyListOut": {
         "properties": {
           "items": {
@@ -4802,7 +4810,7 @@
             "title": "Category"
           },
           "language": {
-            "$ref": "#/components/schemas/Language"
+            "$ref": "#/components/schemas/PolicyLanguage"
           },
           "effective_date": {
             "type": "string",
@@ -5038,14 +5046,6 @@
         ],
         "title": "ReverifyIn"
       },
-      "Role": {
-        "type": "string",
-        "enum": [
-          "employee",
-          "manager",
-          "hr_admin"
-        ]
-      },
       "SessionOut": {
         "properties": {
           "id": {
@@ -5073,7 +5073,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"
@@ -5182,7 +5182,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "$ref": "#/components/schemas/EventKind"
+            "$ref": "#/components/schemas/LocationEventKind"
           },
           "at": {
             "type": "string",
@@ -5247,7 +5247,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"
@@ -5458,7 +5458,7 @@
             "title": "Attendance Id"
           },
           "kind": {
-            "$ref": "#/components/schemas/EventKind"
+            "$ref": "#/components/schemas/LocationEventKind"
           },
           "at": {
             "type": "string",
@@ -5523,7 +5523,7 @@
           "anomaly": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Anomaly"
+                "$ref": "#/components/schemas/AttendanceAnomaly"
               },
               {
                 "type": "null"

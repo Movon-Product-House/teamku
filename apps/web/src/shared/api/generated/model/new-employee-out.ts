@@ -4,10 +4,10 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
+import type { EmployeeRole } from './employee-role';
 import type { EmployeeStatus } from './employee-status';
 import type { LocationOut } from './location-out';
 import type { NewEmployeeOutWorkMode } from './new-employee-out-work-mode';
-import type { Role } from './role';
 
 /**
  * Returned once by POST /employees when HR did not set a password.
@@ -16,7 +16,7 @@ export interface NewEmployeeOut {
   id: string;
   name: string;
   email: string;
-  role: Role;
+  role: EmployeeRole;
   department: string;
   title: string;
   status: EmployeeStatus;

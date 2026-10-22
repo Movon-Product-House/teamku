@@ -5,12 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { PayrollItemOut } from './payroll-item-out';
-import type { PayrollStatus } from './payroll-status';
+import type { PayrollRunStatus } from './payroll-run-status';
 
 export interface PayrollRunOut {
   id: string;
   period: string;
-  status: PayrollStatus;
+  status: PayrollRunStatus;
   items: PayrollItemOut[];
   created_at: string;
   finalized_at: string | null;

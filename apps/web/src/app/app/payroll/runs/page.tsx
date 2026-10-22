@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createRun, finalize, listRuns, publish } from "@/shared/api/generated";
+import {
+  createPayrollRun,
+  finalizePayrollRun,
+  listPayrollRuns,
+  publishPayrollRun,
+} from "@/shared/api/generated";
 import type { PayrollRunOut } from "@/shared/api/generated/model";
 import { formatMoney, formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -14,7 +19,7 @@ export default function Payroll() {
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    listRuns()
+    listPayrollRuns()
       .then((result) => {
         setRuns(result.items);
         setSelected(
@@ -34,7 +39,7 @@ export default function Payroll() {
   async function calculate() {
     setBusy(true);
     try {
-      const run = await createRun({ month });
+      const run = await createPayrollRun({ month });
       setSelected(run);
       notify("success", "Draft payroll siap", `Draft payroll ${month} siap ditinjau.`);
       await load();
@@ -52,7 +57,9 @@ export default function Payroll() {
     if (!selected) return;
     setBusy(true);
     try {
-      const run = await (action === "finalize" ? finalize : publish)(selected.id);
+      const run = await (action === "finalize" ? finalizePayrollRun : publishPayrollRun)(
+        selected.id,
+      );
       setSelected(run);
       notify(
         "success",

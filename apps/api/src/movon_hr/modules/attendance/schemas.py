@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
-from movon_hr.modules.attendance.models import Anomaly, EventKind
+from movon_hr.modules.attendance.models import AttendanceAnomaly, LocationEventKind
 
 
 class AgendaItemIn(BaseModel):
@@ -56,7 +56,7 @@ class SessionOut(BaseModel):
     id: uuid.UUID
     checked_in_at: datetime
     checked_out_at: datetime | None
-    anomaly: Anomaly | None
+    anomaly: AttendanceAnomaly | None
     agenda_count: int
     agenda: list[AgendaItemOut]
     summary: str | None
@@ -67,7 +67,7 @@ class PendingOut(BaseModel):
 
     id: uuid.UUID
     due_at: datetime | None
-    kind: EventKind
+    kind: LocationEventKind
 
 
 class TodayOut(BaseModel):
@@ -99,7 +99,7 @@ class CheckInOut(BaseModel):
     checked_in_at: datetime
     distance_meters: int
     allowed_radius_meters: int
-    anomaly: Anomaly | None
+    anomaly: AttendanceAnomaly | None
     agenda_count: int
 
 
@@ -130,14 +130,14 @@ class LocationEventOut(BaseModel):
     id: uuid.UUID
     employee_id: uuid.UUID
     attendance_id: uuid.UUID
-    kind: EventKind
+    kind: LocationEventKind
     at: datetime
     lat: float | None
     lng: float | None
     accuracy: float | None
     distance_meters: int | None  # always stored rounded; int keeps the old JSON (0, not 0.0)
     inside_geofence: bool | None
-    anomaly: Anomaly | None
+    anomaly: AttendanceAnomaly | None
     due_at: datetime | None
 
     @computed_field

@@ -47,7 +47,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const getAuditLogsUrl = () => {
+export const getListAuditLogsUrl = () => {
 
 
 
@@ -56,11 +56,11 @@ export const getAuditLogsUrl = () => {
 }
 
 /**
- * @summary Audit Logs
+ * @summary List Audit Logs
  */
-export const auditLogs = async ( options?: Parameters<typeof api>[1]): Promise<AuditLogListOut> => {
+export const listAuditLogs = async ( options?: Parameters<typeof api>[1]): Promise<AuditLogListOut> => {
 
-  return api<AuditLogListOut>(getAuditLogsUrl(),
+  return api<AuditLogListOut>(getListAuditLogsUrl(),
   {
     ...options,
     method: 'GET'
@@ -73,69 +73,69 @@ export const auditLogs = async ( options?: Parameters<typeof api>[1]): Promise<A
 
 
 
-export const getAuditLogsQueryKey = () => {
+export const getListAuditLogsQueryKey = () => {
     return [
     `/api/v1/audit-logs`
     ] as const;
     }
 
 
-export const getAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof auditLogs>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAuditLogsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListAuditLogsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof auditLogs>>> = ({ signal }) => auditLogs({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAuditLogs>>> = ({ signal }) => listAuditLogs({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type AuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof auditLogs>>>
-export type AuditLogsQueryError = ErrorType<ErrorOut>
+export type ListAuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof listAuditLogs>>>
+export type ListAuditLogsQueryError = ErrorType<ErrorOut>
 
 
-export function useAuditLogs<TData = Awaited<ReturnType<typeof auditLogs>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData>> & Pick<
+export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof auditLogs>>,
+          Awaited<ReturnType<typeof listAuditLogs>>,
           TError,
-          Awaited<ReturnType<typeof auditLogs>>
+          Awaited<ReturnType<typeof listAuditLogs>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuditLogs<TData = Awaited<ReturnType<typeof auditLogs>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData>> & Pick<
+export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof auditLogs>>,
+          Awaited<ReturnType<typeof listAuditLogs>>,
           TError,
-          Awaited<ReturnType<typeof auditLogs>>
+          Awaited<ReturnType<typeof listAuditLogs>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuditLogs<TData = Awaited<ReturnType<typeof auditLogs>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Audit Logs
+ * @summary List Audit Logs
  */
 
-export function useAuditLogs<TData = Awaited<ReturnType<typeof auditLogs>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAuditLogsQueryOptions(options)
+  const queryOptions = getListAuditLogsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

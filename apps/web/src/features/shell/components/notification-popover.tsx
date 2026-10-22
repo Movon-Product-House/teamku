@@ -2,7 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useState } from "react";
-import { useReadNotifications } from "@/shared/api/generated";
+import { useReadAllNotifications } from "@/shared/api/generated";
 import { Button } from "@/shared/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { usePolledNotifications } from "../api";
@@ -16,7 +16,7 @@ export function unreadLabel(unread: number): string {
 export function NotificationPopover() {
   const [open, setOpen] = useState(false);
   const notifications = usePolledNotifications();
-  const markAllRead = useReadNotifications();
+  const markAllRead = useReadAllNotifications();
   const unread = notifications.data?.unread ?? 0;
 
   return (

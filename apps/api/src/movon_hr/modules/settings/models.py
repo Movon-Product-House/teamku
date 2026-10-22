@@ -12,7 +12,7 @@ from movon_hr.core.tenancy import TenantScoped
 type CalendarProvider = Literal["google", "microsoft"]
 type StoredCalendarProvider = Literal["", "google", "microsoft"]  # "" until HR saves the settings
 type CalendarScope = Literal["company", "division"]
-type DeliveryMode = Literal["shared", "shared_and_email"]
+type CalendarDeliveryMode = Literal["shared", "shared_and_email"]
 
 
 class WorkLocation(TenantScoped, Base):
@@ -59,7 +59,7 @@ class CalendarSettings(TenantScoped, Base):
     calendar_name: Mapped[str] = mapped_column(default="", server_default="")
     scope: Mapped[CalendarScope] = mapped_column(default="company", server_default="company")
     division: Mapped[str] = mapped_column(default="", server_default="")
-    delivery_mode: Mapped[DeliveryMode] = mapped_column(
+    delivery_mode: Mapped[CalendarDeliveryMode] = mapped_column(
         default="shared_and_email", server_default="shared_and_email"
     )
     refresh_token: Mapped[str | None]
@@ -69,7 +69,7 @@ class CalendarSettings(TenantScoped, Base):
     __table_args__ = (
         one_of("provider", StoredCalendarProvider),
         one_of("scope", CalendarScope),
-        one_of("delivery_mode", DeliveryMode),
+        one_of("delivery_mode", CalendarDeliveryMode),
     )
 
 

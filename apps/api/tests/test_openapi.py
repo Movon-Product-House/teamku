@@ -16,6 +16,20 @@ def test_operation_ids_are_unique() -> None:
     assert len(ids) == len(set(ids)), sorted({i for i in ids if ids.count(i) > 1})
 
 
+def test_operation_ids_follow_the_method() -> None:
+    # Naming rule in the README (HTTP 4): a GET reads, list_/get_/create_/update_ say which.
+    expected = {"get": ("list_", "get_"), "put": ("update_",), "patch": ("update_",)}
+    reserved = ("list_", "get_", "update_")
+    wrong = [
+        f"{method.upper()} {path}: {op['operationId']}"
+        for path, ops in app.openapi()["paths"].items()
+        for method, op in ops.items()
+        if not op["operationId"].startswith(expected.get(method, ()))
+        if method in expected or op["operationId"].startswith(reserved)
+    ]
+    assert not wrong, wrong
+
+
 def test_response_fields_are_required() -> None:
     # A response always carries every field; an optional one becomes `field?:` in the web
     # client and breaks narrowing on the `result` discriminator.

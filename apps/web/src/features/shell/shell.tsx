@@ -4,7 +4,7 @@ import { LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { errorMessage } from "@/shared/api/client";
-import { useMe } from "@/shared/api/generated";
+import { useGetMe } from "@/shared/api/generated";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { usePendingApprovals, usePolledAttendanceToday } from "./api";
@@ -22,7 +22,7 @@ const ATTENDANCE_HREF = "/app/attendance/today";
  */
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const me = useMe();
+  const me = useGetMe();
   const today = usePolledAttendanceToday();
   const pendingApprovals = usePendingApprovals(me.data);
   const { logout, signingOut } = useLogout();

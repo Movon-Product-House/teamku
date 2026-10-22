@@ -62,7 +62,7 @@ async def create_invite(db: DB, user: HrAdmin, payload: InviteIn) -> InviteOut:
 
 
 @router.get("/invites/{token}")
-async def preview_invite(db: DB, token: str) -> InvitePreviewOut:
+async def get_invite(db: DB, token: str) -> InvitePreviewOut:
     return await service.preview_invite(db, token)
 
 
@@ -82,7 +82,7 @@ async def forgot_password(
 
 
 @router.post("/auth/reset-password/preview")
-async def preview_reset(db: DB, payload: ResetPreviewIn) -> ResetPreviewOut:
+async def preview_reset_password(db: DB, payload: ResetPreviewIn) -> ResetPreviewOut:
     # POST so the token stays out of the URL (and the access logs).
     return await service.preview_reset(db, payload.token)
 
@@ -103,5 +103,5 @@ async def change_password(
 
 
 @router.get("/me")
-async def me(db: DB, user: CurrentUser) -> MeOut:
+async def get_me(db: DB, user: CurrentUser) -> MeOut:
     return await service.me(db, user)

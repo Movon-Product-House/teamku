@@ -4,10 +4,10 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Decision } from './decision';
+import type { LeaveDecision } from './leave-decision';
 
 export interface ApprovalIn {
-  decision: Decision;
+  decision: LeaveDecision;
   /**
      * @minLength 3
      * @maxLength 500

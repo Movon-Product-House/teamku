@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   createEmployee,
   createInvite,
+  getMe,
   listEmployees,
   listLocations,
-  me,
   updateEmployee,
 } from "@/shared/api/generated";
-import type { EmployeeOut, LocationOut, Role } from "@/shared/api/generated/model";
+import type { EmployeeOut, EmployeeRole, LocationOut } from "@/shared/api/generated/model";
 import { formatMoney } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
@@ -20,7 +20,7 @@ const emptyForm = {
   email: "",
   department: "Engineering",
   title: "Staff",
-  role: "employee" as Role,
+  role: "employee" as EmployeeRole,
   salary: "8000000",
   is_remote: false,
   work_location_id: "",
@@ -41,7 +41,7 @@ export default function People() {
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    Promise.all([listEmployees(), me(), listLocations()])
+    Promise.all([listEmployees(), getMe(), listLocations()])
       .then(([people, profile, locationResult]) => {
         setItems(people.items);
         setRole(profile.user.role);
@@ -340,8 +340,10 @@ export default function People() {
                 Peran
                 <select
                   value={form.role}
-                  // The options below are exactly the Role values.
-                  onChange={(event) => setForm({ ...form, role: event.target.value as Role })}
+                  // The options below are exactly the EmployeeRole values.
+                  onChange={(event) =>
+                    setForm({ ...form, role: event.target.value as EmployeeRole })
+                  }
                 >
                   <option value="employee">Employee</option>
                   <option value="manager">Manager</option>

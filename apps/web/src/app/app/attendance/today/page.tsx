@@ -3,11 +3,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
-  attendanceToday,
   checkIn,
   checkOut,
-  getAttendanceTodayQueryKey,
-  me,
+  getAttendanceToday,
+  getGetAttendanceTodayQueryKey,
+  getMe,
   reverify,
 } from "@/shared/api/generated";
 import type { LocationOut, TodayOut } from "@/shared/api/generated/model";
@@ -44,13 +44,14 @@ export default function Today() {
 
   const queryClient = useQueryClient();
   const load = () =>
-    Promise.all([attendanceToday(), me()])
+    Promise.all([getAttendanceToday(), getMe()])
       .then(([today, profile]) => {
         setAttendance(today);
         if (profile.user.work_location) setOffice(profile.user.work_location);
       })
       .catch((e) => notify("error", "Tidak dapat melanjutkan", e.message));
-  const syncShell = () => queryClient.invalidateQueries({ queryKey: getAttendanceTodayQueryKey() });
+  const syncShell = () =>
+    queryClient.invalidateQueries({ queryKey: getGetAttendanceTodayQueryKey() });
 
   function stopCamera() {
     cameraStream.current?.getTracks().forEach((track) => track.stop());

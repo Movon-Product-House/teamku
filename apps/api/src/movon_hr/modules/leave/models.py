@@ -10,7 +10,7 @@ from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
 
 type LeaveType = Literal["time_off"]
-type Decision = Literal["approved", "rejected", "revision_requested"]
+type LeaveDecision = Literal["approved", "rejected", "revision_requested"]
 type LeaveStatus = Literal["pending", "cancelled", "approved", "rejected", "revision_requested"]
 type CalendarSyncStatus = Literal["not_applicable", "skipped", "ok", "failed", "removed"]
 

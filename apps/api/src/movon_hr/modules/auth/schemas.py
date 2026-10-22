@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from movon_hr.core.identity import Role
+from movon_hr.core.identity import EmployeeRole
 from movon_hr.modules.employees.schemas import EmployeeOut
 
 
@@ -26,7 +26,7 @@ class InviteIn(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     email: str = Field(min_length=5, max_length=150)
     department: str = Field(min_length=2, max_length=100)
-    role: Role
+    role: EmployeeRole
     title: str = Field(default="Staff", min_length=2, max_length=100)
     salary: int = Field(default=8_000_000, ge=0, le=10_000_000_000)
     is_remote: bool = False
@@ -84,7 +84,7 @@ class InvitePreviewOut(BaseModel):
     email: str
     name: str
     company: str
-    role: Role
+    role: EmployeeRole
     department: str
     title: str
     invited_by: str | None

@@ -44,5 +44,5 @@ async def archive_policy(db: DB, user: HrAdmin, policy_id: str) -> PolicyOut:
 
 
 @router.post("/policy-assistant/questions")
-async def ask(db: DB, user: CurrentUser, payload: PolicyQuestionIn) -> AnswerOut:
+async def ask_policy_question(db: DB, user: CurrentUser, payload: PolicyQuestionIn) -> AnswerOut:
     return await service.ask(db, user, payload.question)

@@ -397,7 +397,7 @@ export const useCreateInvite = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getCreateInviteMutationOptions(options), queryClient);
     }
-    export const getPreviewInviteUrl = (token: string,) => {
+    export const getGetInviteUrl = (token: string,) => {
 
 
 
@@ -406,11 +406,11 @@ export const useCreateInvite = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Preview Invite
+ * @summary Get Invite
  */
-export const previewInvite = async (token: string, options?: Parameters<typeof api>[1]): Promise<InvitePreviewOut> => {
+export const getInvite = async (token: string, options?: Parameters<typeof api>[1]): Promise<InvitePreviewOut> => {
 
-  return api<InvitePreviewOut>(getPreviewInviteUrl(token),
+  return api<InvitePreviewOut>(getGetInviteUrl(token),
   {
     ...options,
     method: 'GET'
@@ -423,69 +423,69 @@ export const previewInvite = async (token: string, options?: Parameters<typeof a
 
 
 
-export const getPreviewInviteQueryKey = (token: string,) => {
+export const getGetInviteQueryKey = (token: string,) => {
     return [
     `/api/v1/invites/${token}`
     ] as const;
     }
 
 
-export const getPreviewInviteQueryOptions = <TData = Awaited<ReturnType<typeof previewInvite>>, TError = ErrorType<ErrorOut>>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetInviteQueryOptions = <TData = Awaited<ReturnType<typeof getInvite>>, TError = ErrorType<ErrorOut>>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getPreviewInviteQueryKey(token);
+  const queryKey =  queryOptions?.queryKey ?? getGetInviteQueryKey(token);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof previewInvite>>> = ({ signal }) => previewInvite(token, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInvite>>> = ({ signal }) => getInvite(token, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: token !== null && token !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: token !== null && token !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type PreviewInviteQueryResult = NonNullable<Awaited<ReturnType<typeof previewInvite>>>
-export type PreviewInviteQueryError = ErrorType<ErrorOut>
+export type GetInviteQueryResult = NonNullable<Awaited<ReturnType<typeof getInvite>>>
+export type GetInviteQueryError = ErrorType<ErrorOut>
 
 
-export function usePreviewInvite<TData = Awaited<ReturnType<typeof previewInvite>>, TError = ErrorType<ErrorOut>>(
- token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData>> & Pick<
+export function useGetInvite<TData = Awaited<ReturnType<typeof getInvite>>, TError = ErrorType<ErrorOut>>(
+ token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof previewInvite>>,
+          Awaited<ReturnType<typeof getInvite>>,
           TError,
-          Awaited<ReturnType<typeof previewInvite>>
+          Awaited<ReturnType<typeof getInvite>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePreviewInvite<TData = Awaited<ReturnType<typeof previewInvite>>, TError = ErrorType<ErrorOut>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData>> & Pick<
+export function useGetInvite<TData = Awaited<ReturnType<typeof getInvite>>, TError = ErrorType<ErrorOut>>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof previewInvite>>,
+          Awaited<ReturnType<typeof getInvite>>,
           TError,
-          Awaited<ReturnType<typeof previewInvite>>
+          Awaited<ReturnType<typeof getInvite>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePreviewInvite<TData = Awaited<ReturnType<typeof previewInvite>>, TError = ErrorType<ErrorOut>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetInvite<TData = Awaited<ReturnType<typeof getInvite>>, TError = ErrorType<ErrorOut>>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Preview Invite
+ * @summary Get Invite
  */
 
-export function usePreviewInvite<TData = Awaited<ReturnType<typeof previewInvite>>, TError = ErrorType<ErrorOut>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof previewInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetInvite<TData = Awaited<ReturnType<typeof getInvite>>, TError = ErrorType<ErrorOut>>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvite>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getPreviewInviteQueryOptions(token,options)
+  const queryOptions = getGetInviteQueryOptions(token,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -671,7 +671,7 @@ export const useForgotPassword = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getForgotPasswordMutationOptions(options), queryClient);
     }
-    export const getPreviewResetUrl = () => {
+    export const getPreviewResetPasswordUrl = () => {
 
 
 
@@ -680,9 +680,9 @@ export const useForgotPassword = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Preview Reset
+ * @summary Preview Reset Password
  */
-export const previewReset = async (resetPreviewIn: ResetPreviewIn, options?: Parameters<typeof api>[1]): Promise<ResetPreviewOut> => {
+export const previewResetPassword = async (resetPreviewIn: ResetPreviewIn, options?: Parameters<typeof api>[1]): Promise<ResetPreviewOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -698,7 +698,7 @@ export const previewReset = async (resetPreviewIn: ResetPreviewIn, options?: Par
     }
     return headers;
   };
-return api<ResetPreviewOut>(getPreviewResetUrl(),
+return api<ResetPreviewOut>(getPreviewResetPasswordUrl(),
   {
     ...options,
     method: 'POST',
@@ -711,13 +711,13 @@ return api<ResetPreviewOut>(getPreviewResetUrl(),
 
 
 
-export const getPreviewResetMutationKey = () => ['previewReset'] as const;
+export const getPreviewResetPasswordMutationKey = () => ['previewResetPassword'] as const;
 
-export const getPreviewResetMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewReset>>, TError,PreviewResetMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof previewReset>>, TError,PreviewResetMutationVariables, TContext> => {
+export const getPreviewResetPasswordMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewResetPassword>>, TError,PreviewResetPasswordMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewResetPassword>>, TError,PreviewResetPasswordMutationVariables, TContext> => {
 
-const mutationKey = getPreviewResetMutationKey();
+const mutationKey = getPreviewResetPasswordMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -727,10 +727,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewReset>>, PreviewResetMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewResetPassword>>, PreviewResetPasswordMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  previewReset(data,requestOptions)
+          return  previewResetPassword(data,requestOptions)
         }
 
 
@@ -740,23 +740,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PreviewResetMutationResult = NonNullable<Awaited<ReturnType<typeof previewReset>>>
-    export type PreviewResetMutationBody = ResetPreviewIn
-    export type PreviewResetMutationError = ErrorType<ErrorOut>
-    export type PreviewResetMutationVariables = {data: ResetPreviewIn}
+    export type PreviewResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof previewResetPassword>>>
+    export type PreviewResetPasswordMutationBody = ResetPreviewIn
+    export type PreviewResetPasswordMutationError = ErrorType<ErrorOut>
+    export type PreviewResetPasswordMutationVariables = {data: ResetPreviewIn}
 
     /**
- * @summary Preview Reset
+ * @summary Preview Reset Password
  */
-export const usePreviewReset = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewReset>>, TError,PreviewResetMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const usePreviewResetPassword = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewResetPassword>>, TError,PreviewResetPasswordMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof previewReset>>,
+        Awaited<ReturnType<typeof previewResetPassword>>,
         TError,
-        PreviewResetMutationVariables,
+        PreviewResetPasswordMutationVariables,
         TContext
       > => {
-      return useMutation(getPreviewResetMutationOptions(options), queryClient);
+      return useMutation(getPreviewResetPasswordMutationOptions(options), queryClient);
     }
     export const getResetPasswordUrl = () => {
 
@@ -932,7 +932,7 @@ export const useChangePassword = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getChangePasswordMutationOptions(options), queryClient);
     }
-    export const getMeUrl = () => {
+    export const getGetMeUrl = () => {
 
 
 
@@ -941,11 +941,11 @@ export const useChangePassword = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Me
+ * @summary Get Me
  */
-export const me = async ( options?: Parameters<typeof api>[1]): Promise<MeOut> => {
+export const getMe = async ( options?: Parameters<typeof api>[1]): Promise<MeOut> => {
 
-  return api<MeOut>(getMeUrl(),
+  return api<MeOut>(getGetMeUrl(),
   {
     ...options,
     method: 'GET'
@@ -958,69 +958,69 @@ export const me = async ( options?: Parameters<typeof api>[1]): Promise<MeOut> =
 
 
 
-export const getMeQueryKey = () => {
+export const getGetMeQueryKey = () => {
     return [
     `/api/v1/me`
     ] as const;
     }
 
 
-export const getMeQueryOptions = <TData = Awaited<ReturnType<typeof me>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getMeQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetMeQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof me>>> = ({ signal }) => me({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type MeQueryResult = NonNullable<Awaited<ReturnType<typeof me>>>
-export type MeQueryError = ErrorType<ErrorOut>
+export type GetMeQueryResult = NonNullable<Awaited<ReturnType<typeof getMe>>>
+export type GetMeQueryError = ErrorType<ErrorOut>
 
 
-export function useMe<TData = Awaited<ReturnType<typeof me>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData>> & Pick<
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof me>>,
+          Awaited<ReturnType<typeof getMe>>,
           TError,
-          Awaited<ReturnType<typeof me>>
+          Awaited<ReturnType<typeof getMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMe<TData = Awaited<ReturnType<typeof me>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData>> & Pick<
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof me>>,
+          Awaited<ReturnType<typeof getMe>>,
           TError,
-          Awaited<ReturnType<typeof me>>
+          Awaited<ReturnType<typeof getMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMe<TData = Awaited<ReturnType<typeof me>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Me
+ * @summary Get Me
  */
 
-export function useMe<TData = Awaited<ReturnType<typeof me>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof me>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getMeQueryOptions(options)
+  const queryOptions = getGetMeQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

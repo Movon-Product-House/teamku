@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type Decision = typeof Decision[keyof typeof Decision];
+export type LeaveDecision = typeof LeaveDecision[keyof typeof LeaveDecision];
 
 
-export const Decision = {
+export const LeaveDecision = {
   approved: 'approved',
   rejected: 'rejected',
   revision_requested: 'revision_requested',

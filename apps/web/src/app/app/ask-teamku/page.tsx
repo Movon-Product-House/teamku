@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { ask as askPolicy } from "@/shared/api/generated";
+import { askPolicyQuestion } from "@/shared/api/generated";
 import type { AnswerOut } from "@/shared/api/generated/model";
 import { Icon } from "@/shared/ui/icon";
 
@@ -53,7 +53,7 @@ export default function AskTeamkuPage() {
     setBusy(true);
     setError("");
     try {
-      setAnswer(await askPolicy({ question: question.trim() }));
+      setAnswer(await askPolicyQuestion({ question: question.trim() }));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Jawaban tidak dapat dimuat.");
     } finally {

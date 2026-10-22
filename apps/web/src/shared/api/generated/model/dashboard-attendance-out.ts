@@ -4,12 +4,12 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Anomaly } from './anomaly';
+import type { AttendanceAnomaly } from './attendance-anomaly';
 
 export interface DashboardAttendanceOut {
   employee: string;
   department: string;
   checked_in_at: string;
   checked_out_at: string | null;
-  anomaly: Anomaly | null;
+  anomaly: AttendanceAnomaly | null;
 }

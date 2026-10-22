@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from movon_hr.modules.policies.models import Language, PolicyState
+from movon_hr.modules.policies.models import PolicyLanguage, PolicyState
 
 
 class PolicySectionIn(BaseModel):
@@ -17,7 +17,7 @@ class PolicySectionIn(BaseModel):
 class PolicyIn(BaseModel):
     title: str = Field(min_length=2, max_length=160)
     category: str = Field(default="general", min_length=2, max_length=80)
-    language: Language = "id"
+    language: PolicyLanguage = "id"
     effective_date: date
     expiry_date: date | None = None
     sections: list[PolicySectionIn] = Field(min_length=1, max_length=50)
@@ -42,7 +42,7 @@ class PolicyOut(BaseModel):
     id: uuid.UUID
     title: str
     category: str
-    language: Language
+    language: PolicyLanguage
     effective_date: date
     expiry_date: date | None
     state: PolicyState

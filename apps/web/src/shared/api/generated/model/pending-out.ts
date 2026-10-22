@@ -4,10 +4,10 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { EventKind } from './event-kind';
+import type { LocationEventKind } from './location-event-kind';
 
 export interface PendingOut {
   id: string;
   due_at: string | null;
-  kind: EventKind;
+  kind: LocationEventKind;
 }

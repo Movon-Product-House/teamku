@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import {
   archivePolicy,
   createPolicy,
+  getMe,
   listPolicies,
-  me,
   publishPolicy,
 } from "@/shared/api/generated";
 import type { PolicyIn, PolicyOut } from "@/shared/api/generated/model";
@@ -30,7 +30,7 @@ export default function PolicySettings() {
       .then((value) => setItems(value.items))
       .catch(() => router.replace("/app/overview"));
   useEffect(() => {
-    me().then((profile) => {
+    getMe().then((profile) => {
       if (profile.user.role !== "hr_admin") router.replace("/app/overview");
       else load();
     });

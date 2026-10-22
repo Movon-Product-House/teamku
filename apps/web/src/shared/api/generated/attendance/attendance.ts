@@ -62,7 +62,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const getAttendanceTodayUrl = () => {
+export const getGetAttendanceTodayUrl = () => {
 
 
 
@@ -71,11 +71,11 @@ export const getAttendanceTodayUrl = () => {
 }
 
 /**
- * @summary Attendance Today
+ * @summary Get Attendance Today
  */
-export const attendanceToday = async ( options?: Parameters<typeof api>[1]): Promise<TodayOut> => {
+export const getAttendanceToday = async ( options?: Parameters<typeof api>[1]): Promise<TodayOut> => {
 
-  return api<TodayOut>(getAttendanceTodayUrl(),
+  return api<TodayOut>(getGetAttendanceTodayUrl(),
   {
     ...options,
     method: 'GET'
@@ -88,69 +88,69 @@ export const attendanceToday = async ( options?: Parameters<typeof api>[1]): Pro
 
 
 
-export const getAttendanceTodayQueryKey = () => {
+export const getGetAttendanceTodayQueryKey = () => {
     return [
     `/api/v1/attendance/today`
     ] as const;
     }
 
 
-export const getAttendanceTodayQueryOptions = <TData = Awaited<ReturnType<typeof attendanceToday>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetAttendanceTodayQueryOptions = <TData = Awaited<ReturnType<typeof getAttendanceToday>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAttendanceTodayQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetAttendanceTodayQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceToday>>> = ({ signal }) => attendanceToday({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttendanceToday>>> = ({ signal }) => getAttendanceToday({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type AttendanceTodayQueryResult = NonNullable<Awaited<ReturnType<typeof attendanceToday>>>
-export type AttendanceTodayQueryError = ErrorType<ErrorOut>
+export type GetAttendanceTodayQueryResult = NonNullable<Awaited<ReturnType<typeof getAttendanceToday>>>
+export type GetAttendanceTodayQueryError = ErrorType<ErrorOut>
 
 
-export function useAttendanceToday<TData = Awaited<ReturnType<typeof attendanceToday>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData>> & Pick<
+export function useGetAttendanceToday<TData = Awaited<ReturnType<typeof getAttendanceToday>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof attendanceToday>>,
+          Awaited<ReturnType<typeof getAttendanceToday>>,
           TError,
-          Awaited<ReturnType<typeof attendanceToday>>
+          Awaited<ReturnType<typeof getAttendanceToday>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttendanceToday<TData = Awaited<ReturnType<typeof attendanceToday>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData>> & Pick<
+export function useGetAttendanceToday<TData = Awaited<ReturnType<typeof getAttendanceToday>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof attendanceToday>>,
+          Awaited<ReturnType<typeof getAttendanceToday>>,
           TError,
-          Awaited<ReturnType<typeof attendanceToday>>
+          Awaited<ReturnType<typeof getAttendanceToday>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttendanceToday<TData = Awaited<ReturnType<typeof attendanceToday>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetAttendanceToday<TData = Awaited<ReturnType<typeof getAttendanceToday>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Attendance Today
+ * @summary Get Attendance Today
  */
 
-export function useAttendanceToday<TData = Awaited<ReturnType<typeof attendanceToday>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetAttendanceToday<TData = Awaited<ReturnType<typeof getAttendanceToday>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceToday>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAttendanceTodayQueryOptions(options)
+  const queryOptions = getGetAttendanceTodayQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -162,7 +162,7 @@ export function useAttendanceToday<TData = Awaited<ReturnType<typeof attendanceT
 
 
 
-export const getAttendanceWeekUrl = () => {
+export const getGetAttendanceWeekUrl = () => {
 
 
 
@@ -171,11 +171,11 @@ export const getAttendanceWeekUrl = () => {
 }
 
 /**
- * @summary Attendance Week
+ * @summary Get Attendance Week
  */
-export const attendanceWeek = async ( options?: Parameters<typeof api>[1]): Promise<WeekOut> => {
+export const getAttendanceWeek = async ( options?: Parameters<typeof api>[1]): Promise<WeekOut> => {
 
-  return api<WeekOut>(getAttendanceWeekUrl(),
+  return api<WeekOut>(getGetAttendanceWeekUrl(),
   {
     ...options,
     method: 'GET'
@@ -188,69 +188,69 @@ export const attendanceWeek = async ( options?: Parameters<typeof api>[1]): Prom
 
 
 
-export const getAttendanceWeekQueryKey = () => {
+export const getGetAttendanceWeekQueryKey = () => {
     return [
     `/api/v1/attendance/week`
     ] as const;
     }
 
 
-export const getAttendanceWeekQueryOptions = <TData = Awaited<ReturnType<typeof attendanceWeek>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetAttendanceWeekQueryOptions = <TData = Awaited<ReturnType<typeof getAttendanceWeek>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAttendanceWeekQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetAttendanceWeekQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceWeek>>> = ({ signal }) => attendanceWeek({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttendanceWeek>>> = ({ signal }) => getAttendanceWeek({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type AttendanceWeekQueryResult = NonNullable<Awaited<ReturnType<typeof attendanceWeek>>>
-export type AttendanceWeekQueryError = ErrorType<ErrorOut>
+export type GetAttendanceWeekQueryResult = NonNullable<Awaited<ReturnType<typeof getAttendanceWeek>>>
+export type GetAttendanceWeekQueryError = ErrorType<ErrorOut>
 
 
-export function useAttendanceWeek<TData = Awaited<ReturnType<typeof attendanceWeek>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData>> & Pick<
+export function useGetAttendanceWeek<TData = Awaited<ReturnType<typeof getAttendanceWeek>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof attendanceWeek>>,
+          Awaited<ReturnType<typeof getAttendanceWeek>>,
           TError,
-          Awaited<ReturnType<typeof attendanceWeek>>
+          Awaited<ReturnType<typeof getAttendanceWeek>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttendanceWeek<TData = Awaited<ReturnType<typeof attendanceWeek>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData>> & Pick<
+export function useGetAttendanceWeek<TData = Awaited<ReturnType<typeof getAttendanceWeek>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof attendanceWeek>>,
+          Awaited<ReturnType<typeof getAttendanceWeek>>,
           TError,
-          Awaited<ReturnType<typeof attendanceWeek>>
+          Awaited<ReturnType<typeof getAttendanceWeek>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttendanceWeek<TData = Awaited<ReturnType<typeof attendanceWeek>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetAttendanceWeek<TData = Awaited<ReturnType<typeof getAttendanceWeek>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Attendance Week
+ * @summary Get Attendance Week
  */
 
-export function useAttendanceWeek<TData = Awaited<ReturnType<typeof attendanceWeek>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetAttendanceWeek<TData = Awaited<ReturnType<typeof getAttendanceWeek>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttendanceWeek>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAttendanceWeekQueryOptions(options)
+  const queryOptions = getGetAttendanceWeekQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -523,7 +523,7 @@ export const useReverify = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getReverifyMutationOptions(options), queryClient);
     }
-    export const getLocationHistoryUrl = (employeeId: string,) => {
+    export const getGetLocationHistoryUrl = (employeeId: string,) => {
 
 
 
@@ -532,11 +532,11 @@ export const useReverify = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Location History
+ * @summary Get Location History
  */
-export const locationHistory = async (employeeId: string, options?: Parameters<typeof api>[1]): Promise<LocationHistoryOut> => {
+export const getLocationHistory = async (employeeId: string, options?: Parameters<typeof api>[1]): Promise<LocationHistoryOut> => {
 
-  return api<LocationHistoryOut>(getLocationHistoryUrl(employeeId),
+  return api<LocationHistoryOut>(getGetLocationHistoryUrl(employeeId),
   {
     ...options,
     method: 'GET'
@@ -549,69 +549,69 @@ export const locationHistory = async (employeeId: string, options?: Parameters<t
 
 
 
-export const getLocationHistoryQueryKey = (employeeId: string,) => {
+export const getGetLocationHistoryQueryKey = (employeeId: string,) => {
     return [
     `/api/v1/employees/${employeeId}/location-history`
     ] as const;
     }
 
 
-export const getLocationHistoryQueryOptions = <TData = Awaited<ReturnType<typeof locationHistory>>, TError = ErrorType<ErrorOut>>(employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetLocationHistoryQueryOptions = <TData = Awaited<ReturnType<typeof getLocationHistory>>, TError = ErrorType<ErrorOut>>(employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getLocationHistoryQueryKey(employeeId);
+  const queryKey =  queryOptions?.queryKey ?? getGetLocationHistoryQueryKey(employeeId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof locationHistory>>> = ({ signal }) => locationHistory(employeeId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLocationHistory>>> = ({ signal }) => getLocationHistory(employeeId, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: employeeId !== null && employeeId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: employeeId !== null && employeeId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type LocationHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof locationHistory>>>
-export type LocationHistoryQueryError = ErrorType<ErrorOut>
+export type GetLocationHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof getLocationHistory>>>
+export type GetLocationHistoryQueryError = ErrorType<ErrorOut>
 
 
-export function useLocationHistory<TData = Awaited<ReturnType<typeof locationHistory>>, TError = ErrorType<ErrorOut>>(
- employeeId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData>> & Pick<
+export function useGetLocationHistory<TData = Awaited<ReturnType<typeof getLocationHistory>>, TError = ErrorType<ErrorOut>>(
+ employeeId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof locationHistory>>,
+          Awaited<ReturnType<typeof getLocationHistory>>,
           TError,
-          Awaited<ReturnType<typeof locationHistory>>
+          Awaited<ReturnType<typeof getLocationHistory>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useLocationHistory<TData = Awaited<ReturnType<typeof locationHistory>>, TError = ErrorType<ErrorOut>>(
- employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData>> & Pick<
+export function useGetLocationHistory<TData = Awaited<ReturnType<typeof getLocationHistory>>, TError = ErrorType<ErrorOut>>(
+ employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof locationHistory>>,
+          Awaited<ReturnType<typeof getLocationHistory>>,
           TError,
-          Awaited<ReturnType<typeof locationHistory>>
+          Awaited<ReturnType<typeof getLocationHistory>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useLocationHistory<TData = Awaited<ReturnType<typeof locationHistory>>, TError = ErrorType<ErrorOut>>(
- employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetLocationHistory<TData = Awaited<ReturnType<typeof getLocationHistory>>, TError = ErrorType<ErrorOut>>(
+ employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Location History
+ * @summary Get Location History
  */
 
-export function useLocationHistory<TData = Awaited<ReturnType<typeof locationHistory>>, TError = ErrorType<ErrorOut>>(
- employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof locationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetLocationHistory<TData = Awaited<ReturnType<typeof getLocationHistory>>, TError = ErrorType<ErrorOut>>(
+ employeeId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLocationHistory>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getLocationHistoryQueryOptions(employeeId,options)
+  const queryOptions = getGetLocationHistoryQueryOptions(employeeId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

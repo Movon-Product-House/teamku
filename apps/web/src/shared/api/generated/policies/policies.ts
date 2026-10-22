@@ -476,7 +476,7 @@ export const useArchivePolicy = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getArchivePolicyMutationOptions(options), queryClient);
     }
-    export const getAskUrl = () => {
+    export const getAskPolicyQuestionUrl = () => {
 
 
 
@@ -485,9 +485,9 @@ export const useArchivePolicy = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Ask
+ * @summary Ask Policy Question
  */
-export const ask = async (policyQuestionIn: PolicyQuestionIn, options?: Parameters<typeof api>[1]): Promise<AnswerOut> => {
+export const askPolicyQuestion = async (policyQuestionIn: PolicyQuestionIn, options?: Parameters<typeof api>[1]): Promise<AnswerOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -503,7 +503,7 @@ export const ask = async (policyQuestionIn: PolicyQuestionIn, options?: Paramete
     }
     return headers;
   };
-return api<AnswerOut>(getAskUrl(),
+return api<AnswerOut>(getAskPolicyQuestionUrl(),
   {
     ...options,
     method: 'POST',
@@ -516,13 +516,13 @@ return api<AnswerOut>(getAskUrl(),
 
 
 
-export const getAskMutationKey = () => ['ask'] as const;
+export const getAskPolicyQuestionMutationKey = () => ['askPolicyQuestion'] as const;
 
-export const getAskMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ask>>, TError,AskMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof ask>>, TError,AskMutationVariables, TContext> => {
+export const getAskPolicyQuestionMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof askPolicyQuestion>>, TError,AskPolicyQuestionMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof askPolicyQuestion>>, TError,AskPolicyQuestionMutationVariables, TContext> => {
 
-const mutationKey = getAskMutationKey();
+const mutationKey = getAskPolicyQuestionMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -532,10 +532,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ask>>, AskMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof askPolicyQuestion>>, AskPolicyQuestionMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  ask(data,requestOptions)
+          return  askPolicyQuestion(data,requestOptions)
         }
 
 
@@ -545,21 +545,21 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AskMutationResult = NonNullable<Awaited<ReturnType<typeof ask>>>
-    export type AskMutationBody = PolicyQuestionIn
-    export type AskMutationError = ErrorType<ErrorOut>
-    export type AskMutationVariables = {data: PolicyQuestionIn}
+    export type AskPolicyQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof askPolicyQuestion>>>
+    export type AskPolicyQuestionMutationBody = PolicyQuestionIn
+    export type AskPolicyQuestionMutationError = ErrorType<ErrorOut>
+    export type AskPolicyQuestionMutationVariables = {data: PolicyQuestionIn}
 
     /**
- * @summary Ask
+ * @summary Ask Policy Question
  */
-export const useAsk = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ask>>, TError,AskMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useAskPolicyQuestion = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof askPolicyQuestion>>, TError,AskPolicyQuestionMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ask>>,
+        Awaited<ReturnType<typeof askPolicyQuestion>>,
         TError,
-        AskMutationVariables,
+        AskPolicyQuestionMutationVariables,
         TContext
       > => {
-      return useMutation(getAskMutationOptions(options), queryClient);
+      return useMutation(getAskPolicyQuestionMutationOptions(options), queryClient);
     }

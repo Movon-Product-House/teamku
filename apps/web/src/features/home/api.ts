@@ -1,5 +1,5 @@
-import { usePayslips } from "@/shared/api/generated";
+import { useListPayslips } from "@/shared/api/generated";
 
 export function useLatestPayslip() {
-  return usePayslips({ query: { select: (data) => data.items[0] ?? null } });
+  return useListPayslips({ query: { select: (data) => data.items[0] ?? null } });
 }

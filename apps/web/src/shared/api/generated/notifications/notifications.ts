@@ -52,7 +52,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const getNotificationsUrl = () => {
+export const getListNotificationsUrl = () => {
 
 
 
@@ -61,11 +61,11 @@ export const getNotificationsUrl = () => {
 }
 
 /**
- * @summary Notifications
+ * @summary List Notifications
  */
-export const notifications = async ( options?: Parameters<typeof api>[1]): Promise<NotificationListOut> => {
+export const listNotifications = async ( options?: Parameters<typeof api>[1]): Promise<NotificationListOut> => {
 
-  return api<NotificationListOut>(getNotificationsUrl(),
+  return api<NotificationListOut>(getListNotificationsUrl(),
   {
     ...options,
     method: 'GET'
@@ -78,69 +78,69 @@ export const notifications = async ( options?: Parameters<typeof api>[1]): Promi
 
 
 
-export const getNotificationsQueryKey = () => {
+export const getListNotificationsQueryKey = () => {
     return [
     `/api/v1/notifications`
     ] as const;
     }
 
 
-export const getNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof notifications>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getNotificationsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListNotificationsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof notifications>>> = ({ signal }) => notifications({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listNotifications>>> = ({ signal }) => listNotifications({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type NotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof notifications>>>
-export type NotificationsQueryError = ErrorType<ErrorOut>
+export type ListNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listNotifications>>>
+export type ListNotificationsQueryError = ErrorType<ErrorOut>
 
 
-export function useNotifications<TData = Awaited<ReturnType<typeof notifications>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData>> & Pick<
+export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notifications>>,
+          Awaited<ReturnType<typeof listNotifications>>,
           TError,
-          Awaited<ReturnType<typeof notifications>>
+          Awaited<ReturnType<typeof listNotifications>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotifications<TData = Awaited<ReturnType<typeof notifications>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData>> & Pick<
+export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notifications>>,
+          Awaited<ReturnType<typeof listNotifications>>,
           TError,
-          Awaited<ReturnType<typeof notifications>>
+          Awaited<ReturnType<typeof listNotifications>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotifications<TData = Awaited<ReturnType<typeof notifications>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Notifications
+ * @summary List Notifications
  */
 
-export function useNotifications<TData = Awaited<ReturnType<typeof notifications>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getNotificationsQueryOptions(options)
+  const queryOptions = getListNotificationsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -152,7 +152,7 @@ export function useNotifications<TData = Awaited<ReturnType<typeof notifications
 
 
 
-export const getReadNotificationsUrl = () => {
+export const getReadAllNotificationsUrl = () => {
 
 
 
@@ -161,11 +161,11 @@ export const getReadNotificationsUrl = () => {
 }
 
 /**
- * @summary Read Notifications
+ * @summary Read All Notifications
  */
-export const readNotifications = async ( options?: Parameters<typeof api>[1]): Promise<OkOut> => {
+export const readAllNotifications = async ( options?: Parameters<typeof api>[1]): Promise<OkOut> => {
 
-  return api<OkOut>(getReadNotificationsUrl(),
+  return api<OkOut>(getReadAllNotificationsUrl(),
   {
     ...options,
     method: 'POST'
@@ -178,13 +178,13 @@ export const readNotifications = async ( options?: Parameters<typeof api>[1]): P
 
 
 
-export const getReadNotificationsMutationKey = () => ['readNotifications'] as const;
+export const getReadAllNotificationsMutationKey = () => ['readAllNotifications'] as const;
 
-export const getReadNotificationsMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof readNotifications>>, TError,void, TContext> => {
+export const getReadAllNotificationsMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readAllNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof readAllNotifications>>, TError,void, TContext> => {
 
-const mutationKey = getReadNotificationsMutationKey();
+const mutationKey = getReadAllNotificationsMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -194,10 +194,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof readNotifications>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof readAllNotifications>>, void> = () => {
 
 
-          return  readNotifications(requestOptions)
+          return  readAllNotifications(requestOptions)
         }
 
 
@@ -207,23 +207,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ReadNotificationsMutationResult = NonNullable<Awaited<ReturnType<typeof readNotifications>>>
+    export type ReadAllNotificationsMutationResult = NonNullable<Awaited<ReturnType<typeof readAllNotifications>>>
 
-    export type ReadNotificationsMutationError = ErrorType<ErrorOut>
+    export type ReadAllNotificationsMutationError = ErrorType<ErrorOut>
 
 
     /**
- * @summary Read Notifications
+ * @summary Read All Notifications
  */
-export const useReadNotifications = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof api>}
+export const useReadAllNotifications = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readAllNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof readNotifications>>,
+        Awaited<ReturnType<typeof readAllNotifications>>,
         TError,
         void,
         TContext
       > => {
-      return useMutation(getReadNotificationsMutationOptions(options), queryClient);
+      return useMutation(getReadAllNotificationsMutationOptions(options), queryClient);
     }
     export const getReadNotificationUrl = (notificationId: string,) => {
 

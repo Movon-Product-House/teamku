@@ -54,7 +54,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const getListRunsUrl = () => {
+export const getListPayrollRunsUrl = () => {
 
 
 
@@ -63,11 +63,11 @@ export const getListRunsUrl = () => {
 }
 
 /**
- * @summary List Runs
+ * @summary List Payroll Runs
  */
-export const listRuns = async ( options?: Parameters<typeof api>[1]): Promise<PayrollRunListOut> => {
+export const listPayrollRuns = async ( options?: Parameters<typeof api>[1]): Promise<PayrollRunListOut> => {
 
-  return api<PayrollRunListOut>(getListRunsUrl(),
+  return api<PayrollRunListOut>(getListPayrollRunsUrl(),
   {
     ...options,
     method: 'GET'
@@ -80,69 +80,69 @@ export const listRuns = async ( options?: Parameters<typeof api>[1]): Promise<Pa
 
 
 
-export const getListRunsQueryKey = () => {
+export const getListPayrollRunsQueryKey = () => {
     return [
     `/api/v1/payroll/runs`
     ] as const;
     }
 
 
-export const getListRunsQueryOptions = <TData = Awaited<ReturnType<typeof listRuns>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListPayrollRunsQueryOptions = <TData = Awaited<ReturnType<typeof listPayrollRuns>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListRunsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListPayrollRunsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRuns>>> = ({ signal }) => listRuns({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPayrollRuns>>> = ({ signal }) => listPayrollRuns({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ListRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listRuns>>>
-export type ListRunsQueryError = ErrorType<ErrorOut>
+export type ListPayrollRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listPayrollRuns>>>
+export type ListPayrollRunsQueryError = ErrorType<ErrorOut>
 
 
-export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData>> & Pick<
+export function useListPayrollRuns<TData = Awaited<ReturnType<typeof listPayrollRuns>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listRuns>>,
+          Awaited<ReturnType<typeof listPayrollRuns>>,
           TError,
-          Awaited<ReturnType<typeof listRuns>>
+          Awaited<ReturnType<typeof listPayrollRuns>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData>> & Pick<
+export function useListPayrollRuns<TData = Awaited<ReturnType<typeof listPayrollRuns>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listRuns>>,
+          Awaited<ReturnType<typeof listPayrollRuns>>,
           TError,
-          Awaited<ReturnType<typeof listRuns>>
+          Awaited<ReturnType<typeof listPayrollRuns>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListPayrollRuns<TData = Awaited<ReturnType<typeof listPayrollRuns>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary List Runs
+ * @summary List Payroll Runs
  */
 
-export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListPayrollRuns<TData = Awaited<ReturnType<typeof listPayrollRuns>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayrollRuns>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListRunsQueryOptions(options)
+  const queryOptions = getListPayrollRunsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -154,7 +154,7 @@ export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>, TError
 
 
 
-export const getCreateRunUrl = () => {
+export const getCreatePayrollRunUrl = () => {
 
 
 
@@ -163,9 +163,9 @@ export const getCreateRunUrl = () => {
 }
 
 /**
- * @summary Create Run
+ * @summary Create Payroll Run
  */
-export const createRun = async (payrollIn: PayrollIn, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
+export const createPayrollRun = async (payrollIn: PayrollIn, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -181,7 +181,7 @@ export const createRun = async (payrollIn: PayrollIn, options?: Parameters<typeo
     }
     return headers;
   };
-return api<PayrollRunOut>(getCreateRunUrl(),
+return api<PayrollRunOut>(getCreatePayrollRunUrl(),
   {
     ...options,
     method: 'POST',
@@ -194,13 +194,13 @@ return api<PayrollRunOut>(getCreateRunUrl(),
 
 
 
-export const getCreateRunMutationKey = () => ['createRun'] as const;
+export const getCreatePayrollRunMutationKey = () => ['createPayrollRun'] as const;
 
-export const getCreateRunMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRun>>, TError,CreateRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof createRun>>, TError,CreateRunMutationVariables, TContext> => {
+export const getCreatePayrollRunMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPayrollRun>>, TError,CreatePayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPayrollRun>>, TError,CreatePayrollRunMutationVariables, TContext> => {
 
-const mutationKey = getCreateRunMutationKey();
+const mutationKey = getCreatePayrollRunMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -210,10 +210,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRun>>, CreateRunMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPayrollRun>>, CreatePayrollRunMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  createRun(data,requestOptions)
+          return  createPayrollRun(data,requestOptions)
         }
 
 
@@ -223,25 +223,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type CreateRunMutationResult = NonNullable<Awaited<ReturnType<typeof createRun>>>
-    export type CreateRunMutationBody = PayrollIn
-    export type CreateRunMutationError = ErrorType<ErrorOut>
-    export type CreateRunMutationVariables = {data: PayrollIn}
+    export type CreatePayrollRunMutationResult = NonNullable<Awaited<ReturnType<typeof createPayrollRun>>>
+    export type CreatePayrollRunMutationBody = PayrollIn
+    export type CreatePayrollRunMutationError = ErrorType<ErrorOut>
+    export type CreatePayrollRunMutationVariables = {data: PayrollIn}
 
     /**
- * @summary Create Run
+ * @summary Create Payroll Run
  */
-export const useCreateRun = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRun>>, TError,CreateRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useCreatePayrollRun = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPayrollRun>>, TError,CreatePayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createRun>>,
+        Awaited<ReturnType<typeof createPayrollRun>>,
         TError,
-        CreateRunMutationVariables,
+        CreatePayrollRunMutationVariables,
         TContext
       > => {
-      return useMutation(getCreateRunMutationOptions(options), queryClient);
+      return useMutation(getCreatePayrollRunMutationOptions(options), queryClient);
     }
-    export const getFinalizeUrl = (runId: string,) => {
+    export const getFinalizePayrollRunUrl = (runId: string,) => {
 
 
 
@@ -250,11 +250,11 @@ export const useCreateRun = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Finalize
+ * @summary Finalize Payroll Run
  */
-export const finalize = async (runId: string, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
+export const finalizePayrollRun = async (runId: string, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
 
-  return api<PayrollRunOut>(getFinalizeUrl(runId),
+  return api<PayrollRunOut>(getFinalizePayrollRunUrl(runId),
   {
     ...options,
     method: 'POST'
@@ -267,13 +267,13 @@ export const finalize = async (runId: string, options?: Parameters<typeof api>[1
 
 
 
-export const getFinalizeMutationKey = () => ['finalize'] as const;
+export const getFinalizePayrollRunMutationKey = () => ['finalizePayrollRun'] as const;
 
-export const getFinalizeMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalize>>, TError,FinalizeMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof finalize>>, TError,FinalizeMutationVariables, TContext> => {
+export const getFinalizePayrollRunMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizePayrollRun>>, TError,FinalizePayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof finalizePayrollRun>>, TError,FinalizePayrollRunMutationVariables, TContext> => {
 
-const mutationKey = getFinalizeMutationKey();
+const mutationKey = getFinalizePayrollRunMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -283,10 +283,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalize>>, FinalizeMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalizePayrollRun>>, FinalizePayrollRunMutationVariables> = (props) => {
           const {runId} = props ?? {};
 
-          return  finalize(runId,requestOptions)
+          return  finalizePayrollRun(runId,requestOptions)
         }
 
 
@@ -296,25 +296,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type FinalizeMutationResult = NonNullable<Awaited<ReturnType<typeof finalize>>>
+    export type FinalizePayrollRunMutationResult = NonNullable<Awaited<ReturnType<typeof finalizePayrollRun>>>
 
-    export type FinalizeMutationError = ErrorType<ErrorOut>
-    export type FinalizeMutationVariables = {runId: string}
+    export type FinalizePayrollRunMutationError = ErrorType<ErrorOut>
+    export type FinalizePayrollRunMutationVariables = {runId: string}
 
     /**
- * @summary Finalize
+ * @summary Finalize Payroll Run
  */
-export const useFinalize = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalize>>, TError,FinalizeMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useFinalizePayrollRun = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizePayrollRun>>, TError,FinalizePayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof finalize>>,
+        Awaited<ReturnType<typeof finalizePayrollRun>>,
         TError,
-        FinalizeMutationVariables,
+        FinalizePayrollRunMutationVariables,
         TContext
       > => {
-      return useMutation(getFinalizeMutationOptions(options), queryClient);
+      return useMutation(getFinalizePayrollRunMutationOptions(options), queryClient);
     }
-    export const getPublishUrl = (runId: string,) => {
+    export const getPublishPayrollRunUrl = (runId: string,) => {
 
 
 
@@ -323,11 +323,11 @@ export const useFinalize = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Publish
+ * @summary Publish Payroll Run
  */
-export const publish = async (runId: string, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
+export const publishPayrollRun = async (runId: string, options?: Parameters<typeof api>[1]): Promise<PayrollRunOut> => {
 
-  return api<PayrollRunOut>(getPublishUrl(runId),
+  return api<PayrollRunOut>(getPublishPayrollRunUrl(runId),
   {
     ...options,
     method: 'POST'
@@ -340,13 +340,13 @@ export const publish = async (runId: string, options?: Parameters<typeof api>[1]
 
 
 
-export const getPublishMutationKey = () => ['publish'] as const;
+export const getPublishPayrollRunMutationKey = () => ['publishPayrollRun'] as const;
 
-export const getPublishMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publish>>, TError,PublishMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof publish>>, TError,PublishMutationVariables, TContext> => {
+export const getPublishPayrollRunMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishPayrollRun>>, TError,PublishPayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishPayrollRun>>, TError,PublishPayrollRunMutationVariables, TContext> => {
 
-const mutationKey = getPublishMutationKey();
+const mutationKey = getPublishPayrollRunMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -356,10 +356,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publish>>, PublishMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishPayrollRun>>, PublishPayrollRunMutationVariables> = (props) => {
           const {runId} = props ?? {};
 
-          return  publish(runId,requestOptions)
+          return  publishPayrollRun(runId,requestOptions)
         }
 
 
@@ -369,25 +369,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PublishMutationResult = NonNullable<Awaited<ReturnType<typeof publish>>>
+    export type PublishPayrollRunMutationResult = NonNullable<Awaited<ReturnType<typeof publishPayrollRun>>>
 
-    export type PublishMutationError = ErrorType<ErrorOut>
-    export type PublishMutationVariables = {runId: string}
+    export type PublishPayrollRunMutationError = ErrorType<ErrorOut>
+    export type PublishPayrollRunMutationVariables = {runId: string}
 
     /**
- * @summary Publish
+ * @summary Publish Payroll Run
  */
-export const usePublish = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publish>>, TError,PublishMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const usePublishPayrollRun = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishPayrollRun>>, TError,PublishPayrollRunMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof publish>>,
+        Awaited<ReturnType<typeof publishPayrollRun>>,
         TError,
-        PublishMutationVariables,
+        PublishPayrollRunMutationVariables,
         TContext
       > => {
-      return useMutation(getPublishMutationOptions(options), queryClient);
+      return useMutation(getPublishPayrollRunMutationOptions(options), queryClient);
     }
-    export const getPayslipsUrl = () => {
+    export const getListPayslipsUrl = () => {
 
 
 
@@ -396,11 +396,11 @@ export const usePublish = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Payslips
+ * @summary List Payslips
  */
-export const payslips = async ( options?: Parameters<typeof api>[1]): Promise<PayslipListOut> => {
+export const listPayslips = async ( options?: Parameters<typeof api>[1]): Promise<PayslipListOut> => {
 
-  return api<PayslipListOut>(getPayslipsUrl(),
+  return api<PayslipListOut>(getListPayslipsUrl(),
   {
     ...options,
     method: 'GET'
@@ -413,69 +413,69 @@ export const payslips = async ( options?: Parameters<typeof api>[1]): Promise<Pa
 
 
 
-export const getPayslipsQueryKey = () => {
+export const getListPayslipsQueryKey = () => {
     return [
     `/api/v1/payroll/payslips`
     ] as const;
     }
 
 
-export const getPayslipsQueryOptions = <TData = Awaited<ReturnType<typeof payslips>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListPayslipsQueryOptions = <TData = Awaited<ReturnType<typeof listPayslips>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getPayslipsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListPayslipsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof payslips>>> = ({ signal }) => payslips({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPayslips>>> = ({ signal }) => listPayslips({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type PayslipsQueryResult = NonNullable<Awaited<ReturnType<typeof payslips>>>
-export type PayslipsQueryError = ErrorType<ErrorOut>
+export type ListPayslipsQueryResult = NonNullable<Awaited<ReturnType<typeof listPayslips>>>
+export type ListPayslipsQueryError = ErrorType<ErrorOut>
 
 
-export function usePayslips<TData = Awaited<ReturnType<typeof payslips>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData>> & Pick<
+export function useListPayslips<TData = Awaited<ReturnType<typeof listPayslips>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof payslips>>,
+          Awaited<ReturnType<typeof listPayslips>>,
           TError,
-          Awaited<ReturnType<typeof payslips>>
+          Awaited<ReturnType<typeof listPayslips>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePayslips<TData = Awaited<ReturnType<typeof payslips>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData>> & Pick<
+export function useListPayslips<TData = Awaited<ReturnType<typeof listPayslips>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof payslips>>,
+          Awaited<ReturnType<typeof listPayslips>>,
           TError,
-          Awaited<ReturnType<typeof payslips>>
+          Awaited<ReturnType<typeof listPayslips>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePayslips<TData = Awaited<ReturnType<typeof payslips>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListPayslips<TData = Awaited<ReturnType<typeof listPayslips>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Payslips
+ * @summary List Payslips
  */
 
-export function usePayslips<TData = Awaited<ReturnType<typeof payslips>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof payslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListPayslips<TData = Awaited<ReturnType<typeof listPayslips>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPayslips>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getPayslipsQueryOptions(options)
+  const queryOptions = getListPayslipsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -434,7 +434,7 @@ export const useUpdateOffice = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getUpdateOfficeMutationOptions(options), queryClient);
     }
-    export const getOfficeFromMapsUrlUrl = () => {
+    export const getResolveMapsUrlUrl = () => {
 
 
 
@@ -443,9 +443,9 @@ export const useUpdateOffice = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Office From Maps Url
+ * @summary Resolve Maps Url
  */
-export const officeFromMapsUrl = async (mapsUrlIn: MapsUrlIn, options?: Parameters<typeof api>[1]): Promise<MapsCoordinatesOut> => {
+export const resolveMapsUrl = async (mapsUrlIn: MapsUrlIn, options?: Parameters<typeof api>[1]): Promise<MapsCoordinatesOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -461,7 +461,7 @@ export const officeFromMapsUrl = async (mapsUrlIn: MapsUrlIn, options?: Paramete
     }
     return headers;
   };
-return api<MapsCoordinatesOut>(getOfficeFromMapsUrlUrl(),
+return api<MapsCoordinatesOut>(getResolveMapsUrlUrl(),
   {
     ...options,
     method: 'POST',
@@ -474,13 +474,13 @@ return api<MapsCoordinatesOut>(getOfficeFromMapsUrlUrl(),
 
 
 
-export const getOfficeFromMapsUrlMutationKey = () => ['officeFromMapsUrl'] as const;
+export const getResolveMapsUrlMutationKey = () => ['resolveMapsUrl'] as const;
 
-export const getOfficeFromMapsUrlMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof officeFromMapsUrl>>, TError,OfficeFromMapsUrlMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof officeFromMapsUrl>>, TError,OfficeFromMapsUrlMutationVariables, TContext> => {
+export const getResolveMapsUrlMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveMapsUrl>>, TError,ResolveMapsUrlMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveMapsUrl>>, TError,ResolveMapsUrlMutationVariables, TContext> => {
 
-const mutationKey = getOfficeFromMapsUrlMutationKey();
+const mutationKey = getResolveMapsUrlMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -490,10 +490,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof officeFromMapsUrl>>, OfficeFromMapsUrlMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveMapsUrl>>, ResolveMapsUrlMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  officeFromMapsUrl(data,requestOptions)
+          return  resolveMapsUrl(data,requestOptions)
         }
 
 
@@ -503,23 +503,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type OfficeFromMapsUrlMutationResult = NonNullable<Awaited<ReturnType<typeof officeFromMapsUrl>>>
-    export type OfficeFromMapsUrlMutationBody = MapsUrlIn
-    export type OfficeFromMapsUrlMutationError = ErrorType<ErrorOut>
-    export type OfficeFromMapsUrlMutationVariables = {data: MapsUrlIn}
+    export type ResolveMapsUrlMutationResult = NonNullable<Awaited<ReturnType<typeof resolveMapsUrl>>>
+    export type ResolveMapsUrlMutationBody = MapsUrlIn
+    export type ResolveMapsUrlMutationError = ErrorType<ErrorOut>
+    export type ResolveMapsUrlMutationVariables = {data: MapsUrlIn}
 
     /**
- * @summary Office From Maps Url
+ * @summary Resolve Maps Url
  */
-export const useOfficeFromMapsUrl = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof officeFromMapsUrl>>, TError,OfficeFromMapsUrlMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useResolveMapsUrl = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveMapsUrl>>, TError,ResolveMapsUrlMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof officeFromMapsUrl>>,
+        Awaited<ReturnType<typeof resolveMapsUrl>>,
         TError,
-        OfficeFromMapsUrlMutationVariables,
+        ResolveMapsUrlMutationVariables,
         TContext
       > => {
-      return useMutation(getOfficeFromMapsUrlMutationOptions(options), queryClient);
+      return useMutation(getResolveMapsUrlMutationOptions(options), queryClient);
     }
     export const getGetCalendarUrl = () => {
 
@@ -708,7 +708,7 @@ export const useUpdateCalendar = <TError = ErrorType<ErrorOut>,
       > => {
       return useMutation(getUpdateCalendarMutationOptions(options), queryClient);
     }
-    export const getStartGoogleCalendarUrl = () => {
+    export const getGetGoogleCalendarAuthUrl = () => {
 
 
 
@@ -717,11 +717,11 @@ export const useUpdateCalendar = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Start Google Calendar
+ * @summary Get Google Calendar Auth
  */
-export const startGoogleCalendar = async ( options?: Parameters<typeof api>[1]): Promise<AuthorizationUrlOut> => {
+export const getGoogleCalendarAuth = async ( options?: Parameters<typeof api>[1]): Promise<AuthorizationUrlOut> => {
 
-  return api<AuthorizationUrlOut>(getStartGoogleCalendarUrl(),
+  return api<AuthorizationUrlOut>(getGetGoogleCalendarAuthUrl(),
   {
     ...options,
     method: 'GET'
@@ -734,69 +734,69 @@ export const startGoogleCalendar = async ( options?: Parameters<typeof api>[1]):
 
 
 
-export const getStartGoogleCalendarQueryKey = () => {
+export const getGetGoogleCalendarAuthQueryKey = () => {
     return [
     `/api/v1/settings/calendar/google/start`
     ] as const;
     }
 
 
-export const getStartGoogleCalendarQueryOptions = <TData = Awaited<ReturnType<typeof startGoogleCalendar>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getGetGoogleCalendarAuthQueryOptions = <TData = Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getStartGoogleCalendarQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetGoogleCalendarAuthQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof startGoogleCalendar>>> = ({ signal }) => startGoogleCalendar({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGoogleCalendarAuth>>> = ({ signal }) => getGoogleCalendarAuth({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type StartGoogleCalendarQueryResult = NonNullable<Awaited<ReturnType<typeof startGoogleCalendar>>>
-export type StartGoogleCalendarQueryError = ErrorType<ErrorOut>
+export type GetGoogleCalendarAuthQueryResult = NonNullable<Awaited<ReturnType<typeof getGoogleCalendarAuth>>>
+export type GetGoogleCalendarAuthQueryError = ErrorType<ErrorOut>
 
 
-export function useStartGoogleCalendar<TData = Awaited<ReturnType<typeof startGoogleCalendar>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData>> & Pick<
+export function useGetGoogleCalendarAuth<TData = Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof startGoogleCalendar>>,
+          Awaited<ReturnType<typeof getGoogleCalendarAuth>>,
           TError,
-          Awaited<ReturnType<typeof startGoogleCalendar>>
+          Awaited<ReturnType<typeof getGoogleCalendarAuth>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStartGoogleCalendar<TData = Awaited<ReturnType<typeof startGoogleCalendar>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData>> & Pick<
+export function useGetGoogleCalendarAuth<TData = Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof startGoogleCalendar>>,
+          Awaited<ReturnType<typeof getGoogleCalendarAuth>>,
           TError,
-          Awaited<ReturnType<typeof startGoogleCalendar>>
+          Awaited<ReturnType<typeof getGoogleCalendarAuth>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStartGoogleCalendar<TData = Awaited<ReturnType<typeof startGoogleCalendar>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetGoogleCalendarAuth<TData = Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Start Google Calendar
+ * @summary Get Google Calendar Auth
  */
 
-export function useStartGoogleCalendar<TData = Awaited<ReturnType<typeof startGoogleCalendar>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof startGoogleCalendar>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useGetGoogleCalendarAuth<TData = Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoogleCalendarAuth>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getStartGoogleCalendarQueryOptions(options)
+  const queryOptions = getGetGoogleCalendarAuthQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -808,7 +808,7 @@ export function useStartGoogleCalendar<TData = Awaited<ReturnType<typeof startGo
 
 
 
-export const getGoogleCalendarsUrl = () => {
+export const getListGoogleCalendarsUrl = () => {
 
 
 
@@ -817,11 +817,11 @@ export const getGoogleCalendarsUrl = () => {
 }
 
 /**
- * @summary Google Calendars
+ * @summary List Google Calendars
  */
-export const googleCalendars = async ( options?: Parameters<typeof api>[1]): Promise<GoogleCalendarListOut> => {
+export const listGoogleCalendars = async ( options?: Parameters<typeof api>[1]): Promise<GoogleCalendarListOut> => {
 
-  return api<GoogleCalendarListOut>(getGoogleCalendarsUrl(),
+  return api<GoogleCalendarListOut>(getListGoogleCalendarsUrl(),
   {
     ...options,
     method: 'GET'
@@ -834,69 +834,69 @@ export const googleCalendars = async ( options?: Parameters<typeof api>[1]): Pro
 
 
 
-export const getGoogleCalendarsQueryKey = () => {
+export const getListGoogleCalendarsQueryKey = () => {
     return [
     `/api/v1/settings/calendar/google/calendars`
     ] as const;
     }
 
 
-export const getGoogleCalendarsQueryOptions = <TData = Awaited<ReturnType<typeof googleCalendars>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListGoogleCalendarsQueryOptions = <TData = Awaited<ReturnType<typeof listGoogleCalendars>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGoogleCalendarsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListGoogleCalendarsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof googleCalendars>>> = ({ signal }) => googleCalendars({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listGoogleCalendars>>> = ({ signal }) => listGoogleCalendars({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GoogleCalendarsQueryResult = NonNullable<Awaited<ReturnType<typeof googleCalendars>>>
-export type GoogleCalendarsQueryError = ErrorType<ErrorOut>
+export type ListGoogleCalendarsQueryResult = NonNullable<Awaited<ReturnType<typeof listGoogleCalendars>>>
+export type ListGoogleCalendarsQueryError = ErrorType<ErrorOut>
 
 
-export function useGoogleCalendars<TData = Awaited<ReturnType<typeof googleCalendars>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData>> & Pick<
+export function useListGoogleCalendars<TData = Awaited<ReturnType<typeof listGoogleCalendars>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof googleCalendars>>,
+          Awaited<ReturnType<typeof listGoogleCalendars>>,
           TError,
-          Awaited<ReturnType<typeof googleCalendars>>
+          Awaited<ReturnType<typeof listGoogleCalendars>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGoogleCalendars<TData = Awaited<ReturnType<typeof googleCalendars>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData>> & Pick<
+export function useListGoogleCalendars<TData = Awaited<ReturnType<typeof listGoogleCalendars>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof googleCalendars>>,
+          Awaited<ReturnType<typeof listGoogleCalendars>>,
           TError,
-          Awaited<ReturnType<typeof googleCalendars>>
+          Awaited<ReturnType<typeof listGoogleCalendars>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGoogleCalendars<TData = Awaited<ReturnType<typeof googleCalendars>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListGoogleCalendars<TData = Awaited<ReturnType<typeof listGoogleCalendars>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Google Calendars
+ * @summary List Google Calendars
  */
 
-export function useGoogleCalendars<TData = Awaited<ReturnType<typeof googleCalendars>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof googleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListGoogleCalendars<TData = Awaited<ReturnType<typeof listGoogleCalendars>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoogleCalendars>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGoogleCalendarsQueryOptions(options)
+  const queryOptions = getListGoogleCalendarsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

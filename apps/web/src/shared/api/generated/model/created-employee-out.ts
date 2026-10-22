@@ -5,9 +5,9 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { CreatedEmployeeOutWorkMode } from './created-employee-out-work-mode';
+import type { EmployeeRole } from './employee-role';
 import type { EmployeeStatus } from './employee-status';
 import type { LocationOut } from './location-out';
-import type { Role } from './role';
 
 /**
  * Returned by POST /employees when HR set the password.
@@ -16,7 +16,7 @@ export interface CreatedEmployeeOut {
   id: string;
   name: string;
   email: string;
-  role: Role;
+  role: EmployeeRole;
   department: string;
   title: string;
   status: EmployeeStatus;

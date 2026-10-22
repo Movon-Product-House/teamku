@@ -9,5 +9,5 @@ router = APIRouter(tags=["dashboard"])
 
 
 @router.get("/dashboard")
-async def dashboard(db: DB, user: CurrentUser) -> DashboardOut:
+async def get_dashboard(db: DB, user: CurrentUser) -> DashboardOut:
     return await service.dashboard(db, user)

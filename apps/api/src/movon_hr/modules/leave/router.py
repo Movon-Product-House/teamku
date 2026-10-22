@@ -26,26 +26,26 @@ async def list_leave_requests(db: DB, user: CurrentUser) -> LeaveListOut:
 
 
 @router.post("/leave-requests")
-async def submit_leave(
+async def create_leave_request(
     db: DB, user: CurrentUser, payload: LeaveIn, background_tasks: BackgroundTasks
 ) -> LeaveDaysOut:
     return LeaveDaysOut.model_validate(await service.submit(db, user, payload, background_tasks))
 
 
 @router.post("/leave-requests/{request_id}/cancel")
-async def cancel_leave(
+async def cancel_leave_request(
     db: DB, user: CurrentUser, request_id: str, background_tasks: BackgroundTasks
 ) -> LeaveOut:
     return LeaveOut.model_validate(await service.cancel(db, user, request_id, background_tasks))
 
 
 @router.get("/approvals")
-async def approvals(db: DB, user: Approver) -> ApprovalListOut:
+async def list_approvals(db: DB, user: Approver) -> ApprovalListOut:
     return await service.approvals(db, user)
 
 
 @router.post("/approvals/{request_id}")
-async def decide(
+async def decide_approval(
     db: DB,
     user: Approver,
     request_id: str,

@@ -4,7 +4,7 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Anomaly } from './anomaly';
+import type { AttendanceAnomaly } from './attendance-anomaly';
 
 export interface CheckInOut {
   result: 'created';
@@ -12,6 +12,6 @@ export interface CheckInOut {
   checked_in_at: string;
   distance_meters: number;
   allowed_radius_meters: number;
-  anomaly: Anomaly | null;
+  anomaly: AttendanceAnomaly | null;
   agenda_count: number;
 }

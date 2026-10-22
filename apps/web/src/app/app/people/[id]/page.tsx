@@ -3,22 +3,22 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  me as fetchMe,
   getEmployee,
+  getLocationHistory,
+  getMe,
   listLocations,
-  locationHistory,
   updateEmployee,
 } from "@/shared/api/generated";
 import type {
   EmployeeOut,
-  EventKind,
+  LocationEventKind,
   LocationEventOut,
   LocationOut,
 } from "@/shared/api/generated/model";
 import { formatMoney } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-const kindLabel: Record<EventKind, string> = {
+const kindLabel: Record<LocationEventKind, string> = {
   check_in: "Check-in",
   reverify: "Re-verifikasi",
   check_out: "Check-out",
@@ -38,13 +38,13 @@ export default function EmployeeDetail() {
 
   const load = () => {
     const id = params.id;
-    Promise.all([getEmployee(id), fetchMe(), listLocations()])
+    Promise.all([getEmployee(id), getMe(), listLocations()])
       .then(([profile, me, locationResult]) => {
         setEmployee(profile);
         setRole(me.user.role);
         setLocations(locationResult.items);
         if (me.user.role === "manager" || me.user.role === "hr_admin") {
-          return locationHistory(id).then((history) => setEvents(history.items));
+          return getLocationHistory(id).then((history) => setEvents(history.items));
         }
         setEvents([]);
       })

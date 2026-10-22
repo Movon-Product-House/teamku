@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
-import { useApprovals } from "@/shared/api/generated";
-import type { ApprovalOut, Decision } from "@/shared/api/generated/model";
+import { useListApprovals } from "@/shared/api/generated";
+import type { ApprovalOut, LeaveDecision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import { notify } from "@/shared/ui/notifications";
@@ -19,11 +19,11 @@ const FILTERS: [ApprovalFilter, string][] = [
 ];
 
 export function ApprovalsPage() {
-  const approvals = useApprovals();
+  const approvals = useListApprovals();
   const [filter, setFilter] = useState<ApprovalFilter>("pending");
   const [selected, setSelected] = useState<{
     approval: ApprovalOut;
-    decision: Decision;
+    decision: LeaveDecision;
   } | null>(null);
 
   useEffect(() => {

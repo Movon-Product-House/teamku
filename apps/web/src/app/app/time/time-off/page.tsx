@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { leaveStatusLabels } from "@/features/leave/types";
-import { cancelLeave, listLeaveRequests, submitLeave } from "@/shared/api/generated";
+import { cancelLeaveRequest, createLeaveRequest, listLeaveRequests } from "@/shared/api/generated";
 import type { LeaveListOut } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
@@ -37,7 +37,7 @@ export default function TimeOff() {
     }
     setBusy(true);
     try {
-      await submitLeave({ start, end, reason });
+      await createLeaveRequest({ start, end, reason });
       setReason("");
       notify("success", "Permohonan terkirim", "Permohonan berhasil dikirim ke atasan.");
       await load();
@@ -54,7 +54,7 @@ export default function TimeOff() {
   async function cancel(id: string) {
     setBusy(true);
     try {
-      await cancelLeave(id);
+      await cancelLeaveRequest(id);
       notify(
         "success",
         "Permohonan dibatalkan",

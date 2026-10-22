@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type Language = typeof Language[keyof typeof Language];
+export type PolicyLanguage = typeof PolicyLanguage[keyof typeof PolicyLanguage];
 
 
-export const Language = {
+export const PolicyLanguage = {
   id: 'id',
   en: 'en',
 } as const;

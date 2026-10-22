@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type PayrollStatus = typeof PayrollStatus[keyof typeof PayrollStatus];
+export type PayrollRunStatus = typeof PayrollRunStatus[keyof typeof PayrollRunStatus];
 
 
-export const PayrollStatus = {
+export const PayrollRunStatus = {
   draft: 'draft',
   finalized: 'finalized',
   published: 'published',

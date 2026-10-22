@@ -2,7 +2,7 @@
 
 import { ChevronRight, LogOut, Monitor } from "lucide-react";
 import Link from "next/link";
-import { useMe } from "@/shared/api/generated";
+import { useGetMe } from "@/shared/api/generated";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { usePolledAttendanceToday } from "../api";
@@ -13,7 +13,7 @@ import { StillWorkingNote } from "./account-menu";
 
 /** S3 (Employee) and HM5 (Manager/HR): every page without a tab, the account, and Keluar. */
 export function MorePage() {
-  const me = useMe();
+  const me = useGetMe();
   const today = usePolledAttendanceToday();
   const { logout, signingOut } = useLogout();
   // The shell only renders its children once /me has loaded.

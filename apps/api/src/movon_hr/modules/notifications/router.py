@@ -11,13 +11,13 @@ router = APIRouter(tags=["notifications"])
 
 
 @router.get("/notifications")
-async def notifications(db: DB, user: CurrentUser) -> NotificationListOut:
+async def list_notifications(db: DB, user: CurrentUser) -> NotificationListOut:
     items = [NotificationOut.model_validate(item) for item in await service.list_for(db, user.id)]
     return NotificationListOut(items=items, unread=sum(not item.read for item in items))
 
 
 @router.post("/notifications/read-all")
-async def read_notifications(db: DB, user: CurrentUser) -> OkOut:
+async def read_all_notifications(db: DB, user: CurrentUser) -> OkOut:
     await service.mark_all_read(db, user.id)
     return OkOut(ok=True)
 

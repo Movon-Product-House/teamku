@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from movon_hr.core.identity import EmployeeStatus, Role
+from movon_hr.core.identity import EmployeeRole, EmployeeStatus
 from movon_hr.modules.settings.schemas import LocationOut
 
 
@@ -11,7 +11,7 @@ class EmployeeCreateIn(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     email: str = Field(min_length=5, max_length=150)
     department: str = Field(min_length=2, max_length=100)
-    role: Role
+    role: EmployeeRole
     title: str = Field(default="Staff", min_length=2, max_length=100)
     salary: int = Field(ge=0, le=10_000_000_000)
     # Optional initial password; when omitted a temporary one is generated.
@@ -38,7 +38,7 @@ class EmployeeColumns(BaseModel):
     id: uuid.UUID
     name: str
     email: str
-    role: Role
+    role: EmployeeRole
     department: str
     title: str
     status: EmployeeStatus

@@ -4,9 +4,9 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
+import type { CalendarDeliveryMode } from './calendar-delivery-mode';
 import type { CalendarProvider } from './calendar-provider';
 import type { CalendarScope } from './calendar-scope';
-import type { DeliveryMode } from './delivery-mode';
 
 export interface CalendarSettingsIn {
   provider: CalendarProvider;
@@ -21,5 +21,5 @@ export interface CalendarSettingsIn {
   scope?: CalendarScope;
   /** @maxLength 100 */
   division?: string;
-  delivery_mode?: DeliveryMode;
+  delivery_mode?: CalendarDeliveryMode;
 }

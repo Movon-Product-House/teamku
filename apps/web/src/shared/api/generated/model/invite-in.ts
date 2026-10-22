@@ -4,7 +4,7 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Role } from './role';
+import type { EmployeeRole } from './employee-role';
 
 export interface InviteIn {
   /**
@@ -22,7 +22,7 @@ export interface InviteIn {
      * @maxLength 100
      */
   department: string;
-  role: Role;
+  role: EmployeeRole;
   /**
      * @minLength 2
      * @maxLength 100

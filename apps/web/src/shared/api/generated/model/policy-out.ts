@@ -4,7 +4,7 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Language } from './language';
+import type { PolicyLanguage } from './policy-language';
 import type { PolicySectionOut } from './policy-section-out';
 import type { PolicyState } from './policy-state';
 
@@ -12,7 +12,7 @@ export interface PolicyOut {
   id: string;
   title: string;
   category: string;
-  language: Language;
+  language: PolicyLanguage;
   effective_date: string;
   expiry_date: string | null;
   state: PolicyState;

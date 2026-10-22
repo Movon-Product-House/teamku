@@ -23,12 +23,12 @@ HrOrManager = Annotated[Employee, Depends(require_role("manager", "hr_admin"))]
 
 
 @router.get("/attendance/today")
-async def attendance_today(db: DB, user: CurrentUser) -> TodayOut:
+async def get_attendance_today(db: DB, user: CurrentUser) -> TodayOut:
     return await service.today(db, user)
 
 
 @router.get("/attendance/week")
-async def attendance_week(db: DB, user: CurrentUser) -> WeekOut:
+async def get_attendance_week(db: DB, user: CurrentUser) -> WeekOut:
     return await service.week(db, user)
 
 
@@ -51,5 +51,5 @@ async def reverify(db: DB, user: CurrentUser, payload: ReverifyIn) -> ReverifyRe
 
 # Registered here because the data belongs to attendance (plan Target Structure).
 @router.get("/employees/{employee_id}/location-history")
-async def location_history(db: DB, user: HrOrManager, employee_id: str) -> LocationHistoryOut:
+async def get_location_history(db: DB, user: HrOrManager, employee_id: str) -> LocationHistoryOut:
     return await service.location_history(db, user, employee_id)

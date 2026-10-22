@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DeliveryMode = typeof DeliveryMode[keyof typeof DeliveryMode];
+export type CalendarDeliveryMode = typeof CalendarDeliveryMode[keyof typeof CalendarDeliveryMode];
 
 
-export const DeliveryMode = {
+export const CalendarDeliveryMode = {
   shared: 'shared',
   shared_and_email: 'shared_and_email',
 } as const;

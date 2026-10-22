@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { previewReset, usePreviewInvite } from "@/shared/api/generated";
+import { previewResetPassword, useGetInvite } from "@/shared/api/generated";
 
 // Token previews never refetch, not even after a mutation (meta.keepOnMutation, see
 // providers.tsx): a refetch would swap the page under a half-filled form, and once the
@@ -14,7 +14,7 @@ const PREVIEW_OPTIONS = {
 export function useResetPreview(token: string) {
   return useQuery({
     queryKey: ["auth", "reset", token],
-    queryFn: () => previewReset({ token }),
+    queryFn: () => previewResetPassword({ token }),
     enabled: token !== "",
     ...PREVIEW_OPTIONS,
   });
@@ -22,7 +22,7 @@ export function useResetPreview(token: string) {
 
 export function useInvitePreview(token: string) {
   // The generated URL builder inserts path params raw; the token comes from ?token=.
-  return usePreviewInvite(encodeURIComponent(token), {
+  return useGetInvite(encodeURIComponent(token), {
     query: { enabled: token !== "", ...PREVIEW_OPTIONS },
   });
 }

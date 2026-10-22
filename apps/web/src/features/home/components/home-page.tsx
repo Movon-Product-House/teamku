@@ -15,8 +15,8 @@ import Link from "next/link";
 import { leaveStatusLabels } from "@/features/leave/types";
 import { errorMessage } from "@/shared/api/client";
 import {
-  useAttendanceToday,
-  useAttendanceWeek,
+  useGetAttendanceToday,
+  useGetAttendanceWeek,
   useListLeaveRequests,
 } from "@/shared/api/generated";
 import type {
@@ -61,8 +61,8 @@ const leaveTones = {
 
 /** P1-E, P1-E2 (mobile) and D1 (desktop): Beranda for an Employee. */
 export function HomePage({ user }: { user: MeOut["user"] }) {
-  const today = useAttendanceToday();
-  const week = useAttendanceWeek();
+  const today = useGetAttendanceToday();
+  const week = useGetAttendanceWeek();
   const leave = useListLeaveRequests();
   const payslip = useLatestPayslip();
   const now = new Date();

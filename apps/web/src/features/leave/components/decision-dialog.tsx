@@ -2,8 +2,8 @@
 
 import { type FormEvent, useId, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
-import { useDecide } from "@/shared/api/generated";
-import type { ApprovalOut, Decision } from "@/shared/api/generated/model";
+import { useDecideApproval } from "@/shared/api/generated";
+import type { ApprovalOut, LeaveDecision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import {
@@ -20,12 +20,12 @@ import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
 
-type Props = { approval: ApprovalOut; decision: Decision; onClose: () => void };
+type Props = { approval: ApprovalOut; decision: LeaveDecision; onClose: () => void };
 
 export function DecisionDialog({ approval, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));
   const [error, setError] = useState<string | null>(null);
-  const decide = useDecide();
+  const decide = useDecideApproval();
   const commentId = useId();
   const errorId = useId();
   const approving = decision === "approved";

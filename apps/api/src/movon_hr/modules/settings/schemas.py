@@ -3,9 +3,9 @@ import uuid
 from pydantic import BaseModel, ConfigDict, Field
 
 from movon_hr.modules.settings.models import (
+    CalendarDeliveryMode,
     CalendarProvider,
     CalendarScope,
-    DeliveryMode,
     StoredCalendarProvider,
 )
 
@@ -42,7 +42,7 @@ class CalendarSettingsIn(BaseModel):
     calendar_name: str = Field(default="Kalender perusahaan", max_length=120)
     scope: CalendarScope = "company"
     division: str = Field(default="", max_length=100)
-    delivery_mode: DeliveryMode = "shared_and_email"
+    delivery_mode: CalendarDeliveryMode = "shared_and_email"
 
 
 class MapsUrlIn(BaseModel):
@@ -84,7 +84,7 @@ class CalendarOut(BaseModel):
     calendar_name: str
     scope: CalendarScope
     division: str
-    delivery_mode: DeliveryMode
+    delivery_mode: CalendarDeliveryMode
 
 
 class AuthorizationUrlOut(BaseModel):

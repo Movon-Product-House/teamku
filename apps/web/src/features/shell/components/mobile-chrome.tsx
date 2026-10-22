@@ -2,7 +2,7 @@
 
 import { Bell } from "lucide-react";
 import Link from "next/link";
-import type { Role } from "@/shared/api/generated/model";
+import type { EmployeeRole } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { usePolledNotifications } from "../api";
 import { activeTab, initials, MORE_HREF, type NavItem, NOTIFICATIONS_HREF } from "../nav";
@@ -58,7 +58,7 @@ export function TabBar({
   pendingApprovals,
 }: {
   items: NavItem[];
-  role: Role;
+  role: EmployeeRole;
   pathname: string;
   pendingApprovals: number;
 }) {

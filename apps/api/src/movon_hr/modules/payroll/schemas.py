@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
-from movon_hr.modules.payroll.models import PayrollStatus
+from movon_hr.modules.payroll.models import PayrollRunStatus
 
 
 class PayrollIn(BaseModel):
@@ -25,7 +25,7 @@ class PayrollRunOut(BaseModel):
 
     id: uuid.UUID
     period: str
-    status: PayrollStatus
+    status: PayrollRunStatus
     items: list[PayrollItemOut]
     created_at: datetime
     finalized_at: datetime | None

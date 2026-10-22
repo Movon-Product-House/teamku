@@ -156,7 +156,7 @@ export function useListLeaveRequests<TData = Awaited<ReturnType<typeof listLeave
 
 
 
-export const getSubmitLeaveUrl = () => {
+export const getCreateLeaveRequestUrl = () => {
 
 
 
@@ -165,9 +165,9 @@ export const getSubmitLeaveUrl = () => {
 }
 
 /**
- * @summary Submit Leave
+ * @summary Create Leave Request
  */
-export const submitLeave = async (leaveIn: LeaveIn, options?: Parameters<typeof api>[1]): Promise<LeaveDaysOut> => {
+export const createLeaveRequest = async (leaveIn: LeaveIn, options?: Parameters<typeof api>[1]): Promise<LeaveDaysOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -183,7 +183,7 @@ export const submitLeave = async (leaveIn: LeaveIn, options?: Parameters<typeof 
     }
     return headers;
   };
-return api<LeaveDaysOut>(getSubmitLeaveUrl(),
+return api<LeaveDaysOut>(getCreateLeaveRequestUrl(),
   {
     ...options,
     method: 'POST',
@@ -196,13 +196,13 @@ return api<LeaveDaysOut>(getSubmitLeaveUrl(),
 
 
 
-export const getSubmitLeaveMutationKey = () => ['submitLeave'] as const;
+export const getCreateLeaveRequestMutationKey = () => ['createLeaveRequest'] as const;
 
-export const getSubmitLeaveMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitLeave>>, TError,SubmitLeaveMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof submitLeave>>, TError,SubmitLeaveMutationVariables, TContext> => {
+export const getCreateLeaveRequestMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLeaveRequest>>, TError,CreateLeaveRequestMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof createLeaveRequest>>, TError,CreateLeaveRequestMutationVariables, TContext> => {
 
-const mutationKey = getSubmitLeaveMutationKey();
+const mutationKey = getCreateLeaveRequestMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -212,10 +212,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitLeave>>, SubmitLeaveMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createLeaveRequest>>, CreateLeaveRequestMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  submitLeave(data,requestOptions)
+          return  createLeaveRequest(data,requestOptions)
         }
 
 
@@ -225,25 +225,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type SubmitLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof submitLeave>>>
-    export type SubmitLeaveMutationBody = LeaveIn
-    export type SubmitLeaveMutationError = ErrorType<ErrorOut>
-    export type SubmitLeaveMutationVariables = {data: LeaveIn}
+    export type CreateLeaveRequestMutationResult = NonNullable<Awaited<ReturnType<typeof createLeaveRequest>>>
+    export type CreateLeaveRequestMutationBody = LeaveIn
+    export type CreateLeaveRequestMutationError = ErrorType<ErrorOut>
+    export type CreateLeaveRequestMutationVariables = {data: LeaveIn}
 
     /**
- * @summary Submit Leave
+ * @summary Create Leave Request
  */
-export const useSubmitLeave = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitLeave>>, TError,SubmitLeaveMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useCreateLeaveRequest = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLeaveRequest>>, TError,CreateLeaveRequestMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof submitLeave>>,
+        Awaited<ReturnType<typeof createLeaveRequest>>,
         TError,
-        SubmitLeaveMutationVariables,
+        CreateLeaveRequestMutationVariables,
         TContext
       > => {
-      return useMutation(getSubmitLeaveMutationOptions(options), queryClient);
+      return useMutation(getCreateLeaveRequestMutationOptions(options), queryClient);
     }
-    export const getCancelLeaveUrl = (requestId: string,) => {
+    export const getCancelLeaveRequestUrl = (requestId: string,) => {
 
 
 
@@ -252,11 +252,11 @@ export const useSubmitLeave = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Cancel Leave
+ * @summary Cancel Leave Request
  */
-export const cancelLeave = async (requestId: string, options?: Parameters<typeof api>[1]): Promise<LeaveOut> => {
+export const cancelLeaveRequest = async (requestId: string, options?: Parameters<typeof api>[1]): Promise<LeaveOut> => {
 
-  return api<LeaveOut>(getCancelLeaveUrl(requestId),
+  return api<LeaveOut>(getCancelLeaveRequestUrl(requestId),
   {
     ...options,
     method: 'POST'
@@ -269,13 +269,13 @@ export const cancelLeave = async (requestId: string, options?: Parameters<typeof
 
 
 
-export const getCancelLeaveMutationKey = () => ['cancelLeave'] as const;
+export const getCancelLeaveRequestMutationKey = () => ['cancelLeaveRequest'] as const;
 
-export const getCancelLeaveMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelLeave>>, TError,CancelLeaveMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof cancelLeave>>, TError,CancelLeaveMutationVariables, TContext> => {
+export const getCancelLeaveRequestMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelLeaveRequest>>, TError,CancelLeaveRequestMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelLeaveRequest>>, TError,CancelLeaveRequestMutationVariables, TContext> => {
 
-const mutationKey = getCancelLeaveMutationKey();
+const mutationKey = getCancelLeaveRequestMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -285,10 +285,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelLeave>>, CancelLeaveMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelLeaveRequest>>, CancelLeaveRequestMutationVariables> = (props) => {
           const {requestId} = props ?? {};
 
-          return  cancelLeave(requestId,requestOptions)
+          return  cancelLeaveRequest(requestId,requestOptions)
         }
 
 
@@ -298,25 +298,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type CancelLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof cancelLeave>>>
+    export type CancelLeaveRequestMutationResult = NonNullable<Awaited<ReturnType<typeof cancelLeaveRequest>>>
 
-    export type CancelLeaveMutationError = ErrorType<ErrorOut>
-    export type CancelLeaveMutationVariables = {requestId: string}
+    export type CancelLeaveRequestMutationError = ErrorType<ErrorOut>
+    export type CancelLeaveRequestMutationVariables = {requestId: string}
 
     /**
- * @summary Cancel Leave
+ * @summary Cancel Leave Request
  */
-export const useCancelLeave = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelLeave>>, TError,CancelLeaveMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useCancelLeaveRequest = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelLeaveRequest>>, TError,CancelLeaveRequestMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof cancelLeave>>,
+        Awaited<ReturnType<typeof cancelLeaveRequest>>,
         TError,
-        CancelLeaveMutationVariables,
+        CancelLeaveRequestMutationVariables,
         TContext
       > => {
-      return useMutation(getCancelLeaveMutationOptions(options), queryClient);
+      return useMutation(getCancelLeaveRequestMutationOptions(options), queryClient);
     }
-    export const getApprovalsUrl = () => {
+    export const getListApprovalsUrl = () => {
 
 
 
@@ -325,11 +325,11 @@ export const useCancelLeave = <TError = ErrorType<ErrorOut>,
 }
 
 /**
- * @summary Approvals
+ * @summary List Approvals
  */
-export const approvals = async ( options?: Parameters<typeof api>[1]): Promise<ApprovalListOut> => {
+export const listApprovals = async ( options?: Parameters<typeof api>[1]): Promise<ApprovalListOut> => {
 
-  return api<ApprovalListOut>(getApprovalsUrl(),
+  return api<ApprovalListOut>(getListApprovalsUrl(),
   {
     ...options,
     method: 'GET'
@@ -342,69 +342,69 @@ export const approvals = async ( options?: Parameters<typeof api>[1]): Promise<A
 
 
 
-export const getApprovalsQueryKey = () => {
+export const getListApprovalsQueryKey = () => {
     return [
     `/api/v1/approvals`
     ] as const;
     }
 
 
-export const getApprovalsQueryOptions = <TData = Awaited<ReturnType<typeof approvals>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export const getListApprovalsQueryOptions = <TData = Awaited<ReturnType<typeof listApprovals>>, TError = ErrorType<ErrorOut>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData>>, request?: SecondParameter<typeof api>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getApprovalsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListApprovalsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof approvals>>> = ({ signal }) => approvals({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApprovals>>> = ({ signal }) => listApprovals({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ApprovalsQueryResult = NonNullable<Awaited<ReturnType<typeof approvals>>>
-export type ApprovalsQueryError = ErrorType<ErrorOut>
+export type ListApprovalsQueryResult = NonNullable<Awaited<ReturnType<typeof listApprovals>>>
+export type ListApprovalsQueryError = ErrorType<ErrorOut>
 
 
-export function useApprovals<TData = Awaited<ReturnType<typeof approvals>>, TError = ErrorType<ErrorOut>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData>> & Pick<
+export function useListApprovals<TData = Awaited<ReturnType<typeof listApprovals>>, TError = ErrorType<ErrorOut>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof approvals>>,
+          Awaited<ReturnType<typeof listApprovals>>,
           TError,
-          Awaited<ReturnType<typeof approvals>>
+          Awaited<ReturnType<typeof listApprovals>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useApprovals<TData = Awaited<ReturnType<typeof approvals>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData>> & Pick<
+export function useListApprovals<TData = Awaited<ReturnType<typeof listApprovals>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof approvals>>,
+          Awaited<ReturnType<typeof listApprovals>>,
           TError,
-          Awaited<ReturnType<typeof approvals>>
+          Awaited<ReturnType<typeof listApprovals>>
         > , 'initialData'
       >, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useApprovals<TData = Awaited<ReturnType<typeof approvals>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListApprovals<TData = Awaited<ReturnType<typeof listApprovals>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Approvals
+ * @summary List Approvals
  */
 
-export function useApprovals<TData = Awaited<ReturnType<typeof approvals>>, TError = ErrorType<ErrorOut>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approvals>>, TError, TData>>, request?: SecondParameter<typeof api>}
+export function useListApprovals<TData = Awaited<ReturnType<typeof listApprovals>>, TError = ErrorType<ErrorOut>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApprovals>>, TError, TData>>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApprovalsQueryOptions(options)
+  const queryOptions = getListApprovalsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -416,7 +416,7 @@ export function useApprovals<TData = Awaited<ReturnType<typeof approvals>>, TErr
 
 
 
-export const getDecideUrl = (requestId: string,) => {
+export const getDecideApprovalUrl = (requestId: string,) => {
 
 
 
@@ -425,9 +425,9 @@ export const getDecideUrl = (requestId: string,) => {
 }
 
 /**
- * @summary Decide
+ * @summary Decide Approval
  */
-export const decide = async (requestId: string,
+export const decideApproval = async (requestId: string,
     approvalIn: ApprovalIn, options?: Parameters<typeof api>[1]): Promise<LeaveOut> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
@@ -444,7 +444,7 @@ export const decide = async (requestId: string,
     }
     return headers;
   };
-return api<LeaveOut>(getDecideUrl(requestId),
+return api<LeaveOut>(getDecideApprovalUrl(requestId),
   {
     ...options,
     method: 'POST',
@@ -457,13 +457,13 @@ return api<LeaveOut>(getDecideUrl(requestId),
 
 
 
-export const getDecideMutationKey = () => ['decide'] as const;
+export const getDecideApprovalMutationKey = () => ['decideApproval'] as const;
 
-export const getDecideMutationOptions = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decide>>, TError,DecideMutationVariables, TContext>, request?: SecondParameter<typeof api>}
-): UseMutationOptions<Awaited<ReturnType<typeof decide>>, TError,DecideMutationVariables, TContext> => {
+export const getDecideApprovalMutationOptions = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideApproval>>, TError,DecideApprovalMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+): UseMutationOptions<Awaited<ReturnType<typeof decideApproval>>, TError,DecideApprovalMutationVariables, TContext> => {
 
-const mutationKey = getDecideMutationKey();
+const mutationKey = getDecideApprovalMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -473,10 +473,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof decide>>, DecideMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof decideApproval>>, DecideApprovalMutationVariables> = (props) => {
           const {requestId,data} = props ?? {};
 
-          return  decide(requestId,data,requestOptions)
+          return  decideApproval(requestId,data,requestOptions)
         }
 
 
@@ -486,21 +486,21 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DecideMutationResult = NonNullable<Awaited<ReturnType<typeof decide>>>
-    export type DecideMutationBody = ApprovalIn
-    export type DecideMutationError = ErrorType<ErrorOut>
-    export type DecideMutationVariables = {requestId: string;data: ApprovalIn}
+    export type DecideApprovalMutationResult = NonNullable<Awaited<ReturnType<typeof decideApproval>>>
+    export type DecideApprovalMutationBody = ApprovalIn
+    export type DecideApprovalMutationError = ErrorType<ErrorOut>
+    export type DecideApprovalMutationVariables = {requestId: string;data: ApprovalIn}
 
     /**
- * @summary Decide
+ * @summary Decide Approval
  */
-export const useDecide = <TError = ErrorType<ErrorOut>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decide>>, TError,DecideMutationVariables, TContext>, request?: SecondParameter<typeof api>}
+export const useDecideApproval = <TError = ErrorType<ErrorOut>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideApproval>>, TError,DecideApprovalMutationVariables, TContext>, request?: SecondParameter<typeof api>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof decide>>,
+        Awaited<ReturnType<typeof decideApproval>>,
         TError,
-        DecideMutationVariables,
+        DecideApprovalMutationVariables,
         TContext
       > => {
-      return useMutation(getDecideMutationOptions(options), queryClient);
+      return useMutation(getDecideApprovalMutationOptions(options), queryClient);
     }

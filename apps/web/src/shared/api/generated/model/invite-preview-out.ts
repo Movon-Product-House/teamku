@@ -4,13 +4,13 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
-import type { Role } from './role';
+import type { EmployeeRole } from './employee-role';
 
 export interface InvitePreviewOut {
   email: string;
   name: string;
   company: string;
-  role: Role;
+  role: EmployeeRole;
   department: string;
   title: string;
   invited_by: string | null;
