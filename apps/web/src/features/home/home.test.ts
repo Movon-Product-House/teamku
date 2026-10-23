@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { SessionOut, TodayOut } from "@/shared/api/generated/model";
-import { formatDuration, greeting, timelineSlots, weekBars, workedMs } from "./home";
+import type { CheckOutOut, SessionOut, TodayOut } from "@/shared/api/generated/model";
+import {
+  checkOutMessage,
+  formatDuration,
+  greeting,
+  timelineSlots,
+  todaySpans,
+  weekBars,
+  workedMs,
+} from "./home";
 
 const at = (hour: number, minute = 0) => new Date(2026, 8, 29, hour, minute);
 const session = (checked_in_at: string, checked_out_at: string | null): SessionOut => ({
@@ -28,6 +36,7 @@ describe("home", () => {
       pending_reverification: null,
       is_remote: false,
       closed_hours_today: 1.5,
+      sessions_today: [],
     });
     expect(workedMs(today("checked_in", null), at(14))).toBe(2.5 * 3_600_000);
     expect(workedMs(today("completed", at(14).toISOString()), at(18))).toBe(1.5 * 3_600_000);
@@ -40,6 +49,7 @@ describe("home", () => {
       pending_reverification: null,
       is_remote: false,
       closed_hours_today: 1,
+      sessions_today: [],
     });
     // Device clock two minutes behind the server.
     expect(workedMs(open("2026-09-29T06:02:00Z"), new Date("2026-09-29T06:00:00Z"))).toBe(
@@ -59,8 +69,55 @@ describe("home", () => {
 
   it("fills the timeline slots between check-in and now", () => {
     // 10 slots of one hour from 08.00 to 18.00.
-    const slots = timelineSlots(at(8, 52), at(12, 10), 10);
+    const slots = timelineSlots([{ start: at(8, 52), end: at(12, 10) }], 10);
     expect(slots).toEqual([true, true, true, true, true, false, false, false, false, false]);
+  });
+
+  it("reports the session and the day total after check-out", () => {
+    expect(
+      checkOutMessage({
+        id: "s",
+        checked_out_at: "",
+        effective_hours: 1.5,
+        total_hours_today: 4.25,
+      }),
+    ).toBe("Sesi ini 1j 30m · total hari ini 4j 15m.");
+    // An API deployed behind the web sends no total.
+    const olderApi = { id: "s", checked_out_at: "", effective_hours: 0.25 } as CheckOutOut;
+    expect(checkOutMessage(olderApi)).toBe("Sesi ini 15m.");
+  });
+
+  it("turns today's sessions into timeline spans, the open one running until now", () => {
+    const today: TodayOut = {
+      state: "checked_in",
+      session: session(at(13).toISOString(), null),
+      pending_reverification: null,
+      is_remote: false,
+      closed_hours_today: 1,
+      sessions_today: [
+        { checked_in_at: at(8).toISOString(), checked_out_at: at(9).toISOString() },
+        { checked_in_at: at(13).toISOString(), checked_out_at: null },
+      ],
+    };
+    expect(todaySpans(today, at(14))).toEqual([
+      { start: at(8), end: at(9) },
+      { start: at(13), end: at(14) },
+    ]);
+    // An API deployed behind the web sends no sessions_today: the latest session stands in.
+    const { sessions_today: _, ...olderApi } = today;
+    expect(todaySpans(olderApi as TodayOut, at(14))).toEqual([{ start: at(13), end: at(14) }]);
+    expect(todaySpans({ ...olderApi, session: null } as TodayOut, at(14))).toEqual([]);
+  });
+
+  it("fills the timeline for every session today, leaving the gaps empty", () => {
+    const slots = timelineSlots(
+      [
+        { start: at(8), end: at(9) },
+        { start: at(13, 30), end: at(15) },
+      ],
+      10,
+    );
+    expect(slots).toEqual([true, false, false, false, false, true, true, false, false, false]);
   });
 
   it("scales the week to the target and colours late and leave days", () => {

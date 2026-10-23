@@ -62,6 +62,13 @@ class SessionOut(BaseModel):
     summary: str | None
 
 
+class SessionSpanOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    checked_in_at: datetime
+    checked_out_at: datetime | None
+
+
 class PendingOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -80,6 +87,7 @@ class TodayOut(BaseModel):
     is_remote: bool
     # Sessions already checked out today, so the client can add the open one live.
     closed_hours_today: float
+    sessions_today: list[SessionSpanOut]
 
 
 class WeekDayOut(BaseModel):
@@ -123,6 +131,8 @@ class CheckOutOut(BaseModel):
     id: uuid.UUID
     checked_out_at: datetime
     effective_hours: float
+    # The check-in day's other sessions plus this one in full.
+    total_hours_today: float
 
 
 class LocationEventOut(BaseModel):

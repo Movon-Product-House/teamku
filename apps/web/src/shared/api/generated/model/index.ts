@@ -96,6 +96,7 @@ export * from './reset-preview-in';
 export * from './reset-preview-out';
 export * from './reverify-in';
 export * from './session-out';
+export * from './session-span-out';
 export * from './signup-in';
 export * from './skipped-event-out';
 export * from './skipped-out';

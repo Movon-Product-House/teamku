@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { checkOutMessage } from "@/features/home/home";
 import {
   checkIn,
   checkOut,
@@ -280,11 +281,7 @@ export default function Today() {
         longitude: position.coords.longitude,
         accuracy_meters: position.coords.accuracy,
       });
-      notify(
-        "success",
-        "Check-out berhasil",
-        `Durasi kerja efektif ${result.effective_hours} jam.`,
-      );
+      notify("success", "Check-out berhasil", checkOutMessage(result));
       await load().then(syncShell);
     } catch (reason) {
       notify(

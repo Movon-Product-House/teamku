@@ -2674,13 +2674,18 @@
           "effective_hours": {
             "type": "number",
             "title": "Effective Hours"
+          },
+          "total_hours_today": {
+            "type": "number",
+            "title": "Total Hours Today"
           }
         },
         "type": "object",
         "required": [
           "id",
           "checked_out_at",
-          "effective_hours"
+          "effective_hours",
+          "total_hours_today"
         ],
         "title": "CheckOutOut"
       },
@@ -5128,6 +5133,33 @@
         ],
         "title": "SessionOut"
       },
+      "SessionSpanOut": {
+        "properties": {
+          "checked_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked In At"
+          },
+          "checked_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked Out At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checked_in_at",
+          "checked_out_at"
+        ],
+        "title": "SessionSpanOut"
+      },
       "SignupIn": {
         "properties": {
           "company_name": {
@@ -5430,6 +5462,13 @@
           "closed_hours_today": {
             "type": "number",
             "title": "Closed Hours Today"
+          },
+          "sessions_today": {
+            "items": {
+              "$ref": "#/components/schemas/SessionSpanOut"
+            },
+            "type": "array",
+            "title": "Sessions Today"
           }
         },
         "type": "object",
@@ -5438,7 +5477,8 @@
           "session",
           "pending_reverification",
           "is_remote",
-          "closed_hours_today"
+          "closed_hours_today",
+          "sessions_today"
         ],
         "title": "TodayOut"
       },

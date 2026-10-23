@@ -7,7 +7,7 @@ import type { MeOut, TodayOut } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { formatDuration, timelineSlots, workedMs } from "../home";
+import { formatDuration, type Span, timelineSlots, todaySpans, workedMs } from "../home";
 
 export const ATTENDANCE_HREF = "/app/attendance/today";
 const clock = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
@@ -58,7 +58,7 @@ export function TodayCard({ today, user }: { today: TodayOut; user: MeOut["user"
         )}
       </div>
 
-      <Timeline start={start} end={end} />
+      <Timeline spans={todaySpans(today, now)} />
 
       <ul className="flex flex-wrap gap-x-6 gap-y-2 border-border border-t pt-4 text-caption text-muted-foreground max-lg:hidden">
         <li className="flex items-center gap-2">
@@ -128,12 +128,12 @@ function NotCheckedIn({ today, user }: { today: TodayOut; user: MeOut["user"] })
   );
 }
 
-function Timeline({ start, end }: { start: Date; end: Date }) {
-  const slots = timelineSlots(start, end);
+function Timeline({ spans }: { spans: Span[] }) {
+  const slots = timelineSlots(spans);
   return (
     <figure className="flex flex-col gap-2 max-lg:hidden">
       <figcaption className="text-caption text-faint-foreground">
-        Sesi terakhir, 08.00 sampai 18.00
+        Semua sesi hari ini, 08.00 sampai 18.00
       </figcaption>
       <div className="flex h-12 items-end gap-0.5">
         {slots.map((filled, index) => (
