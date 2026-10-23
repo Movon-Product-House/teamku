@@ -2,10 +2,11 @@
 
 import { Inbox, LogIn, LogOut, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
-import { useGetAttendanceToday, useGetDashboard, useListApprovals } from "@/shared/api/generated";
-import type { DashboardOut, MeOut, TodayOut } from "@/shared/api/generated/model";
+import { useGetAttendanceToday, useGetDashboard } from "@/shared/api/generated";
+import type { ApprovalOut, DashboardOut, MeOut, TodayOut } from "@/shared/api/generated/model";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { usePendingLeave } from "../api";
 import { formatDuration, greeting, workedMs } from "../home";
 import {
   APPROVALS_HREF,
@@ -14,7 +15,6 @@ import {
   isoDay,
   PEOPLE_HREF,
   pendingBanner,
-  pendingLeave,
 } from "../manager-home";
 import { Loaded } from "./loaded";
 import { ManagerActions } from "./manager-actions";
@@ -26,15 +26,15 @@ const longDate = new Intl.DateTimeFormat("id-ID", {
   weekday: "long",
   day: "numeric",
   month: "long",
+  timeZone: "Asia/Jakarta",
 });
 
 /** M1: Beranda for a Manager. */
 export function ManagerHomePage({ user }: { user: MeOut["user"] }) {
   const dashboard = useGetDashboard();
-  const approvals = useListApprovals({ query: { select: (data) => pendingLeave(data.items) } });
+  const approvals = usePendingLeave(user.id);
   const today = useGetAttendanceToday();
   const now = new Date();
-  const banner = pendingBanner(approvals.data ?? []);
 
   return (
     <div data-surface="v2" className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-5 lg:gap-6">
@@ -64,17 +64,9 @@ export function ManagerHomePage({ user }: { user: MeOut["user"] }) {
         </div>
       </header>
 
-      {banner && (
-        <div className="flex flex-wrap items-center gap-3.5 rounded-tile bg-card px-5 py-4">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-control bg-brand">
-            <Inbox className="size-4 text-primary-foreground" aria-hidden />
-          </span>
-          <p className="min-w-0 flex-1 basis-60 text-body">{banner}</p>
-          <Button asChild size="sm">
-            <Link href={APPROVALS_HREF}>Tinjau sekarang</Link>
-          </Button>
-        </div>
-      )}
+      <Loaded query={approvals} label="Cuti menunggu" className="min-h-16 rounded-tile">
+        {(pending) => <PendingBanner pending={pending} />}
+      </Loaded>
 
       <Loaded query={dashboard} label="Ringkasan tim" className="min-h-96">
         {(data) => (
@@ -93,6 +85,22 @@ export function ManagerHomePage({ user }: { user: MeOut["user"] }) {
           </>
         )}
       </Loaded>
+    </div>
+  );
+}
+
+function PendingBanner({ pending }: { pending: ApprovalOut[] }) {
+  const banner = pendingBanner(pending);
+  if (!banner) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-3.5 rounded-tile bg-card px-5 py-4">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-control bg-brand">
+        <Inbox className="size-4 text-primary-foreground" aria-hidden />
+      </span>
+      <p className="min-w-0 flex-1 basis-60 text-body">{banner}</p>
+      <Button asChild size="sm">
+        <Link href={APPROVALS_HREF}>Tinjau sekarang</Link>
+      </Button>
     </div>
   );
 }
@@ -174,10 +182,10 @@ function TeamLeaveCard({ dashboard }: { dashboard: DashboardOut }) {
         <ul className="flex flex-col gap-2.5">
           {dashboard.team_leave.map((item) => (
             <li
-              key={`${item.employee_id}-${item.start_date}`}
+              key={`${item.employee_id}-${item.start_date}-${item.status}`}
               className="flex justify-between gap-3"
             >
-              <span className="truncate font-semibold text-sm">{item.employee}</span>
+              <span className="truncate text-body">{item.employee}</span>
               <span className="shrink-0 text-caption text-faint-foreground">
                 {dateRange(item.start_date, item.end_date)}
                 {item.status === "pending" && " · menunggu"}

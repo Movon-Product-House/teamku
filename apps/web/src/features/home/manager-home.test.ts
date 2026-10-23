@@ -40,23 +40,34 @@ const flag = (
   at,
 });
 const request = (employee_name: string, start: string, end: string, status = "pending") =>
-  ({ employee_name, start, end, status }) as ApprovalOut;
-const local = (hour: number, minute: number) => new Date(2026, 8, 29, hour, minute).toISOString();
+  ({ employee_id: employee_name.toLowerCase(), employee_name, start, end, status }) as ApprovalOut;
+const pad = (value: number) => String(value).padStart(2, "0");
+// API moments are WIB whatever zone the browser runs in.
+const wib = (hour: number, minute: number, day = 29) =>
+  `2026-09-${day}T${pad(hour)}:${pad(minute)}:00+07:00`;
+const SELF = "budi hartono";
 
 describe("manager home", () => {
   it("writes leave ranges compactly", () => {
     expect(dateRange("2026-10-06", "2026-10-08")).toBe("6–8 Okt");
     expect(dateRange("2026-09-30", "2026-10-02")).toBe("30 Sep–2 Okt");
     expect(dateRange("2026-10-06", "2026-10-06")).toBe("6 Okt");
-    expect(isoDay(new Date(2026, 8, 9, 23, 30))).toBe("2026-09-09");
+    expect(isoDay(new Date("2026-09-09T23:30:00+07:00"))).toBe("2026-09-09");
+    // 01.30 WIB is already the next day, even where the browser clock still says the 9th.
+    expect(isoDay(new Date("2026-09-09T18:30:00Z"))).toBe("2026-09-10");
   });
 
   it("names the earliest pending request in the banner, nothing when none wait", () => {
-    const pending = pendingLeave([
-      request("Andi Pratama", "2026-10-20", "2026-10-20"),
-      request("Sari Wulan", "2026-10-01", "2026-10-02", "approved"),
-      request("Rina Sari", "2026-10-06", "2026-10-08"),
-    ]);
+    const pending = pendingLeave(
+      [
+        request("Andi Pratama", "2026-10-20", "2026-10-20"),
+        request("Sari Wulan", "2026-10-01", "2026-10-02", "approved"),
+        request("Rina Sari", "2026-10-06", "2026-10-08"),
+        // The manager's own request goes to HR, never to their own queue.
+        request("Budi Hartono", "2026-10-02", "2026-10-02"),
+      ],
+      SELF,
+    );
     expect(pending.map((item) => item.employee_name)).toEqual(["Rina Sari", "Andi Pratama"]);
     expect(pendingBanner(pending)).toBe(
       "2 permohonan cuti menunggu keputusanmu. Paling awal: Rina Sari, 6–8 Okt.",
@@ -73,13 +84,14 @@ describe("manager home", () => {
     ]);
   });
 
-  it("lists late members, then missing check-ins, then leave that has started", () => {
+  it("lists late members, missing check-ins, open sessions, then leave that has started", () => {
     const rows = watchList(
       dashboard({
         attention: [
+          flag("Fajar Hidayat", "open_session", wib(22, 0, 27)),
           flag("Dewi Lestari", "not_checked_in"),
-          flag("Andi Pratama", "late", local(9, 21)),
-          flag("Joko Santoso", "missed_reverify", local(12, 45)),
+          flag("Andi Pratama", "late", wib(9, 21)),
+          flag("Joko Santoso", "missed_reverify", wib(12, 45)),
         ],
         team_leave: [
           {
@@ -105,6 +117,7 @@ describe("manager home", () => {
     expect(rows.map((row) => [row.name, row.status, row.detail])).toEqual([
       ["Andi Pratama", "Terlambat", "09.21"],
       ["Dewi Lestari", "Belum check-in", "—"],
+      ["Fajar Hidayat", "Sesi terbuka", "sejak 27 Sep"],
       ["Sari Wulan", "Cuti", "s.d. 30 Sep"],
     ]);
   });
@@ -117,27 +130,32 @@ describe("manager home", () => {
             employee_id: "andi",
             employee: "Andi Pratama",
             department: "Sales",
-            checked_in_at: local(9, 21),
+            checked_in_at: wib(9, 21),
             checked_out_at: null,
             anomaly: "outside_geofence",
           },
         ],
         attention: [
-          flag("Joko Santoso", "missed_reverify", local(12, 45)),
+          flag("Joko Santoso", "missed_reverify", wib(12, 45)),
+          flag("Fajar Hidayat", "open_session", wib(22, 0, 28)),
           flag("Dewi Lestari", "not_checked_in"),
         ],
       }),
-      pendingLeave([
-        request("Rina Sari", "2026-10-06", "2026-10-08"),
-        request("Andi Pratama", "2026-10-20", "2026-10-20"),
-        request("Dewi Lestari", "2026-10-21", "2026-10-22"),
-        request("Maya Kusuma", "2026-10-23", "2026-10-23"),
-      ]),
+      pendingLeave(
+        [
+          request("Rina Sari", "2026-10-06", "2026-10-08"),
+          request("Andi Pratama", "2026-10-20", "2026-10-20"),
+          request("Dewi Lestari", "2026-10-21", "2026-10-22"),
+          request("Maya Kusuma", "2026-10-23", "2026-10-23"),
+        ],
+        SELF,
+      ),
     );
     expect(items.map((item) => [item.title, item.detail, item.href])).toEqual([
       ["4 cuti menunggu", "Rina, Andi, Dewi +1 · paling awal 6 Okt", "/app/approvals"],
       ["Lokasi di luar radius", "Andi Pratama · check-in 09.21", "/app/people/andi"],
       ["Re-verifikasi terlewat", "Joko Santoso · terlewat 12.45", "/app/people/joko santoso"],
+      ["Sesi belum ditutup", "Fajar Hidayat · check-in 28 Sep 22.00", "/app/people/fajar hidayat"],
       ["Belum check-in", "Dewi Lestari · shift mulai 09.00", "/app/people/dewi lestari"],
     ]);
   });

@@ -80,14 +80,14 @@ export function TeamAttendanceCard({
                 className="flex items-center gap-3 py-3 outline-none hover:bg-secondary/60 focus-visible:outline-2 focus-visible:outline-ring"
               >
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary font-bold text-caption text-muted-foreground"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-caption text-muted-foreground"
                   aria-hidden
                 >
                   {initials(row.name)}
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-semibold text-sm">{row.name}</span>
-                  <span className="truncate text-faint-foreground text-xs">{row.title}</span>
+                  <span className="truncate text-body">{row.name}</span>
+                  <span className="truncate text-caption text-faint-foreground">{row.title}</span>
                 </span>
                 <Badge tone={row.tone} variant="plain" className="w-32 max-sm:w-auto">
                   {row.status}

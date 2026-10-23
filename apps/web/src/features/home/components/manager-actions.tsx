@@ -1,4 +1,4 @@
-import { Inbox, type LucideIcon, MapPinOff, ScanFace, UserX } from "lucide-react";
+import { Inbox, type LucideIcon, MapPinOff, ScanFace, TimerOff, UserX } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/shared/lib/cn";
 import type { ActionItem } from "../manager-home";
@@ -7,6 +7,7 @@ const icons: Record<ActionItem["kind"], { icon: LucideIcon; tone: string }> = {
   leave: { icon: Inbox, tone: "text-brand" },
   outside_geofence: { icon: MapPinOff, tone: "text-warning" },
   missed_reverify: { icon: ScanFace, tone: "text-warning" },
+  open_session: { icon: TimerOff, tone: "text-warning" },
   not_checked_in: { icon: UserX, tone: "text-faint-foreground" },
 };
 
@@ -36,10 +37,10 @@ export function ManagerActions({ items }: { items: ActionItem[] }) {
                     <Icon className={cn("size-4.5", tone)} aria-hidden />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="font-semibold text-sm">{item.title}</span>
-                    <span className="text-faint-foreground text-xs">{item.detail}</span>
+                    <span className="text-body">{item.title}</span>
+                    <span className="text-caption text-faint-foreground">{item.detail}</span>
                   </span>
-                  <span className="shrink-0 font-semibold text-caption">{item.cta}</span>
+                  <span className="shrink-0 text-caption">{item.cta}</span>
                 </Link>
               </li>
             );

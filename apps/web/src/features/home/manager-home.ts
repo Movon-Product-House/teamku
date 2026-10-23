@@ -1,6 +1,18 @@
 import type { ApprovalOut, DashboardOut } from "@/shared/api/generated/model";
 
-const clock = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
+// Moments from the API read in WIB, the zone the API decides "today" and "late" in.
+const WIB = "Asia/Jakarta";
+const clock = new Intl.DateTimeFormat("id-ID", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: WIB,
+});
+const wibDayMonth = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "short",
+  timeZone: WIB,
+});
+const wibIsoDay = new Intl.DateTimeFormat("en-CA", { timeZone: WIB });
 const dayMonth = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short" });
 const day = new Intl.DateTimeFormat("id-ID", { day: "numeric" });
 const asDate = (iso: string) => new Date(`${iso}T00:00:00`);
@@ -17,16 +29,15 @@ export function dateRange(start: string, end: string): string {
   return `${dayMonth.format(from)}–${dayMonth.format(to)}`;
 }
 
-/** Local "YYYY-MM-DD" of `now`, comparable with the API's leave dates. */
+/** WIB "YYYY-MM-DD" of `now`, comparable with the API's leave dates. */
 export function isoDay(now: Date): string {
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  return wibIsoDay.format(now);
 }
 
-/** Pending leave requests, earliest start first. */
-export function pendingLeave(items: ApprovalOut[]): ApprovalOut[] {
+/** Pending leave the manager decides, earliest start first; their own goes to HR. */
+export function pendingLeave(items: ApprovalOut[], selfId: string): ApprovalOut[] {
   return items
-    .filter((item) => item.status === "pending")
+    .filter((item) => item.status === "pending" && item.employee_id !== selfId)
     .sort((a, b) => a.start.localeCompare(b.start));
 }
 
@@ -39,7 +50,7 @@ export function pendingBanner(pending: ApprovalOut[]): string | null {
 export type Tone = "success" | "warning" | "info" | "neutral";
 export type Segment = { label: string; count: number; tone: Tone };
 
-/** The composition bar under "N / M hadir": on time, late, on leave, not checked in. */
+/** The composition bar under "N / M hadir": on time, late, on leave, not checked in (open sessions too). */
 export function composition(dashboard: DashboardOut): Segment[] {
   return [
     { label: "Tepat waktu", count: dashboard.present - dashboard.late, tone: "success" },
@@ -53,14 +64,14 @@ export type WatchRow = {
   employeeId: string;
   name: string;
   title: string;
-  status: "Terlambat" | "Belum check-in" | "Cuti";
+  status: "Terlambat" | "Belum check-in" | "Sesi terbuka" | "Cuti";
   tone: Tone;
   detail: string;
 };
 
-/** Members worth a look today: late, not checked in yet, then on leave. */
+/** Members worth a look today: late, not checked in yet, a session left open, then on leave. */
 export function watchList(dashboard: DashboardOut, today: string): WatchRow[] {
-  const flagged = (kind: "late" | "not_checked_in") =>
+  const flagged = (kind: "late" | "not_checked_in" | "open_session") =>
     dashboard.attention.filter((item) => item.kind === kind);
   return [
     ...flagged("late").map((item) => ({
@@ -79,6 +90,14 @@ export function watchList(dashboard: DashboardOut, today: string): WatchRow[] {
       tone: "neutral" as const,
       detail: "—",
     })),
+    ...flagged("open_session").map((item) => ({
+      employeeId: item.employee_id,
+      name: item.employee,
+      title: item.title,
+      status: "Sesi terbuka" as const,
+      tone: "warning" as const,
+      detail: item.at ? `sejak ${wibDayMonth.format(new Date(item.at))}` : "—",
+    })),
     ...dashboard.team_leave
       .filter((item) => item.status === "approved" && item.start_date <= today)
       .map((item) => ({
@@ -94,7 +113,7 @@ export function watchList(dashboard: DashboardOut, today: string): WatchRow[] {
 
 export type ActionItem = {
   key: string;
-  kind: "leave" | "outside_geofence" | "missed_reverify" | "not_checked_in";
+  kind: "leave" | "outside_geofence" | "missed_reverify" | "open_session" | "not_checked_in";
   title: string;
   detail: string;
   href: string;
@@ -135,6 +154,18 @@ export function actionItems(dashboard: DashboardOut, pending: ApprovalOut[]): Ac
       title: "Re-verifikasi terlewat",
       detail: item.at
         ? `${item.employee} · terlewat ${clock.format(new Date(item.at))}`
+        : item.employee,
+      href: `${PEOPLE_HREF}/${item.employee_id}`,
+      cta: "Lihat",
+    });
+  // It blocks the next check-in, so the manager follows it up per person.
+  for (const item of dashboard.attention.filter((entry) => entry.kind === "open_session"))
+    items.push({
+      key: `open-${item.employee_id}`,
+      kind: "open_session",
+      title: "Sesi belum ditutup",
+      detail: item.at
+        ? `${item.employee} · check-in ${wibDayMonth.format(new Date(item.at))} ${clock.format(new Date(item.at))}`
         : item.employee,
       href: `${PEOPLE_HREF}/${item.employee_id}`,
       cta: "Lihat",
