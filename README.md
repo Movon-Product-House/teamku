@@ -79,6 +79,8 @@ Semua state API (termasuk sesi, lockout login, dan state OAuth) ada di
 PostgreSQL, jadi API tidak lagi terikat ke satu proses. Job terjadwal dan
 operasional lainnya ada di [docs/runbook.md](docs/runbook.md).
 
+Langkah deploy Dokploy, ID app, dan rollback ada di
+[docs/plans/2026-10-22-001-deploy-web-to-dokploy-plan.md](docs/plans/2026-10-22-001-deploy-web-to-dokploy-plan.md).
 Riwayat deploy Vercel sebelumnya:
 [docs/plans/2026-09-12-001-migrate-web-to-vercel-plan.md](docs/plans/2026-09-12-001-migrate-web-to-vercel-plan.md).
 
