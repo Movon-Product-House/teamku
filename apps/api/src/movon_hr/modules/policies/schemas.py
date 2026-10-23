@@ -1,26 +1,29 @@
 import uuid
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from movon_hr.modules.policies.models import PolicyLanguage, PolicyState
 
-class PolicySectionInput(BaseModel):
+
+class PolicySectionIn(BaseModel):
     # Kept only when it is the id of an existing section of the same policy.
     id: str | None = Field(default=None, max_length=80)
     heading: str = Field(min_length=1, max_length=160)
     body: str = Field(min_length=1, max_length=10_000)
 
 
-class PolicyInput(BaseModel):
+class PolicyIn(BaseModel):
     title: str = Field(min_length=2, max_length=160)
     category: str = Field(default="general", min_length=2, max_length=80)
-    language: str = Field(default="id", pattern="^(id|en)$")
+    language: PolicyLanguage = "id"
     effective_date: date
     expiry_date: date | None = None
-    sections: list[PolicySectionInput] = Field(min_length=1, max_length=50)
+    sections: list[PolicySectionIn] = Field(min_length=1, max_length=50)
 
 
-class PolicyQuestion(BaseModel):
+class PolicyQuestionIn(BaseModel):
     question: str = Field(min_length=3, max_length=800)
 
 
@@ -39,10 +42,10 @@ class PolicyOut(BaseModel):
     id: uuid.UUID
     title: str
     category: str
-    language: str
+    language: PolicyLanguage
     effective_date: date
     expiry_date: date | None
-    state: str
+    state: PolicyState
     sections: list[PolicySectionOut]
     created_at: datetime
     updated_at: datetime
@@ -50,11 +53,11 @@ class PolicyOut(BaseModel):
     updated_by: uuid.UUID
 
 
-class PolicyList(BaseModel):
+class PolicyListOut(BaseModel):
     items: list[PolicyOut]
 
 
-class Citation(BaseModel):
+class CitationOut(BaseModel):
     policy_id: uuid.UUID
     policy_title: str
     section_id: uuid.UUID
@@ -64,20 +67,26 @@ class Citation(BaseModel):
     score: int
 
 
-class PersonalFact(BaseModel):
-    type: str
+# The assistant (core/policy_assistant.py) maps provider output onto these closed sets.
+type PolicyFactType = Literal["leave_balance"]
+type PolicyActionType = Literal["contact_hr", "open_leave_request"]
+type PolicyAnswerConfidence = Literal["supported", "partially_supported", "insufficient_evidence"]
+
+
+class PersonalFactOut(BaseModel):
+    type: PolicyFactType
     label: str
     value: int
 
 
-class SuggestedAction(BaseModel):
-    type: str
+class SuggestedActionOut(BaseModel):
+    type: PolicyActionType
     href: str
 
 
 class AnswerOut(BaseModel):
     answer: str
-    confidence: str
-    citations: list[Citation]
-    personal_facts: list[PersonalFact]
-    suggested_action: SuggestedAction
+    confidence: PolicyAnswerConfidence
+    citations: list[CitationOut]
+    personal_facts: list[PersonalFactOut]
+    suggested_action: SuggestedActionOut

@@ -62,6 +62,7 @@ async def test_temporary_password_only_without_password(client, login_headers) -
         json=NEW | {"work_location_id": "office-default"},
     )
     assert generated.status_code == 200
+    assert generated.json()["result"] == "temporary_password"
     assert generated.json()["temporary_password"]
     # An unknown location id is not validated on create; the primary location is shown.
     assert generated.json()["work_location"]["name"] == "Jakarta HQ"
@@ -72,6 +73,7 @@ async def test_temporary_password_only_without_password(client, login_headers) -
         json=NEW | {"email": "nadia2@movon.test", "password": "Rahasia123", "work_location_id": ""},
     )
     assert chosen.status_code == 200
+    assert chosen.json()["result"] == "password_set"
     assert "temporary_password" not in chosen.json()
     assert chosen.json()["work_location_id"] is None
 

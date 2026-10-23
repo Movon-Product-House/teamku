@@ -16,6 +16,7 @@ Semua dijalankan dari `apps/api`. Postgres lokal: `docker compose -f ../../infra
 | `uv run python -m movon_hr.jobs attendance-alerts` | Job alert presensi (di prod tiap 5 menit) |
 | `uv run python -m movon_hr.jobs cleanup` | Job pembersihan harian |
 | `uv run alembic revision --autogenerate -m "<domain>_<perubahan>"` | Revisi migrasi baru dari model |
+| `uv run python -m movon_hr.openapi` | Tulis ulang `openapi.json` (kontrak sumber client web). Wajib setelah mengubah route atau schema; `tests/test_openapi.py` gagal kalau basi |
 | `scripts/check.sh` | Gerbang yang sama dengan CI: ruff check, ruff format --check, pyrefly, lint-imports, pytest |
 
 Jalankan `scripts/check.sh` sebelum push. Tes butuh database kosong terpisah: sekali saja jalankan `docker compose -f ../../infra/compose/docker-compose.yml exec postgres createdb -U movon movon_test`, atau arahkan `MOVON_TEST_DATABASE_URL` ke DB lain. CI (`.github/workflows/api.yml`) menjalankan `check.sh` ditambah `alembic upgrade head`, `alembic check`, dan cek satu head.
@@ -83,6 +84,20 @@ Contoh terkecil: `modules/audit/`.
 ### HTTP
 1. Setiap endpoint JSON punya schema respons lewat return annotation (`-> EmployeeOut`). `response_model=` hanya kalau handler me-return objek lain.
 2. Cek peran lewat dependency `require_role(...)` dari `core.auth`.
+3. Nama schema mengikuti arah data: body request `XIn` (`LeaveIn`, `EmployeeUpdateIn`), respons dan semua bagiannya `XOut` (`LeaveOut`, `LeaveListOut`, `CitationOut`). Enum tidak bersufiks dan selalu `<Resource><Atribut>`: `type EmployeeRole = Literal[...]` di `models.py` (lihat `one_of` di `core/db.py`), bukan `Role`. Nama ini menjadi nama type di client web.
+4. Nama fungsi handler = operationId = nama fungsi/hook di client web, jadi diturunkan dari method + path, dengan nama resource lengkap (`payroll_run`, bukan `run`):
+
+   | Endpoint | Nama | Contoh |
+   |---|---|---|
+   | `GET` koleksi | `list_<jamak>` | `list_approvals` |
+   | `GET` satu item / singleton | `get_<tunggal>` | `get_me`, `get_dashboard` |
+   | `POST` koleksi yang menyimpan resource baru | `create_<tunggal>` | `create_leave_request` |
+   | `PUT`/`PATCH` | `update_<tunggal>` | `update_office` |
+   | `POST` aksi lain (dengan atau tanpa segmen aksi di path) | `<aksi>_<resource>` | `publish_payroll_run`, `decide_approval`, `read_all_notifications`, `ask_policy_question` |
+   | `POST /auth/…`, `POST /attendance/…` (modul bukan nama resource) | `<aksi>` | `login`, `check_in` |
+
+   `tests/test_openapi.py` menjaga awalan: GET wajib `list_`/`get_`, PUT/PATCH wajib `update_`, dan `create_` hanya untuk POST. Nama aksi POST dijaga review.
+5. Union respons diberi field `result: Literal[...]` per varian dan `Field(discriminator="result")`.
 
 ### Bahasa
 Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan commit dalam bahasa Inggris. Teks untuk pengguna (pesan error API) dalam bahasa Indonesia. Dokumen tim di `docs/` dalam bahasa Indonesia.
@@ -92,8 +107,8 @@ Kode, komentar, konfigurasi (termasuk nama kontrak import-linter), dan pesan com
 1. Buat `src/movon_hr/modules/<domain>/` dengan `__init__.py`, `models.py`, `schemas.py`, `service.py`, `router.py`. Tabel tenant memakai `Base` dari `core.db` dan mixin `TenantScoped`; PK `uuid` dengan `server_default=text("uuidv7()")`.
 2. Import `models.py` baru di `alembic/env.py`, supaya tabelnya masuk `Base.metadata`.
 3. `uv run alembic upgrade head`, lalu `uv run alembic revision --autogenerate -m "<domain>"`. Review hasilnya (`uuidv7()`, index parsial, nama constraint), lalu `uv run alembic upgrade head && uv run alembic check`.
-4. Daftarkan router di `main.py` dengan `prefix="/api/v1"`.
-5. Tambah tes di `tests/`, lalu `scripts/check.sh`.
+4. `router = APIRouter(tags=["<domain>"])` tanpa `prefix`: tulis path lengkap di setiap route (`@router.get("/payroll/runs")`), karena satu modul bisa melayani lebih dari satu akar path. Tambahkan router ke daftar di `main.py`, yang memasang `/api/v1` dan respons `4XX`.
+5. Tambah tes di `tests/`, `uv run python -m movon_hr.openapi`, lalu `scripts/check.sh`.
 
 ## Tes
 

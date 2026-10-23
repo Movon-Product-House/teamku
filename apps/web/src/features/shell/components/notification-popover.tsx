@@ -2,9 +2,10 @@
 
 import { Bell } from "lucide-react";
 import { useState } from "react";
+import { useReadAllNotifications } from "@/shared/api/generated";
 import { Button } from "@/shared/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { useMarkAllRead, useNotifications } from "../api";
+import { usePolledNotifications } from "../api";
 import { NotificationRow, NotificationStates } from "./notification-item";
 
 export function unreadLabel(unread: number): string {
@@ -14,8 +15,8 @@ export function unreadLabel(unread: number): string {
 /** D6: sidebar bell with an unread dot, opening the notification panel. */
 export function NotificationPopover() {
   const [open, setOpen] = useState(false);
-  const notifications = useNotifications();
-  const markAllRead = useMarkAllRead();
+  const notifications = usePolledNotifications();
+  const markAllRead = useReadAllNotifications();
   const unread = notifications.data?.unread ?? 0;
 
   return (

@@ -1,4 +1,4 @@
-import type { Today, Week } from "./types";
+import type { TodayOut, WeekOut } from "@/shared/api/generated/model";
 
 export function greeting(now: Date): string {
   const hour = now.getHours();
@@ -13,7 +13,7 @@ const DAY_MS = 24 * HOUR_MS;
 const WIB_OFFSET_MS = 7 * HOUR_MS; // Asia/Jakarta has no DST.
 
 /** Every session today counts: the closed ones plus the open one, capped like the API's worked_hours. */
-export function workedMs(today: Today, now: Date): number {
+export function workedMs(today: TodayOut, now: Date): number {
   const closed = (today.closed_hours_today ?? 0) * HOUR_MS;
   if (today.state !== "checked_in" || !today.session) return closed;
   const start = new Date(today.session.checked_in_at).getTime();
@@ -51,7 +51,7 @@ export type WeekBar = {
   tone: "actual" | "late" | "leave";
 };
 
-export function weekBars(week: Week): WeekBar[] {
+export function weekBars(week: WeekOut): WeekBar[] {
   const scale = Math.max(week.target_hours * 1.25, ...week.days.map((day) => day.hours));
   const target = (week.target_hours / scale) * 100;
   return week.days.map((day, index) => ({

@@ -3,11 +3,11 @@
 import { CircleAlert, Clock, Inbox, Mail, Send, ShieldCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useForgotPassword } from "@/shared/api/generated";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldLabel } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
-import { useForgotPassword } from "../api";
 import { formatCountdown } from "../auth";
 import { useCooldown } from "../use-cooldown";
 import { AuthLayout, BackToLogin } from "./auth-layout";
@@ -22,12 +22,15 @@ export function ForgotPasswordPage() {
   const cooldown = useCooldown(RESEND_SECONDS);
 
   function send(target: string) {
-    forgot.mutate(target.trim(), {
-      onSuccess: () => {
-        setSentTo(target.trim());
-        cooldown.start();
+    forgot.mutate(
+      { data: { email: target.trim() } },
+      {
+        onSuccess: () => {
+          setSentTo(target.trim());
+          cooldown.start();
+        },
       },
-    });
+    );
   }
 
   function submit(event: FormEvent) {

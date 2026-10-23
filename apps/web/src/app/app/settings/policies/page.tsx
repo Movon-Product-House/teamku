@@ -2,17 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { api } from "@/shared/api/client";
+import {
+  archivePolicy,
+  createPolicy,
+  getMe,
+  listPolicies,
+  publishPolicy,
+} from "@/shared/api/generated";
+import type { PolicyIn, PolicyOut } from "@/shared/api/generated/model";
 
-type Policy = {
-  id: string;
-  title: string;
-  category: string;
-  effective_date: string;
-  state: string;
-  updated_at: string;
-};
-const blank = () => ({
+const blank = (): PolicyIn => ({
   title: "",
   category: "general",
   language: "id",
@@ -22,16 +21,16 @@ const blank = () => ({
 
 export default function PolicySettings() {
   const router = useRouter();
-  const [items, setItems] = useState<Policy[]>([]);
+  const [items, setItems] = useState<PolicyOut[]>([]);
   const [form, setForm] = useState(blank());
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const load = () =>
-    api<{ items: Policy[] }>("/policies", {})
+    listPolicies()
       .then((value) => setItems(value.items))
       .catch(() => router.replace("/app/overview"));
   useEffect(() => {
-    api<{ user: { role: string } }>("/me", {}).then((profile) => {
+    getMe().then((profile) => {
       if (profile.user.role !== "hr_admin") router.replace("/app/overview");
       else load();
     });
@@ -39,7 +38,7 @@ export default function PolicySettings() {
   const save = async () => {
     setBusy(true);
     try {
-      await api("/policies", { method: "POST", body: JSON.stringify(form) });
+      await createPolicy(form);
       setForm(blank());
       setMessage("Draft kebijakan disimpan.");
       load();
@@ -51,12 +50,12 @@ export default function PolicySettings() {
   };
   const publish = async (id: string) => {
     if (!confirm("Publikasikan kebijakan ini?")) return;
-    await api(`/policies/${id}/publish`, { method: "POST" });
+    await publishPolicy(id);
     load();
   };
   const archive = async (id: string) => {
     if (!confirm("Batalkan publikasi dan arsipkan kebijakan ini?")) return;
-    await api(`/policies/${id}/archive`, { method: "POST" });
+    await archivePolicy(id);
     load();
   };
   return (

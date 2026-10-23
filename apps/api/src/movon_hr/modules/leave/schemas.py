@@ -4,16 +4,17 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from movon_hr.core.time import working_days
+from movon_hr.modules.leave.models import CalendarSyncStatus, LeaveDecision, LeaveStatus, LeaveType
 
 
-class LeaveInput(BaseModel):
+class LeaveIn(BaseModel):
     start: date
     end: date
     reason: str = Field(min_length=4, max_length=500)
 
 
-class ApprovalInput(BaseModel):
-    decision: str = Field(pattern="^(approved|rejected|revision_requested)$")
+class ApprovalIn(BaseModel):
+    decision: LeaveDecision
     comment: str = Field(min_length=3, max_length=500)
 
 
@@ -27,11 +28,11 @@ class LeaveOut(BaseModel):
     start: date = Field(validation_alias="start_date")
     end: date = Field(validation_alias="end_date")
     reason: str
-    request_type: str
-    status: str
+    request_type: LeaveType
+    status: LeaveStatus
     created_at: datetime
     approver_comment: str | None
-    calendar_sync_status: str
+    calendar_sync_status: CalendarSyncStatus
     employee_calendar_event_id: str | None
     team_calendar_event_id: str | None
 
@@ -48,17 +49,17 @@ class ApprovalOut(LeaveDaysOut):
     department: str
 
 
-class LeaveBalance(BaseModel):
+class LeaveBalanceOut(BaseModel):
     annual_days: int
     used_days: int
     remaining_days: int
 
 
-class LeaveList(BaseModel):
+class LeaveListOut(BaseModel):
     items: list[LeaveDaysOut]
-    balance: LeaveBalance
+    balance: LeaveBalanceOut
 
 
-class ApprovalList(BaseModel):
+class ApprovalListOut(BaseModel):
     items: list[ApprovalOut]
     pending: int

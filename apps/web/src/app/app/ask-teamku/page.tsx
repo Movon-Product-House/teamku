@@ -2,24 +2,10 @@
 
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { api } from "@/shared/api/client";
+import { askPolicyQuestion } from "@/shared/api/generated";
+import type { AnswerOut } from "@/shared/api/generated/model";
 import { Icon } from "@/shared/ui/icon";
 
-type Citation = {
-  policy_id: string;
-  policy_title: string;
-  section_id: string;
-  section_heading: string;
-  effective_date: string;
-  excerpt: string;
-};
-type Answer = {
-  answer: string;
-  confidence: "supported" | "partially_supported" | "insufficient_evidence";
-  citations: Citation[];
-  personal_facts: { label: string; value: string | number }[];
-  suggested_action: { type: string; href: string };
-};
 const examples = [
   "Apakah saya perlu surat dokter untuk cuti sakit?",
   "How many leave days do I have?",
@@ -58,7 +44,7 @@ const popular = [
 
 export default function AskTeamkuPage() {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState<Answer>();
+  const [answer, setAnswer] = useState<AnswerOut>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const ask = async (event: FormEvent) => {
@@ -67,12 +53,7 @@ export default function AskTeamkuPage() {
     setBusy(true);
     setError("");
     try {
-      setAnswer(
-        await api<Answer>("/policy-assistant/questions", {
-          method: "POST",
-          body: JSON.stringify({ question: question.trim() }),
-        }),
-      );
+      setAnswer(await askPolicyQuestion({ question: question.trim() }));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Jawaban tidak dapat dimuat.");
     } finally {

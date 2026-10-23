@@ -2,10 +2,11 @@ name: web
 
 on:
   pull_request:
-    paths: ["apps/web/**", ".github/workflows/web.yml"]
+    # openapi.json: an API-only change must still prove the web client builds against it.
+    paths: ["apps/web/**", "apps/api/openapi.json", ".github/workflows/web.yml"]
   push:
     branches: [main]
-    paths: ["apps/web/**", ".github/workflows/web.yml"]
+    paths: ["apps/web/**", "apps/api/openapi.json", ".github/workflows/web.yml"]
 
 jobs:
   check:
@@ -22,6 +23,14 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - run: npm run check
+      # `check` regenerates the Orval client; on a clean checkout any change means it was not committed.
+      - name: Generated client matches openapi.json
+        run: |
+          if [ -n "$(git status --porcelain -- src/shared/api/generated)" ]; then
+            git status --short -- src/shared/api/generated
+            echo "::error::src/shared/api/generated is stale: run npm run api:gen in apps/web and commit the result"
+            exit 1
+          fi
       - run: npm run build
         env:
           # Build CI hanya memverifikasi kompilasi; origin asli di-set di Vercel.

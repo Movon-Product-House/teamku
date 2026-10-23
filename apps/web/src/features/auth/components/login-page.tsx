@@ -3,6 +3,7 @@
 import { Building2, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
+import { useLogin } from "@/shared/api/generated";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
@@ -10,7 +11,6 @@ import { Field, FieldLabel } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { Separator } from "@/shared/ui/separator";
-import { useLogin } from "../api";
 import { loginAlert } from "../auth";
 import { useEnterApp } from "../use-enter-app";
 import { AuthLayout } from "./auth-layout";
@@ -28,7 +28,7 @@ export function LoginPage() {
     event.preventDefault();
     const startedAt = Date.now();
     login.mutate(
-      { email, password },
+      { data: { email, password } },
       {
         onSuccess: () => enterApp(startedAt),
       },

@@ -4,12 +4,13 @@ import { CircleAlert } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useAcceptInvite } from "@/shared/api/generated";
+import type { InvitePreviewOut } from "@/shared/api/generated/model";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
-import { useAcceptInvite, useInvitePreview } from "../api";
+import { useInvitePreview } from "../api";
 import { companyInitials, inviteMeta, isDeadLink } from "../auth";
-import type { InvitePreview } from "../types";
 import { useEnterApp } from "../use-enter-app";
 import { AuthChecking, AuthLayout } from "./auth-layout";
 import { DeadLink, PreviewFailed } from "./dead-link";
@@ -47,7 +48,7 @@ export function InvitePage() {
     event.preventDefault();
     const startedAt = Date.now();
     accept.mutate(
-      { token, password: fields.password },
+      { data: { token, password: fields.password } },
       {
         onSuccess: () => enterApp(startedAt),
       },
@@ -85,7 +86,7 @@ export function InvitePage() {
   );
 }
 
-function InviteCard({ invite }: { invite: InvitePreview }) {
+function InviteCard({ invite }: { invite: InvitePreviewOut }) {
   return (
     <div className="flex items-center gap-3.5 rounded-card bg-card p-4">
       <span

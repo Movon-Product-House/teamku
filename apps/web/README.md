@@ -7,15 +7,16 @@ Keputusan arsitekturnya ada di [`docs/adr/0001-web-frontend-architecture.md`](..
 
 | Perintah | Fungsi |
 |---|---|
-| `npm run dev` | Dev server. Request `/api/*` di-proxy ke `MOVON_API_ORIGIN` (default `http://127.0.0.1:8000`) |
-| `npm run check` | Gerbang yang sama dengan CI: `biome ci` + batas panjang file + `tsc` + `vitest` |
+| `npm run dev` | Dev server. Request `/api/v1/*` di-proxy apa adanya ke `MOVON_API_ORIGIN` (default `http://127.0.0.1:8000`) |
+| `npm run check` | Gerbang sebelum push: generate ulang client API + `biome ci` + batas panjang file + `tsc` + `vitest`. File generate yang berubah muncul di `git status` untuk di-commit |
+| `npm run api:gen` | Generate ulang client API (`src/shared/api/generated/`) dari `apps/api/openapi.json` dengan Orval. Jalankan setelah spec API berubah, lalu commit hasilnya |
 | `npm run lint:fix` | Format + organize imports + fix lint yang aman |
 | `npm run lint:size` | Cek batas 600 baris per file |
 | `npm run design:sync` | Salin token `@theme` ke `DESIGN.md` + `shared/lib/text-sizes.ts` |
 | `npm test` | Vitest |
 | `npx shadcn add <nama>` | Menambah komponen shadcn ke `src/shared/ui/` (lihat aturan Komponen) |
 
-Jalankan `npm run check` sebelum push. CI (`.github/workflows/web.yml`) menjalankan perintah yang sama, ditambah `build`.
+Jalankan `npm run check` sebelum push. CI (`.github/workflows/web.yml`) menjalankan perintah yang sama, lalu gagal bila client generate berubah (lupa di-commit), ditambah `build`.
 
 ## Struktur
 
@@ -23,12 +24,13 @@ Jalankan `npm run check` sebelum push. CI (`.github/workflows/web.yml`) menjalan
 src/
   app/                 # Routing saja. page.tsx cukup me-render komponen dari features/
   features/<domain>/   # Satu folder per domain bisnis
-    types.ts           #   Bentuk data API untuk domain ini (satu sumber)
-    api.ts             #   Query key + hook useQuery/useMutation
+    types.ts           #   Label UI per enum (mis. leaveStatusLabels). Bukan bentuk data API
+    api.ts             #   Hook yang menambah perilaku pada hook generate (polling, select). Opsional
     <logic>.ts         #   Logika murni (filter, validasi, kalkulasi) + <logic>.test.ts
-    components/        #   UI. Tidak memanggil api() secara langsung
+    components/        #   UI. Memanggil hook/fungsi dari shared/api/generated
   shared/
-    api/client.ts      # Satu-satunya fetch wrapper (ApiError, timeout, redirect 401)
+    api/client.ts      # Fetch wrapper = mutator Orval (ApiError, timeout, redirect 401)
+    api/generated/     # Hasil Orval: fungsi fetch, hook TanStack Query, model. Jangan diedit
     lib/               # Helper lintas fitur (format tanggal/uang)
     ui/                # Komponen generik: primitive shadcn + komposisi Teamku
   styles/legacy.css    # CSS lama, dibekukan. Jangan ditambah
@@ -42,12 +44,15 @@ src/
 ### Arsitektur
 1. **Arah import:** `app → features → shared`. `shared` tidak boleh import dari `features`. Antar-feature hanya boleh import `types.ts`. Bila butuh lebih dari itu, pindahkan ke `shared`.
 2. **Import pakai alias `@/`**, bukan `../../`. Di dalam feature yang sama boleh relatif (`../api`).
-3. **Server state = TanStack Query.** Jangan memakai `useEffect` + `useState` untuk fetch. Setelah mutasi, invalidate key-nya (`queryClient.invalidateQueries`), jangan load ulang manual.
+3. **Server state = TanStack Query lewat client generate.** Pakai hook dari `@/shared/api/generated` (`useListApprovals`, `useDecideApproval`, …; namanya mengikuti aturan operationId di README API) dan type dari `@/shared/api/generated/model` apa adanya, tanpa alias dan tanpa type tulisan tangan untuk data API. Jangan memakai `useEffect` + `useState` untuk fetch. Perilaku tambahan (polling, `select`, `enabled`) dioper lewat opsi `query` di satu hook pembungkus di `features/<domain>/api.ts`, bukan langsung di komponen: `usePolledNotifications()` = `useListNotifications({ query: { refetchInterval } })`.
+   - **Invalidasi otomatis:** setiap mutation yang sukses meng-invalidate semua query (`MutationCache` di `app/providers.tsx`), jadi tidak perlu `onSuccess` invalidasi atau query key per domain. Query yang tidak boleh ikut (pratinjau token) memakai `meta: { keepOnMutation: true }`. Ini hanya berlaku untuk hook mutation generate (`useDecideApproval`, …): halaman legacy yang memanggil fungsi plain (`createLeaveRequest()`, …) tidak memicunya, jadi cache lain (mis. saldo cuti di Beranda) tetap basi sampai halaman itu dimigrasi.
+   - Panggilan yang tidak boleh memicu invalidasi (logout) memakai fungsi fetch biasa (`logout()`), bukan hook mutation.
+   - API berubah? `npm run api:gen`, lalu biarkan `tsc` menunjukkan pemakaian yang perlu disesuaikan.
 4. **Client state:** `useState` lebih dulu. Zustand hanya untuk state UI yang dipakai lintas komponen yang tidak bersaudara (contoh: `shared/ui/notifications.tsx`). Data dari API jangan disimpan di Zustand.
 5. **Logika bisnis keluar dari komponen** ke fungsi murni di feature, dan diberi test. Komponen hanya merakit.
 6. **Setiap query punya tiga state di UI:** loading, error, kosong. Jangan tampilkan state "kosong" sebelum data selesai dimuat (`isSuccess`).
 7. **Notifikasi:** panggil `notify({...})` dari `@/shared/ui/notifications`. Jangan membuat state `NotificationDialog` lokal.
-8. **Error:** pakai `errorMessage(error, fallback)` dari client. `ApiError.status` tersedia bila perlu membedakan 403/404.
+8. **Error:** pakai `errorMessage(error, fallback)` dari client. `error` di setiap hook ber-type `ApiError<ErrorOut>`: `status` untuk membedakan 403/404, `body.detail` berisi pesan atau daftar error field (422).
 
 ### Komponen & shadcn/ui
 1. **Cek `src/shared/ui/` dulu.** Bila komponennya sudah ada, pakai itu. Jangan membuat versi sendiri dari Button, Dialog, dan sejenisnya.
@@ -75,7 +80,7 @@ Urutan `@layer` di `app/globals.css`: `legacy` < `ui-reset` < `utilities`. Utili
 
 ## Memigrasi satu halaman lama
 
-1. Buat `features/<domain>/{types,api}.ts`, lalu pindahkan type dan panggilan API ke sana sebagai hook.
+1. Ganti `useEffect` + fungsi fetch generate dengan hook generate (`useListLeaveRequests`, …). `features/<domain>/api.ts` hanya bila perlu menambah perilaku (polling, `select`).
 2. Pindahkan logika non-UI ke fungsi murni + test.
 3. Pindahkan JSX ke `features/<domain>/components/<nama>-page.tsx`, lalu jadikan `app/.../page.tsx` re-export. Pakai komponen `shared/ui` untuk tombol, dialog, dan input.
 4. Hapus path halaman itu dari override "legacy" di `biome.json` (dan dari `LEGACY_CAPS` bila ada), lalu perbaiki lint yang muncul.

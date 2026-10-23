@@ -4,10 +4,11 @@ import { CircleAlert } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useResetPassword } from "@/shared/api/generated";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
-import { useResetPassword, useResetPreview } from "../api";
+import { useResetPreview } from "../api";
 import { isDeadLink } from "../auth";
 import { useEnterApp } from "../use-enter-app";
 import { AuthChecking, AuthLayout } from "./auth-layout";
@@ -46,7 +47,7 @@ export function ResetPasswordPage() {
     event.preventDefault();
     const startedAt = Date.now();
     reset.mutate(
-      { token, password: fields.password },
+      { data: { token, password: fields.password } },
       {
         onSuccess: () => enterApp(startedAt),
       },

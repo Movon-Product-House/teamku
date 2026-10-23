@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import { useListApprovals } from "@/shared/api/generated";
+import type { ApprovalOut, LeaveDecision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import { notify } from "@/shared/ui/notifications";
-import { useApprovals } from "../api";
 import { type ApprovalFilter, countApprovals, filterApprovals } from "../approvals";
-import { type ApprovalDecision, type ApprovalRequest, leaveStatusLabels } from "../types";
+import { leaveStatusLabels } from "../types";
 import { DecisionDialog } from "./decision-dialog";
 
 const FILTERS: [ApprovalFilter, string][] = [
@@ -18,11 +19,11 @@ const FILTERS: [ApprovalFilter, string][] = [
 ];
 
 export function ApprovalsPage() {
-  const approvals = useApprovals();
+  const approvals = useListApprovals();
   const [filter, setFilter] = useState<ApprovalFilter>("pending");
   const [selected, setSelected] = useState<{
-    request: ApprovalRequest;
-    decision: ApprovalDecision;
+    approval: ApprovalOut;
+    decision: LeaveDecision;
   } | null>(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function ApprovalsPage() {
       });
   }, [approvals.error]);
 
-  const items = approvals.data ?? [];
+  const items = approvals.data?.items ?? [];
   const visible = filterApprovals(items, filter);
 
   return (
@@ -108,14 +109,14 @@ export function ApprovalsPage() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => setSelected({ request: item, decision: "approved" })}
+                          onClick={() => setSelected({ approval: item, decision: "approved" })}
                         >
                           Setujui
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => setSelected({ request: item, decision: "rejected" })}
+                          onClick={() => setSelected({ approval: item, decision: "rejected" })}
                         >
                           Tolak
                         </Button>
@@ -144,7 +145,7 @@ export function ApprovalsPage() {
       </div>
       {selected && (
         <DecisionDialog
-          request={selected.request}
+          approval={selected.approval}
           decision={selected.decision}
           onClose={() => setSelected(null)}
         />

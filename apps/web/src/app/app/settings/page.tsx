@@ -8,28 +8,25 @@ import {
   isGoogleMapsShortUrl,
   parseGoogleMapsLocation,
 } from "@/features/settings/google-maps";
-import type { AttendanceSettings } from "@/features/settings/types";
-import { api } from "@/shared/api/client";
+import {
+  createLocation,
+  getCalendar,
+  getGoogleCalendarAuth,
+  getMe,
+  getOffice,
+  listGoogleCalendars,
+  listLocations,
+  resolveMapsUrl,
+  updateCalendar,
+  updateOffice,
+} from "@/shared/api/generated";
+import type { CalendarOut, GoogleCalendarOut, LocationOut } from "@/shared/api/generated/model";
 import { Icon } from "@/shared/ui/icon";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type User = { role: string };
-type MapsParseResult = {
-  latitude: number;
-  longitude: number;
-  resolved_url: string;
-  maps_url: string;
-};
-type CalendarSettings = {
-  provider: string;
-  connected: boolean;
-  team_calendar_id: string;
-  calendar_name: string;
-  scope: "company" | "division";
-  division: string;
-  delivery_mode: "shared" | "shared_and_email";
-};
-type GoogleCalendar = { id: string; name: string; primary: boolean };
+/** Form state for a work location: a LocationOut whose id is unknown until it is saved. */
+type AttendanceSettings = Omit<LocationOut, "id" | "is_primary"> &
+  Partial<Pick<LocationOut, "id" | "is_primary">>;
 
 const empty: AttendanceSettings = {
   name: "Jakarta HQ",
@@ -46,7 +43,7 @@ const empty: AttendanceSettings = {
   max_open_hours: 10,
   alert_managers: false,
 };
-const emptyCalendar: CalendarSettings = {
+const emptyCalendar: CalendarOut = {
   provider: "google",
   connected: false,
   team_calendar_id: "",
@@ -103,10 +100,10 @@ export default function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<NotificationDialogState | null>(null);
-  const [calendar, setCalendar] = useState<CalendarSettings>(emptyCalendar);
+  const [calendar, setCalendar] = useState<CalendarOut>(emptyCalendar);
   const [calendarBusy, setCalendarBusy] = useState(false);
   const [calendarAccount, setCalendarAccount] = useState(false);
-  const [calendars, setCalendars] = useState<GoogleCalendar[]>([]);
+  const [calendars, setCalendars] = useState<GoogleCalendarOut[]>([]);
   const previewTouchX = useRef<number | null>(null);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
@@ -114,12 +111,7 @@ export default function SettingsPage() {
   const embedUrl = googleMapsEmbedUrl(form.latitude, form.longitude);
 
   useEffect(() => {
-    Promise.all([
-      api<{ user: User }>("/me", {}),
-      api<AttendanceSettings>("/settings/office", {}),
-      api<CalendarSettings>("/settings/calendar", {}),
-      api<{ items: AttendanceSettings[] }>("/settings/locations", {}),
-    ])
+    Promise.all([getMe(), getOffice(), getCalendar(), listLocations()])
       .then(([profile, office, calendarSettings, locationResult]) => {
         if (profile.user.role !== "hr_admin") {
           router.replace("/app/overview");
@@ -146,10 +138,7 @@ export default function SettingsPage() {
   async function connectGoogle() {
     setCalendarBusy(true);
     try {
-      const result = await api<{ authorization_url: string }>(
-        "/settings/calendar/google/start",
-        {},
-      );
+      const result = await getGoogleCalendarAuth();
       window.location.assign(result.authorization_url);
     } catch (reason) {
       notify(
@@ -163,10 +152,7 @@ export default function SettingsPage() {
 
   async function loadGoogleCalendars() {
     try {
-      const result = await api<{ items: GoogleCalendar[] }>(
-        "/settings/calendar/google/calendars",
-        {},
-      );
+      const result = await listGoogleCalendars();
       setCalendars(result.items);
     } catch (reason) {
       notify(
@@ -200,14 +186,13 @@ export default function SettingsPage() {
     }
     setCalendarBusy(true);
     try {
-      const saved = await api<CalendarSettings>("/settings/calendar", {
-        method: "PUT",
-        body: JSON.stringify({
-          ...calendar,
-          team_calendar_id: calendar.team_calendar_id.trim(),
-          calendar_name: calendar.calendar_name || "Kalender perusahaan",
-          connected: true,
-        }),
+      const saved = await updateCalendar({
+        ...calendar,
+        // "" = never saved; the form preselects Google (emptyCalendar), so default to it.
+        provider: calendar.provider || "google",
+        team_calendar_id: calendar.team_calendar_id.trim(),
+        calendar_name: calendar.calendar_name || "Kalender perusahaan",
+        connected: true,
       });
       setCalendar(saved);
       notify(
@@ -241,23 +226,20 @@ export default function SettingsPage() {
     }
     setBusy(true);
     try {
-      const saved = await api<AttendanceSettings>("/settings/office", {
-        method: "PUT",
-        body: JSON.stringify({
-          name: form.name.trim(),
-          latitude: Number(form.latitude),
-          longitude: Number(form.longitude),
-          radius_meters: Number(form.radius_meters),
-          reverify_enabled: form.reverify_enabled,
-          reverify_count_per_day: Number(form.reverify_count_per_day),
-          reverify_window_start_minutes: Number(form.reverify_window_start_minutes),
-          reverify_window_end_minutes: Number(form.reverify_window_end_minutes),
-          alerts_enabled: form.alerts_enabled,
-          clock_in_reminder_time: form.clock_in_reminder_time,
-          clock_out_reminder_time: form.clock_out_reminder_time,
-          max_open_hours: Number(form.max_open_hours),
-          alert_managers: form.alert_managers,
-        }),
+      const saved = await updateOffice({
+        name: form.name.trim(),
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+        radius_meters: Number(form.radius_meters),
+        reverify_enabled: form.reverify_enabled,
+        reverify_count_per_day: Number(form.reverify_count_per_day),
+        reverify_window_start_minutes: Number(form.reverify_window_start_minutes),
+        reverify_window_end_minutes: Number(form.reverify_window_end_minutes),
+        alerts_enabled: form.alerts_enabled,
+        clock_in_reminder_time: form.clock_in_reminder_time,
+        clock_out_reminder_time: form.clock_out_reminder_time,
+        max_open_hours: Number(form.max_open_hours),
+        alert_managers: form.alert_managers,
       });
       setForm({ ...empty, ...saved });
       setLocations((current) =>
@@ -286,14 +268,11 @@ export default function SettingsPage() {
     }
     setBusy(true);
     try {
-      const created = await api<AttendanceSettings>("/settings/locations", {
-        method: "POST",
-        body: JSON.stringify({
-          name: form.name.trim(),
-          latitude: Number(form.latitude),
-          longitude: Number(form.longitude),
-          radius_meters: Number(form.radius_meters),
-        }),
+      const created = await createLocation({
+        name: form.name.trim(),
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+        radius_meters: Number(form.radius_meters),
       });
       setLocations((current) => [...current, created]);
       setLocationStep(3);
@@ -396,10 +375,7 @@ export default function SettingsPage() {
         );
         return;
       }
-      const parsed = await api<MapsParseResult>("/settings/office/from-maps-url", {
-        method: "POST",
-        body: JSON.stringify({ url: value }),
-      });
+      const parsed = await resolveMapsUrl({ url: value });
       setForm((current) => ({
         ...current,
         latitude: parsed.latitude,
@@ -1037,13 +1013,13 @@ export default function SettingsPage() {
             >
               {[
                 {
-                  id: "google",
+                  id: "google" as const,
                   name: "Google Calendar",
                   description: "Google Workspace",
                   color: "google",
                 },
                 {
-                  id: "microsoft",
+                  id: "microsoft" as const,
                   name: "Microsoft 365",
                   description: "Outlook & Teams",
                   color: "microsoft",

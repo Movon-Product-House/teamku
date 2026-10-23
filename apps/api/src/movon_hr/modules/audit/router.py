@@ -6,13 +6,13 @@ from movon_hr.core.auth import require_role
 from movon_hr.core.db import DB
 from movon_hr.core.identity import Employee
 from movon_hr.modules.audit import service
-from movon_hr.modules.audit.schemas import AuditLogList
+from movon_hr.modules.audit.schemas import AuditLogListOut
 
-router = APIRouter()
+router = APIRouter(tags=["audit"])
 
 
 @router.get("/audit-logs")
-async def audit_logs(
+async def list_audit_logs(
     db: DB, _: Annotated[Employee, Depends(require_role("hr_admin"))]
-) -> AuditLogList:
-    return AuditLogList.model_validate({"items": await service.list_audit_logs(db)})
+) -> AuditLogListOut:
+    return AuditLogListOut.model_validate({"items": await service.list_audit_logs(db)})

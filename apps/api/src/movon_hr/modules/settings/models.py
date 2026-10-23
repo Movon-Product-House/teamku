@@ -1,12 +1,18 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from sqlalchemy import ForeignKey, Index, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from movon_hr.core.db import Base
+from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
+
+type CalendarProvider = Literal["google", "microsoft"]
+type StoredCalendarProvider = Literal["", "google", "microsoft"]  # "" until HR saves the settings
+type CalendarScope = Literal["company", "division"]
+type CalendarDeliveryMode = Literal["shared", "shared_and_email"]
 
 
 class WorkLocation(TenantScoped, Base):
@@ -47,18 +53,24 @@ class CalendarSettings(TenantScoped, Base):
     __tablename__ = "calendar_settings"
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id"), primary_key=True)
-    provider: Mapped[str] = mapped_column(default="", server_default="")
+    provider: Mapped[StoredCalendarProvider] = mapped_column(default="", server_default="")
     connected: Mapped[bool] = mapped_column(default=False, server_default="false")
     team_calendar_id: Mapped[str] = mapped_column(default="", server_default="")
     calendar_name: Mapped[str] = mapped_column(default="", server_default="")
-    scope: Mapped[str] = mapped_column(default="company", server_default="company")
+    scope: Mapped[CalendarScope] = mapped_column(default="company", server_default="company")
     division: Mapped[str] = mapped_column(default="", server_default="")
-    delivery_mode: Mapped[str] = mapped_column(
+    delivery_mode: Mapped[CalendarDeliveryMode] = mapped_column(
         default="shared_and_email", server_default="shared_and_email"
     )
     refresh_token: Mapped[str | None]
     access_token: Mapped[str | None]
     token_expires_at: Mapped[datetime | None]
+
+    __table_args__ = (
+        one_of("provider", StoredCalendarProvider),
+        one_of("scope", CalendarScope),
+        one_of("delivery_mode", CalendarDeliveryMode),
+    )
 
 
 class OAuthState(TenantScoped, Base):

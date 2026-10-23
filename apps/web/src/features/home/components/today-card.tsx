@@ -3,19 +3,18 @@
 import { Camera, LogIn, LogOut, MapPin, ScanFace } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Me } from "@/features/shell/types";
+import type { MeOut, TodayOut } from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { formatDuration, timelineSlots, workedMs } from "../home";
-import type { Today } from "../types";
 
 export const ATTENDANCE_HREF = "/app/attendance/today";
 const clock = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
 const HOURS = ["08.00", "10.00", "12.00", "14.00", "16.00", "18.00"];
 
 /** P1-E / P1-E2 / D1 "Hari ini": the attendance state and its one next action. */
-export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
+export function TodayCard({ today, user }: { today: TodayOut; user: MeOut["user"] }) {
   const now = useNow();
   const session = today.session;
   if (today.state === "not_checked_in" || !session)
@@ -92,7 +91,7 @@ export function TodayCard({ today, user }: { today: Today; user: Me["user"] }) {
   );
 }
 
-function NotCheckedIn({ today, user }: { today: Today; user: Me["user"] }) {
+function NotCheckedIn({ today, user }: { today: TodayOut; user: MeOut["user"] }) {
   const place = today.is_remote
     ? "Pekerja lapangan · lokasi bebas"
     : user.work_location

@@ -12,17 +12,27 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { type LeaveStatus, leaveStatusLabels } from "@/features/leave/types";
-import type { Me } from "@/features/shell/types";
+import { leaveStatusLabels } from "@/features/leave/types";
 import { errorMessage } from "@/shared/api/client";
+import {
+  useGetAttendanceToday,
+  useGetAttendanceWeek,
+  useListLeaveRequests,
+} from "@/shared/api/generated";
+import type {
+  AgendaItemOut,
+  LeaveListOut,
+  MeOut,
+  PayslipOut,
+  TodayOut,
+} from "@/shared/api/generated/model";
 import { cn } from "@/shared/lib/cn";
 import { formatPeriod } from "@/shared/lib/format";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { useLatestPayslip, useLeaveSummary, useToday, useWeek } from "../api";
+import { useLatestPayslip } from "../api";
 import { greeting } from "../home";
-import type { AgendaItem, LeaveSummary, Payslip, Today } from "../types";
 import { ATTENDANCE_HREF, TodayCard } from "./today-card";
 import { WeekCard } from "./week-card";
 
@@ -50,10 +60,10 @@ const leaveTones = {
 } as const;
 
 /** P1-E, P1-E2 (mobile) and D1 (desktop): Beranda for an Employee. */
-export function HomePage({ user }: { user: Me["user"] }) {
-  const today = useToday();
-  const week = useWeek();
-  const leave = useLeaveSummary();
+export function HomePage({ user }: { user: MeOut["user"] }) {
+  const today = useGetAttendanceToday();
+  const week = useGetAttendanceWeek();
+  const leave = useListLeaveRequests();
   const payslip = useLatestPayslip();
   const now = new Date();
 
@@ -166,8 +176,8 @@ function Loaded<T>({
   return children(query.data);
 }
 
-function AgendaCard({ today }: { today: Today }) {
-  const items: AgendaItem[] = today.session?.agenda ?? [];
+function AgendaCard({ today }: { today: TodayOut }) {
+  const items: AgendaItemOut[] = today.session?.agenda ?? [];
   const done = items.filter((item) => item.status === "done").length;
   return (
     <section
@@ -224,7 +234,7 @@ function AgendaCard({ today }: { today: Today }) {
   );
 }
 
-function LeaveCard({ leave }: { leave: LeaveSummary }) {
+function LeaveCard({ leave }: { leave: LeaveListOut }) {
   return (
     <SummaryCard
       icon={Palmtree}
@@ -243,7 +253,7 @@ function LeaveCard({ leave }: { leave: LeaveSummary }) {
   );
 }
 
-function PayslipCard({ payslip }: { payslip: Payslip | null }) {
+function PayslipCard({ payslip }: { payslip: PayslipOut | null }) {
   if (!payslip)
     return (
       <SummaryCard
@@ -325,9 +335,9 @@ function SummaryCard({
   );
 }
 
-function LatestLeave({ item }: { item: LeaveSummary["items"][number] }) {
+function LatestLeave({ item }: { item: LeaveListOut["items"][number] }) {
   const start = new Date(`${item.start}T00:00:00`);
-  const status = item.status as LeaveStatus;
+  const status = item.status;
   return (
     <section className="flex flex-col gap-2">
       <div className="flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import { type FormEvent, useId, useState } from "react";
 import { errorMessage } from "@/shared/api/client";
+import type { ApprovalOut, LeaveDecision } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { Button } from "@/shared/ui/button";
 import {
@@ -16,16 +17,15 @@ import {
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
 import { notify } from "@/shared/ui/notifications";
 import { Textarea } from "@/shared/ui/textarea";
-import { useDecideApproval } from "../api";
+import { useDecideAndRefresh } from "../api";
 import { defaultDecisionComment, validateDecisionComment } from "../approvals";
-import type { ApprovalDecision, ApprovalRequest } from "../types";
 
-type Props = { request: ApprovalRequest; decision: ApprovalDecision; onClose: () => void };
+type Props = { approval: ApprovalOut; decision: LeaveDecision; onClose: () => void };
 
-export function DecisionDialog({ request, decision, onClose }: Props) {
+export function DecisionDialog({ approval, decision, onClose }: Props) {
   const [comment, setComment] = useState(() => defaultDecisionComment(decision));
   const [error, setError] = useState<string | null>(null);
-  const decide = useDecideApproval();
+  const decide = useDecideAndRefresh();
   const commentId = useId();
   const errorId = useId();
   const approving = decision === "approved";
@@ -36,7 +36,7 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
     setError(invalid);
     if (invalid) return;
     decide.mutate(
-      { id: request.id, decision, comment },
+      { requestId: approval.id, data: { decision, comment } },
       {
         onSuccess: (result) => {
           notify({
@@ -45,7 +45,7 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
             message:
               result.calendar_sync_status === "failed"
                 ? "Permohonan diproses, tetapi event Google Calendar gagal dibuat."
-                : `Permohonan ${request.employee_name} berhasil diproses.`,
+                : `Permohonan ${approval.employee_name} berhasil diproses.`,
           });
           onClose();
         },
@@ -67,10 +67,10 @@ export function DecisionDialog({ request, decision, onClose }: Props) {
           <DialogHeader>
             <p className="font-semibold text-caption text-faint-foreground">Konfirmasi keputusan</p>
             <DialogTitle>
-              {approving ? "Setujui" : "Tolak"} permohonan {request.employee_name}?
+              {approving ? "Setujui" : "Tolak"} permohonan {approval.employee_name}?
             </DialogTitle>
             <DialogDescription>
-              {formatDate(request.start)} sampai {formatDate(request.end)} · {request.days} hari
+              {formatDate(approval.start)} sampai {formatDate(approval.end)} · {approval.days} hari
               kerja
             </DialogDescription>
           </DialogHeader>

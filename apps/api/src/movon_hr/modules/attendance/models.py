@@ -1,13 +1,17 @@
 import uuid
 from datetime import date, datetime
+from typing import Literal
 
 from sqlalchemy import ForeignKey, Index, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from movon_hr.core.db import Base
+from movon_hr.core.db import Base, one_of
 from movon_hr.core.identity import UUIDV7
 from movon_hr.core.tenancy import TenantScoped
+
+type AttendanceAnomaly = Literal["low_accuracy", "missed_reverify", "outside_geofence"]
+type LocationEventKind = Literal["check_in", "check_out", "reverify"]
 
 
 class Attendance(TenantScoped, Base):
@@ -20,7 +24,7 @@ class Attendance(TenantScoped, Base):
     longitude: Mapped[float]
     accuracy_meters: Mapped[float]
     agenda: Mapped[list[dict]] = mapped_column(JSONB)
-    anomaly: Mapped[str | None]
+    anomaly: Mapped[AttendanceAnomaly | None]
     checked_out_at: Mapped[datetime | None]
     summary: Mapped[str | None]
 
@@ -33,6 +37,7 @@ class Attendance(TenantScoped, Base):
             unique=True,
             postgresql_where=text("checked_out_at IS NULL"),
         ),
+        one_of("anomaly", AttendanceAnomaly),
     )
 
 
@@ -52,15 +57,17 @@ class LocationEvent(TenantScoped, Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=UUIDV7)
     employee_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("employees.id"))
     attendance_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("attendance.id"))
-    kind: Mapped[str]
+    kind: Mapped[LocationEventKind]
     at: Mapped[datetime]
     lat: Mapped[float | None]
     lng: Mapped[float | None]
     accuracy: Mapped[float | None]
     distance_meters: Mapped[float | None]
     inside_geofence: Mapped[bool | None]
-    anomaly: Mapped[str | None]
+    anomaly: Mapped[AttendanceAnomaly | None]
     due_at: Mapped[datetime | None]
+
+    __table_args__ = (one_of("kind", LocationEventKind), one_of("anomaly", AttendanceAnomaly))
 
 
 class AlertReceipt(TenantScoped, Base):

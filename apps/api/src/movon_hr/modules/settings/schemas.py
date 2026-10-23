@@ -2,10 +2,17 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from movon_hr.modules.settings.models import (
+    CalendarDeliveryMode,
+    CalendarProvider,
+    CalendarScope,
+    StoredCalendarProvider,
+)
+
 HHMM = r"^([01]\d|2[0-3]):[0-5]\d$"
 
 
-class OfficeSettingsInput(BaseModel):
+class OfficeSettingsIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -21,24 +28,24 @@ class OfficeSettingsInput(BaseModel):
     alert_managers: bool | None = None
 
 
-class WorkLocationInput(BaseModel):
+class WorkLocationIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     radius_meters: float = Field(default=300, ge=50, le=5_000)
 
 
-class CalendarSettingsInput(BaseModel):
-    provider: str = Field(pattern="^(google|microsoft)$")
+class CalendarSettingsIn(BaseModel):
+    provider: CalendarProvider
     team_calendar_id: str = Field(min_length=2, max_length=300)
     connected: bool = False
     calendar_name: str = Field(default="Kalender perusahaan", max_length=120)
-    scope: str = Field(default="company", pattern="^(company|division)$")
+    scope: CalendarScope = "company"
     division: str = Field(default="", max_length=100)
-    delivery_mode: str = Field(default="shared_and_email", pattern="^(shared|shared_and_email)$")
+    delivery_mode: CalendarDeliveryMode = "shared_and_email"
 
 
-class MapsUrlInput(BaseModel):
+class MapsUrlIn(BaseModel):
     url: str = Field(min_length=4, max_length=2_000)
 
 
@@ -62,7 +69,7 @@ class LocationOut(BaseModel):
     is_primary: bool
 
 
-class LocationList(BaseModel):
+class LocationListOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     items: list[LocationOut]
@@ -71,16 +78,16 @@ class LocationList(BaseModel):
 class CalendarOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    provider: str
+    provider: StoredCalendarProvider
     connected: bool
     team_calendar_id: str
     calendar_name: str
-    scope: str
+    scope: CalendarScope
     division: str
-    delivery_mode: str
+    delivery_mode: CalendarDeliveryMode
 
 
-class AuthorizationUrl(BaseModel):
+class AuthorizationUrlOut(BaseModel):
     authorization_url: str
 
 
@@ -90,11 +97,11 @@ class GoogleCalendarOut(BaseModel):
     primary: bool
 
 
-class GoogleCalendarList(BaseModel):
+class GoogleCalendarListOut(BaseModel):
     items: list[GoogleCalendarOut]
 
 
-class MapsCoordinates(BaseModel):
+class MapsCoordinatesOut(BaseModel):
     latitude: float
     longitude: float
     resolved_url: str

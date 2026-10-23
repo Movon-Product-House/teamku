@@ -16,7 +16,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import type { Me, Role } from "./types";
+import type { EmployeeRole } from "@/shared/api/generated/model";
 
 export type NavItem = {
   label: string;
@@ -83,7 +83,7 @@ const company: NavItem[] = [
 ];
 
 /** Sidebar groups per role: Saya for everyone, Tim for managers and HR, Perusahaan for HR. */
-export function navGroups(role: Role, department: string): NavGroup[] {
+export function navGroups(role: EmployeeRole, department: string): NavGroup[] {
   if (role === "manager")
     return [
       { label: "Saya", items: personal },
@@ -101,14 +101,14 @@ export function navGroups(role: Role, department: string): NavGroup[] {
 const more: NavItem = { label: "Lainnya", href: MORE_HREF, icon: LayoutGrid };
 
 /** Mobile tab bar: four items, the last one always Lainnya. */
-export function tabItems(role: Role): NavItem[] {
+export function tabItems(role: EmployeeRole): NavItem[] {
   return role === "employee"
     ? [home, attendance, { ...leave, label: "Cuti" }, more]
     : [home, attendance, approvals, more];
 }
 
 /** Groups for the Lainnya screen: every page that is not already a tab. */
-export function moreGroups(role: Role, department: string): NavGroup[] {
+export function moreGroups(role: EmployeeRole, department: string): NavGroup[] {
   const tabs = new Set(tabItems(role).map((item) => item.href));
   return navGroups(role, department)
     .filter((group) => !group.shortcuts)
@@ -127,7 +127,7 @@ export function activeHref(pathname: string, hrefs: string[]): string | undefine
 }
 
 /** The tab to highlight. Pages without a tab of their own live under Lainnya. */
-export function activeTab(pathname: string, role: Role): string {
+export function activeTab(pathname: string, role: EmployeeRole): string {
   return (
     activeHref(
       pathname,
@@ -137,7 +137,7 @@ export function activeTab(pathname: string, role: Role): string {
 }
 
 /** Title for the mobile top bar, taken from the nav item that matches the path. */
-export function pageTitle(pathname: string, role: Role, department: string): string {
+export function pageTitle(pathname: string, role: EmployeeRole, department: string): string {
   const items = [
     more,
     { label: "Notifikasi", href: NOTIFICATIONS_HREF, icon: Bell },
@@ -162,6 +162,9 @@ export function initials(name: string): string {
   );
 }
 
-export function workLocation(user: Pick<Me["user"], "is_remote" | "work_location">): string {
+export function workLocation(user: {
+  is_remote: boolean;
+  work_location: { name: string } | null;
+}): string {
   return user.is_remote ? "Pekerja lapangan" : (user.work_location?.name ?? "Lokasi belum diatur");
 }

@@ -2,15 +2,16 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from movon_hr.modules.attendance.models import AttendanceAnomaly
 from movon_hr.modules.employees.schemas import EmployeeOut
 
 
-class DashboardAttendance(BaseModel):
+class DashboardAttendanceOut(BaseModel):
     employee: str
     department: str
     checked_in_at: datetime
     checked_out_at: datetime | None
-    anomaly: str | None
+    anomaly: AttendanceAnomaly | None
 
 
 class DashboardOut(BaseModel):
@@ -24,4 +25,4 @@ class DashboardOut(BaseModel):
     pending_approvals: int
     agenda_total: int
     agenda_completed: int
-    attendance: list[DashboardAttendance]
+    attendance: list[DashboardAttendanceOut]

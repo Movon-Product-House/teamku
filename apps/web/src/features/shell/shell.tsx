@@ -4,9 +4,10 @@ import { LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { errorMessage } from "@/shared/api/client";
+import { useGetMe } from "@/shared/api/generated";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
-import { useMe, usePendingApprovals, useTodayAttendance } from "./api";
+import { usePendingApprovals, usePolledAttendanceToday } from "./api";
 import { MobileHeader, TabBar } from "./components/mobile-chrome";
 import { Sidebar } from "./components/sidebar";
 import { navGroups, pageTitle, tabItems } from "./nav";
@@ -21,8 +22,8 @@ const ATTENDANCE_HREF = "/app/attendance/today";
  */
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const me = useMe();
-  const today = useTodayAttendance();
+  const me = useGetMe();
+  const today = usePolledAttendanceToday();
   const pendingApprovals = usePendingApprovals(me.data);
   const { logout, signingOut } = useLogout();
 

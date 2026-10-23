@@ -12,9 +12,12 @@ const LEGACY_CAPS = {
   "src/app/app/attendance/today/page.tsx": 658,
 };
 
+// Orval output (orval.config.ts) is never edited by hand, so the limit does not apply.
+const GENERATED = join("shared", "api", "generated");
+
 const root = new URL("..", import.meta.url).pathname;
 const files = readdirSync(join(root, "src"), { recursive: true })
-  .filter((file) => /\.(ts|tsx|mjs|js)$/.test(file))
+  .filter((file) => /\.(ts|tsx|mjs|js)$/.test(file) && !file.startsWith(GENERATED))
   .map((file) => join("src", file));
 
 const failures = [];

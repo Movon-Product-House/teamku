@@ -129,6 +129,7 @@ async def test_successful_reverify_clears_pending_and_writes_event(
     assert submitted.status_code == 200
     assert submitted.json()["anomaly"] is None
     assert submitted.json()["kind"] == "reverify"
+    assert submitted.json()["result"] == "verified"
 
     today = (
         await client.get(

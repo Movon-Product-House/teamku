@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
+import type { SessionOut, TodayOut } from "@/shared/api/generated/model";
 import { formatDuration, greeting, timelineSlots, weekBars, workedMs } from "./home";
-import type { Today } from "./types";
 
 const at = (hour: number, minute = 0) => new Date(2026, 8, 29, hour, minute);
+const session = (checked_in_at: string, checked_out_at: string | null): SessionOut => ({
+  id: "s",
+  checked_in_at,
+  checked_out_at,
+  anomaly: null,
+  agenda_count: 0,
+  agenda: [],
+  summary: null,
+});
 
 describe("home", () => {
   it("greets by time of day", () => {
@@ -13,9 +22,9 @@ describe("home", () => {
   });
 
   it("sums the closed sessions of today with the open one", () => {
-    const today = (state: Today["state"], checked_out_at: string | null): Today => ({
+    const today = (state: TodayOut["state"], checked_out_at: string | null): TodayOut => ({
       state,
-      session: { id: "s", checked_in_at: at(13).toISOString(), checked_out_at, agenda: [] },
+      session: session(at(13).toISOString(), checked_out_at),
       pending_reverification: null,
       is_remote: false,
       closed_hours_today: 1.5,
@@ -25,9 +34,9 @@ describe("home", () => {
   });
 
   it("never lets the open session go negative or past midnight WIB", () => {
-    const open = (checked_in_at: string): Today => ({
+    const open = (checked_in_at: string): TodayOut => ({
       state: "checked_in",
-      session: { id: "s", checked_in_at, checked_out_at: null, agenda: [] },
+      session: session(checked_in_at, null),
       pending_reverification: null,
       is_remote: false,
       closed_hours_today: 1,

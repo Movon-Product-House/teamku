@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { ApprovalOut } from "@/shared/api/generated/model";
 import { countApprovals, filterApprovals, validateDecisionComment } from "./approvals";
-import type { ApprovalRequest } from "./types";
 
-const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest => ({
+const approval = (id: string, status: ApprovalOut["status"]): ApprovalOut => ({
   id,
   status,
   employee_id: "e1",
@@ -12,10 +12,16 @@ const request = (id: string, status: ApprovalRequest["status"]): ApprovalRequest
   end: "2026-10-02",
   days: 2,
   reason: "Keluarga",
+  request_type: "time_off",
+  created_at: "2026-09-30T02:00:00Z",
+  approver_comment: null,
+  calendar_sync_status: "not_applicable",
+  employee_calendar_event_id: null,
+  team_calendar_event_id: null,
 });
 
 describe("approvals", () => {
-  const items = [request("1", "pending"), request("2", "approved"), request("3", "pending")];
+  const items = [approval("1", "pending"), approval("2", "approved"), approval("3", "pending")];
 
   it("filters by status and keeps everything for 'all'", () => {
     expect(filterApprovals(items, "pending").map((item) => item.id)).toEqual(["1", "3"]);

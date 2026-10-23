@@ -1,36 +1,23 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { type LeaveStatus, leaveStatusLabels } from "@/features/leave/types";
-import { api } from "@/shared/api/client";
+import { leaveStatusLabels } from "@/features/leave/types";
+import { cancelLeaveRequest, createLeaveRequest, listLeaveRequests } from "@/shared/api/generated";
+import type { LeaveListOut } from "@/shared/api/generated/model";
 import { formatDate } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
-
-type Request = {
-  id: string;
-  start: string;
-  end: string;
-  reason: string;
-  days: number;
-  status: LeaveStatus;
-  approver_comment?: string;
-};
-type Data = {
-  items: Request[];
-  balance: { annual_days: number; used_days: number; remaining_days: number };
-};
 
 export default function TimeOff() {
   const initial = useMemo(() => futureDate(7), []);
   const [start, setStart] = useState(initial),
     [end, setEnd] = useState(initial),
     [reason, setReason] = useState(""),
-    [data, setData] = useState<Data>(),
+    [data, setData] = useState<LeaveListOut>(),
     [notification, setNotification] = useState<NotificationDialogState | null>(null),
     [busy, setBusy] = useState(false);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    api<Data>("/leave-requests", {})
+    listLeaveRequests()
       .then((result) => setData(result))
       .catch((reason) =>
         notify(
@@ -50,10 +37,7 @@ export default function TimeOff() {
     }
     setBusy(true);
     try {
-      await api("/leave-requests", {
-        method: "POST",
-        body: JSON.stringify({ start, end, reason }),
-      });
+      await createLeaveRequest({ start, end, reason });
       setReason("");
       notify("success", "Permohonan terkirim", "Permohonan berhasil dikirim ke atasan.");
       await load();
@@ -70,7 +54,7 @@ export default function TimeOff() {
   async function cancel(id: string) {
     setBusy(true);
     try {
-      await api(`/leave-requests/${id}/cancel`, { method: "POST" });
+      await cancelLeaveRequest(id);
       notify(
         "success",
         "Permohonan dibatalkan",

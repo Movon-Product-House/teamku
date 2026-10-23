@@ -16,10 +16,10 @@ class NotificationOut(BaseModel):
     read: bool
 
 
-class NotificationList(BaseModel):
+class NotificationListOut(BaseModel):
     items: list[NotificationOut]
     unread: int
 
 
-class Ok(BaseModel):
+class OkOut(BaseModel):
     ok: bool

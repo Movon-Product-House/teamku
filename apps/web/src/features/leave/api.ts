@@ -1,30 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { approvalsKey, fetchApprovals } from "@/shared/api/approvals";
-import { api } from "@/shared/api/client";
-import type { ApprovalDecision, ApprovalRequest } from "./types";
+import { useQueryClient } from "@tanstack/react-query";
+import { getListApprovalsQueryKey, useDecideApproval } from "@/shared/api/generated";
 
-export const leaveKeys = {
-  all: ["leave"] as const,
-  approvals: () => approvalsKey,
-};
-
-export function useApprovals() {
-  return useQuery({
-    queryKey: leaveKeys.approvals(),
-    queryFn: () => fetchApprovals<ApprovalRequest>(),
-    select: (data) => data.items,
-  });
-}
-
-export function useDecideApproval() {
+/**
+ * Decide an approval and stay pending until the approvals list has refetched. The global
+ * invalidation (providers.tsx) does not wait, so without this the dialog closes while the
+ * decided row still shows as pending and can be decided twice.
+ */
+export function useDecideAndRefresh() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (input: { id: string; decision: ApprovalDecision; comment: string }) =>
-      api<ApprovalRequest>(`/approvals/${input.id}`, {
-        method: "POST",
-        body: JSON.stringify({ decision: input.decision, comment: input.comment }),
-      }),
-    // Saldo & daftar cuti karyawan ikut berubah, jadi seluruh cache leave dibuang.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: leaveKeys.all }),
+  return useDecideApproval({
+    mutation: {
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: getListApprovalsQueryKey() }),
+    },
   });
 }

@@ -1,37 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "@/shared/api/client";
+import {
+  createPayrollRun,
+  finalizePayrollRun,
+  listPayrollRuns,
+  publishPayrollRun,
+} from "@/shared/api/generated";
+import type { PayrollRunOut } from "@/shared/api/generated/model";
 import { formatMoney, formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-type Row = {
-  employee_id: string;
-  employee: string;
-  gross_rupiah: number;
-  deductions_rupiah: number;
-  net_rupiah: number;
-};
-type PayrollRun = {
-  id: string;
-  period: string;
-  status: "draft" | "finalized" | "published";
-  items: Row[];
-  total_gross_rupiah: number;
-  total_deductions_rupiah: number;
-  total_net_rupiah: number;
-  disclaimer: string;
-};
-
 export default function Payroll() {
-  const [runs, setRuns] = useState<PayrollRun[]>([]),
-    [selected, setSelected] = useState<PayrollRun>(),
+  const [runs, setRuns] = useState<PayrollRunOut[]>([]),
+    [selected, setSelected] = useState<PayrollRunOut>(),
     [month, setMonth] = useState(new Date().toISOString().slice(0, 7)),
     [notification, setNotification] = useState<NotificationDialogState | null>(null),
     [busy, setBusy] = useState(false);
   const notify = (type: NotificationDialogState["type"], title: string, message: string) =>
     setNotification({ type, title, message });
   const load = () =>
-    api<{ items: PayrollRun[] }>("/payroll/runs", {})
+    listPayrollRuns()
       .then((result) => {
         setRuns(result.items);
         setSelected(
@@ -51,10 +39,7 @@ export default function Payroll() {
   async function calculate() {
     setBusy(true);
     try {
-      const run = await api<PayrollRun>("/payroll/runs", {
-        method: "POST",
-        body: JSON.stringify({ month }),
-      });
+      const run = await createPayrollRun({ month });
       setSelected(run);
       notify("success", "Draft payroll siap", `Draft payroll ${month} siap ditinjau.`);
       await load();
@@ -72,9 +57,9 @@ export default function Payroll() {
     if (!selected) return;
     setBusy(true);
     try {
-      const run = await api<PayrollRun>(`/payroll/runs/${selected.id}/${action}`, {
-        method: "POST",
-      });
+      const run = await (action === "finalize" ? finalizePayrollRun : publishPayrollRun)(
+        selected.id,
+      );
       setSelected(run);
       notify(
         "success",

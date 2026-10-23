@@ -1,63 +1,28 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "@/shared/api/client";
-import type { InvitePreview, ResetPreview } from "./types";
+import { useQuery } from "@tanstack/react-query";
+import { previewResetPassword, useGetInvite } from "@/shared/api/generated";
 
-export const authKeys = {
-  invite: (token: string) => ["auth", "invite", token] as const,
-  reset: (token: string) => ["auth", "reset", token] as const,
-};
-
-function post<T>(path: string, body: unknown) {
-  return api<T>(path, { method: "POST", body: JSON.stringify(body) });
-}
-
-// Login, reset and invite acceptance start a session through the httpOnly cookie the API sets.
-export function useLogin() {
-  return useMutation({
-    mutationFn: (input: { email: string; password: string }) => post("/auth/login", input),
-  });
-}
-
-export function useForgotPassword() {
-  return useMutation({
-    mutationFn: (email: string) => post<{ ok: boolean }>("/auth/forgot-password", { email }),
-  });
-}
-
-// Token previews never refetch in the background: a refetch would swap the page under a
-// half-filled form. The global retry already skips dead links (4xx).
+// Token previews never refetch, not even after a mutation (meta.keepOnMutation, see
+// providers.tsx): a refetch would swap the page under a half-filled form, and once the
+// token is used it would turn into a dead link. The global retry already skips 4xx.
 const PREVIEW_OPTIONS = {
   staleTime: Number.POSITIVE_INFINITY,
   refetchOnWindowFocus: false,
+  meta: { keepOnMutation: true },
 } as const;
 
 // POST keeps the reset token out of the URL, and so out of access logs.
 export function useResetPreview(token: string) {
   return useQuery({
-    queryKey: authKeys.reset(token),
-    queryFn: () => post<ResetPreview>("/auth/reset-password/preview", { token }),
+    queryKey: ["auth", "reset", token],
+    queryFn: () => previewResetPassword({ token }),
     enabled: token !== "",
     ...PREVIEW_OPTIONS,
-  });
-}
-
-export function useResetPassword() {
-  return useMutation({
-    mutationFn: (input: { token: string; password: string }) => post("/auth/reset-password", input),
   });
 }
 
 export function useInvitePreview(token: string) {
-  return useQuery({
-    queryKey: authKeys.invite(token),
-    queryFn: () => api<InvitePreview>(`/invites/${encodeURIComponent(token)}`),
-    enabled: token !== "",
-    ...PREVIEW_OPTIONS,
-  });
-}
-
-export function useAcceptInvite() {
-  return useMutation({
-    mutationFn: (input: { token: string; password: string }) => post("/auth/accept-invite", input),
+  // The generated URL builder inserts path params raw; the token comes from ?token=.
+  return useGetInvite(encodeURIComponent(token), {
+    query: { enabled: token !== "", ...PREVIEW_OPTIONS },
   });
 }
