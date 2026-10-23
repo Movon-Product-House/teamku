@@ -1,17 +1,46 @@
-from datetime import datetime
+import uuid
+from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel
 
 from movon_hr.modules.attendance.models import AttendanceAnomaly
+from movon_hr.modules.attendance.schemas import AgendaItemOut
 from movon_hr.modules.employees.schemas import EmployeeOut
+from movon_hr.modules.leave.models import LeaveStatus
+
+type DashboardAttentionKind = Literal["late", "not_checked_in", "missed_reverify"]
 
 
 class DashboardAttendanceOut(BaseModel):
+    employee_id: uuid.UUID
     employee: str
     department: str
     checked_in_at: datetime
     checked_out_at: datetime | None
     anomaly: AttendanceAnomaly | None
+
+
+class DashboardAttentionOut(BaseModel):
+    employee_id: uuid.UUID
+    employee: str
+    title: str
+    kind: DashboardAttentionKind
+    # The late check-in or the missed reverify; null for no check-in yet.
+    at: datetime | None
+
+
+class DashboardAgendaOut(AgendaItemOut):
+    employee_id: uuid.UUID
+    employee: str
+
+
+class DashboardLeaveOut(BaseModel):
+    employee_id: uuid.UUID
+    employee: str
+    start_date: date
+    end_date: date
+    status: LeaveStatus
 
 
 class DashboardOut(BaseModel):
@@ -25,4 +54,9 @@ class DashboardOut(BaseModel):
     pending_approvals: int
     agenda_total: int
     agenda_completed: int
+    work_start_time: str
     attendance: list[DashboardAttendanceOut]
+    attention: list[DashboardAttentionOut]
+    agenda: list[DashboardAgendaOut]
+    # Approved or pending, from today to two weeks ahead.
+    team_leave: list[DashboardLeaveOut]

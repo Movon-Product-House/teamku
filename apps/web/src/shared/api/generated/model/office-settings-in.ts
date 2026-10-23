@@ -30,6 +30,7 @@ export interface OfficeSettingsIn {
   reverify_count_per_day?: number | null;
   reverify_window_start_minutes?: number | null;
   reverify_window_end_minutes?: number | null;
+  work_start_time?: string | null;
   alerts_enabled?: boolean | null;
   clock_in_reminder_time?: string | null;
   clock_out_reminder_time?: string | null;

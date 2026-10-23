@@ -11,7 +11,6 @@ MAX_ACCURACY_CREDIT_METERS = 50
 LOW_ACCURACY_METERS = 100
 # A reverify slot counts as missed this long after it is due.
 REVERIFY_GRACE = timedelta(minutes=15)
-LATE_AFTER = time(9, 0)  # hardcoded, kept as is (#19)
 TARGET_HOURS_PER_DAY = 8  # ponytail: fixed until shifts exist; per-office setting when they do
 
 
@@ -41,8 +40,8 @@ def is_missed(due_at: datetime, now: datetime) -> bool:
     return now >= due_at + REVERIFY_GRACE
 
 
-def is_late(checked_in_at: datetime) -> bool:
-    return checked_in_at.astimezone(JAKARTA).time() >= LATE_AFTER
+def is_late(checked_in_at: datetime, work_start: time) -> bool:
+    return checked_in_at.astimezone(JAKARTA).time() >= work_start
 
 
 def parse_hhmm(value: str) -> time:

@@ -49,6 +49,7 @@ POLICY = {
     "clock_in_reminder_time": "09:15",
     "clock_out_reminder_time": "18:15",
     "max_open_hours": 10,
+    "work_start_time": "09:00",
 }
 
 
@@ -63,6 +64,7 @@ POLICY = {
         ({"reverify_window_end_minutes": 60}, "Jendela akhir harus lebih besar dari jendela mulai"),
         ({"clock_out_reminder_time": "24:00"}, "Format jam pengingat harus HH:MM"),
         ({"max_open_hours": 25}, "Batas sesi terbuka harus antara 1 dan 24 jam"),
+        ({"work_start_time": "9:00"}, "Format jam mulai kerja harus HH:MM"),
     ],
 )
 def test_office_policy_validation(overrides: dict, message: str) -> None:

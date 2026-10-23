@@ -21,6 +21,7 @@ class OfficeSettingsIn(BaseModel):
     reverify_count_per_day: int | None = Field(default=None, ge=1, le=3)
     reverify_window_start_minutes: int | None = Field(default=None, ge=0, le=1_440)
     reverify_window_end_minutes: int | None = Field(default=None, ge=0, le=1_440)
+    work_start_time: str | None = Field(default=None, pattern=HHMM)
     alerts_enabled: bool | None = None
     clock_in_reminder_time: str | None = Field(default=None, pattern=HHMM)
     clock_out_reminder_time: str | None = Field(default=None, pattern=HHMM)
@@ -61,6 +62,7 @@ class LocationOut(BaseModel):
     reverify_count_per_day: int
     reverify_window_start_minutes: int
     reverify_window_end_minutes: int
+    work_start_time: str
     alerts_enabled: bool
     clock_in_reminder_time: str
     clock_out_reminder_time: str

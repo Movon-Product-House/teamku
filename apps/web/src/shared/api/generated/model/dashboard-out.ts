@@ -4,7 +4,10 @@
  * Teamku API
  * OpenAPI spec version: 0.1.0
  */
+import type { DashboardAgendaOut } from './dashboard-agenda-out';
 import type { DashboardAttendanceOut } from './dashboard-attendance-out';
+import type { DashboardAttentionOut } from './dashboard-attention-out';
+import type { DashboardLeaveOut } from './dashboard-leave-out';
 import type { EmployeeOut } from './employee-out';
 
 export interface DashboardOut {
@@ -18,5 +21,9 @@ export interface DashboardOut {
   pending_approvals: number;
   agenda_total: number;
   agenda_completed: number;
+  work_start_time: string;
   attendance: DashboardAttendanceOut[];
+  attention: DashboardAttentionOut[];
+  agenda: DashboardAgendaOut[];
+  team_leave: DashboardLeaveOut[];
 }

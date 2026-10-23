@@ -30,6 +30,8 @@ class WorkLocation(TenantScoped, Base):
     reverify_count_per_day: Mapped[int] = mapped_column(default=1, server_default="1")
     reverify_window_start_minutes: Mapped[int] = mapped_column(default=60, server_default="60")
     reverify_window_end_minutes: Mapped[int] = mapped_column(default=420, server_default="420")
+    # A first check-in of the day at or after this "HH:MM" (WIB) is late.
+    work_start_time: Mapped[str] = mapped_column(default="09:00", server_default="09:00")
     alerts_enabled: Mapped[bool] = mapped_column(default=False, server_default="false")
     clock_in_reminder_time: Mapped[str] = mapped_column(default="09:15", server_default="09:15")
     clock_out_reminder_time: Mapped[str] = mapped_column(default="18:15", server_default="18:15")

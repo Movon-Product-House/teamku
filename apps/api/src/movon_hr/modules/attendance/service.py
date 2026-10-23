@@ -176,13 +176,15 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
             )
         )
     ).all()
+    office = await settings_service.primary_location(db)
+    work_start = rules.parse_hhmm(office.work_start_time)
     now = datetime.now(UTC)
     hours = dict.fromkeys(days, 0.0)
     late: dict[date, bool] = {}
     for item in sessions:
         day = jakarta_date(item.checked_in_at)
         hours[day] += worked_hours(item, now)
-        late.setdefault(day, rules.is_late(item.checked_in_at))
+        late.setdefault(day, rules.is_late(item.checked_in_at, work_start))
     return WeekOut(
         target_hours=rules.TARGET_HOURS_PER_DAY,
         days=[

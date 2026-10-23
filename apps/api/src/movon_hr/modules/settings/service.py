@@ -33,6 +33,7 @@ POLICY_FIELDS = (
     "reverify_count_per_day",
     "reverify_window_start_minutes",
     "reverify_window_end_minutes",
+    "work_start_time",
     "alerts_enabled",
     "clock_in_reminder_time",
     "clock_out_reminder_time",
@@ -97,6 +98,8 @@ def validate_office_policy(data: dict[str, Any]) -> None:
     for key in ("clock_in_reminder_time", "clock_out_reminder_time"):
         if not re.fullmatch(HHMM, str(data[key])):
             raise HTTPException(422, "Format jam pengingat harus HH:MM")
+    if not re.fullmatch(HHMM, str(data["work_start_time"])):
+        raise HTTPException(422, "Format jam mulai kerja harus HH:MM")
     if not 1 <= data["max_open_hours"] <= 24:
         raise HTTPException(422, "Batas sesi terbuka harus antara 1 dan 24 jam")
 
