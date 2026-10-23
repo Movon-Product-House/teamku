@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatMoney, formatPeriod, formatShortTime } from "./format";
+import { formatDate, formatMoney, formatPeriod, formatShortTime, initials } from "./format";
 
 describe("format", () => {
   it("formats ISO dates as local dates without shifting the day", () => {
@@ -20,5 +20,13 @@ describe("format", () => {
     expect(formatShortTime(new Date(2026, 9, 18, 23, 0).toISOString(), now)).toBe("Kemarin");
     expect(formatShortTime(new Date(2026, 7, 29, 9, 0).toISOString(), now)).toBe("29 Agu");
     expect(formatShortTime(new Date(2025, 11, 31, 9, 0).toISOString(), now)).toBe("31 Des 2025");
+  });
+});
+
+describe("initials", () => {
+  it("takes the first two words", () => {
+    expect(initials("dewi wulandari putri")).toBe("DW");
+    expect(initials("Rina")).toBe("R");
+    expect(initials("  ")).toBe("--");
   });
 });

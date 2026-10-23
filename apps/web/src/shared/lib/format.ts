@@ -47,3 +47,15 @@ export function formatShortTime(value: string, now: Date = new Date()): string {
     date,
   );
 }
+
+/** Avatar initials: the first letter of the first two words, "--" for a blank name. */
+export function initials(name: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "--"
+  );
+}

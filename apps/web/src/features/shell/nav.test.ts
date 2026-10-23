@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   activeHref,
   activeTab,
-  initials,
   MORE_HREF,
   moreGroups,
   navGroups,
@@ -92,14 +91,6 @@ describe("pageTitle", () => {
     expect(pageTitle("/app/notifications", "employee", "Sales")).toBe("Notifikasi");
     expect(pageTitle("/app/profile", "hr_admin", "HR")).toBe("Profil & keamanan");
     expect(pageTitle("/app/unknown", "employee", "Sales")).toBe("Teamku");
-  });
-});
-
-describe("initials", () => {
-  it("takes the first two words", () => {
-    expect(initials("dewi wulandari putri")).toBe("DW");
-    expect(initials("Rina")).toBe("R");
-    expect(initials("  ")).toBe("--");
   });
 });
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HomePage } from "@/features/home/components/home-page";
+import { ManagerHomePage } from "@/features/home/components/manager-home-page";
 import {
   getDashboard,
   getOffice,
@@ -14,12 +15,15 @@ import type { DashboardOut, LeaveListOut, PayslipOut } from "@/shared/api/genera
 import { formatPeriod } from "@/shared/lib/format";
 import { NotificationDialog, type NotificationDialogState } from "@/shared/ui/notification-dialog";
 
-// Employees get the v2 Beranda (#11); Manager and HR keep this page until their Beranda ships.
+// v2 Beranda for Employee (#11) and Manager (#19); HR keeps this page until #22.
 export default function OverviewPage() {
   const me = useGetMe();
   // The shell only renders its children once /me has loaded.
   if (!me.data) return null;
-  return me.data.user.role === "employee" ? <HomePage user={me.data.user} /> : <Overview />;
+  const { user } = me.data;
+  if (user.role === "employee") return <HomePage user={user} />;
+  if (user.role === "manager") return <ManagerHomePage user={user} />;
+  return <Overview />;
 }
 
 function Overview() {
