@@ -1,4 +1,4 @@
-import type { TodayOut, WeekOut } from "@/shared/api/generated/model";
+import type { CheckOutOut, TodayOut, WeekOut } from "@/shared/api/generated/model";
 
 export function greeting(now: Date): string {
   const hour = now.getHours();
@@ -29,13 +29,46 @@ export function formatDuration(ms: number): string {
   return hours ? `${hours}j ${minutes % 60}m` : `${minutes}m`;
 }
 
-/** Slots from 08.00 to 18.00; a slot is filled when it overlaps the worked span. */
-export function timelineSlots(start: Date, end: Date, count = 48, from = 8, to = 18): boolean[] {
-  const day = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
-  const size = ((to - from) * 3_600_000) / count;
+const weekday = new Intl.DateTimeFormat("id-ID", { weekday: "long", timeZone: "Asia/Jakarta" });
+const wibDay = (iso: string) => Math.floor((Date.parse(iso) + WIB_OFFSET_MS) / DAY_MS);
+// The API rounds hours to 2 decimals (50 min → 0.83), so round to the nearest minute, not down.
+const formatHours = (hours: number) => formatDuration(Math.round(hours * 60) * 60_000);
+
+/** Check-out toast: this session, then the whole check-in day. */
+export function checkOutMessage(result: CheckOutOut, checkedInAt?: string): string {
+  const session = formatHours(result.effective_hours);
+  // The web can deploy ahead of the API, which then sends no total.
+  if (result.total_hours_today == null) return `Sesi ini ${session}.`;
+  // A night shift's total belongs to the day it started, not the day it ends.
+  const day =
+    checkedInAt && wibDay(checkedInAt) !== wibDay(result.checked_out_at)
+      ? `hari ${weekday.format(new Date(checkedInAt))}`
+      : "hari ini";
+  return `Sesi ini ${session} · total ${day} ${formatHours(result.total_hours_today)}.`;
+}
+
+export type Span = { start: Date; end: Date };
+
+/** Every session today as a span; the open one runs until now. */
+export function todaySpans(today: TodayOut, now: Date): Span[] {
+  // The web can deploy ahead of the API, which then sends no sessions_today.
+  const sessions = today.sessions_today ?? (today.session ? [today.session] : []);
+  return sessions.map((item) => ({
+    start: new Date(item.checked_in_at),
+    end: item.checked_out_at ? new Date(item.checked_out_at) : now,
+  }));
+}
+
+/** Slots from 08.00 to 18.00 on the first span's day; a slot is filled when it overlaps any span. */
+export function timelineSlots(spans: Span[], count = 48, from = 8, to = 18): boolean[] {
+  const first = spans[0]?.start ?? new Date();
+  const day = new Date(first.getFullYear(), first.getMonth(), first.getDate()).getTime();
+  const size = ((to - from) * HOUR_MS) / count;
   return Array.from({ length: count }, (_, index) => {
-    const slotStart = day + from * 3_600_000 + index * size;
-    return slotStart < end.getTime() && slotStart + size > start.getTime();
+    const slotStart = day + from * HOUR_MS + index * size;
+    return spans.some(
+      ({ start, end }) => slotStart < end.getTime() && slotStart + size > start.getTime(),
+    );
   });
 }
 

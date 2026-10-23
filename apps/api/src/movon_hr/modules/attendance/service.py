@@ -22,6 +22,7 @@ from movon_hr.modules.attendance.schemas import (
     PendingOut,
     ReverifyIn,
     SessionOut,
+    SessionSpanOut,
     SkippedEventOut,
     SkippedOut,
     TodayOut,
@@ -121,6 +122,7 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
             pending_reverification=None,
             is_remote=user.is_remote,
             closed_hours_today=0,
+            sessions_today=[],
         )
     latest = sessions[-1]
     now = datetime.now(UTC)
@@ -142,6 +144,7 @@ async def today(db: AsyncSession, user: Employee) -> TodayOut:
         pending_reverification=PendingOut.model_validate(pending) if pending else None,
         is_remote=user.is_remote,
         closed_hours_today=round(closed, 2),
+        sessions_today=[SessionSpanOut.model_validate(item) for item in sessions],
     )
 
 
@@ -328,10 +331,16 @@ async def check_out(db: AsyncSession, user: Employee, payload: CheckOutIn) -> Ch
         )
     )
     await audit(db, "attendance.check_out", user, str(record.id))
+    # The total is the check-in day: its other sessions (capped at midnight, as on Beranda)
+    # plus this one in full, so a night shift never shows a session above its total.
+    session_hours = (now - record.checked_in_at).total_seconds() / 3600
+    day = await sessions_on(db, user.id, jakarta_date(record.checked_in_at))
+    others = sum(worked_hours(item, now) for item in day if item.id != record.id)
     return CheckOutOut(
         id=record.id,
         checked_out_at=now,
-        effective_hours=round((now - record.checked_in_at).total_seconds() / 3600, 2),
+        effective_hours=round(session_hours, 2),
+        total_hours_today=round(others + session_hours, 2),
     )
 
 

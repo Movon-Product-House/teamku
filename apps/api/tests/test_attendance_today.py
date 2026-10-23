@@ -34,6 +34,7 @@ async def test_fresh_demo_account_starts_without_a_check_in(client, login_header
         "pending_reverification": None,
         "is_remote": False,
         "closed_hours_today": 0,
+        "sessions_today": [],
     }
 
 
@@ -157,3 +158,81 @@ async def test_today_sums_the_hours_of_every_closed_session_today(
 
     assert response.json()["state"] == "checked_in"
     assert response.json()["closed_hours_today"] == 0.1
+
+
+async def test_today_lists_every_session_today_in_order(client, db, login_headers) -> None:
+    now = datetime.now(UTC).replace(microsecond=0)
+    await add_attendance(
+        db,
+        "fresh@movon.test",
+        checked_in_at=now - timedelta(minutes=10),
+        checked_out_at=now - timedelta(minutes=7),
+        agenda=[{}],
+    )
+    await add_attendance(
+        db, "fresh@movon.test", checked_in_at=now - timedelta(minutes=2), agenda=[{}]
+    )
+
+    response = await client.get(
+        "/api/v1/attendance/today", headers=await login_headers("fresh@movon.test")
+    )
+
+    spans = [
+        [
+            datetime.fromisoformat(item["checked_in_at"]),
+            item["checked_out_at"] and datetime.fromisoformat(item["checked_out_at"]),
+        ]
+        for item in response.json()["sessions_today"]
+    ]
+    assert spans == [
+        [now - timedelta(minutes=10), now - timedelta(minutes=7)],
+        [now - timedelta(minutes=2), None],
+    ]
+
+
+async def test_check_out_reports_the_session_and_the_total_today(client, db, login_headers) -> None:
+    now = datetime.now(UTC)
+    await add_attendance(
+        db,
+        "fresh@movon.test",
+        checked_in_at=now - timedelta(minutes=10),
+        checked_out_at=now - timedelta(minutes=7),
+        agenda=[{}],
+    )
+    await add_attendance(
+        db, "fresh@movon.test", checked_in_at=now - timedelta(minutes=6), agenda=[{}]
+    )
+
+    response = await client.post(
+        "/api/v1/attendance/check-out",
+        headers=await login_headers("fresh@movon.test"),
+        json={"summary": "Selesai"},
+    )
+
+    assert response.json()["effective_hours"] == 0.1
+    assert response.json()["total_hours_today"] == 0.15
+
+
+async def test_overnight_check_out_reports_the_full_session_in_the_total(
+    client, db, login_headers, clock
+) -> None:
+    # Wednesday: a 17:00-18:00 WIB session, then a night shift from 20:00 WIB.
+    for check_in, check_out in [(10, 11), (13, None)]:
+        await add_attendance(
+            db,
+            "fresh@movon.test",
+            checked_in_at=datetime(2026, 10, 21, check_in, tzinfo=UTC),
+            checked_out_at=check_out and datetime(2026, 10, 21, check_out, tzinfo=UTC),
+            agenda=[{}],
+        )
+    clock.move_to(datetime(2026, 10, 21, 19, tzinfo=UTC))  # 02:00 WIB Thursday
+
+    response = await client.post(
+        "/api/v1/attendance/check-out",
+        headers=await login_headers("fresh@movon.test"),
+        json={"summary": "Shift malam"},
+    )
+
+    # The night shift counts in full, past midnight, and the total adds Wednesday's hour.
+    assert response.json()["effective_hours"] == 6.0
+    assert response.json()["total_hours_today"] == 7.0

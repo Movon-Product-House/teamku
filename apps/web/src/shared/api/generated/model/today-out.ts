@@ -7,6 +7,7 @@
 import type { AttendanceTodayState } from './attendance-today-state';
 import type { PendingOut } from './pending-out';
 import type { SessionOut } from './session-out';
+import type { SessionSpanOut } from './session-span-out';
 
 export interface TodayOut {
   state: AttendanceTodayState;
@@ -14,4 +15,5 @@ export interface TodayOut {
   pending_reverification: PendingOut | null;
   is_remote: boolean;
   closed_hours_today: number;
+  sessions_today: SessionSpanOut[];
 }

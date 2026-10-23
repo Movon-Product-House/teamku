@@ -9,4 +9,5 @@ export interface CheckOutOut {
   id: string;
   checked_out_at: string;
   effective_hours: number;
+  total_hours_today: number;
 }
