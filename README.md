@@ -55,24 +55,36 @@ Repositori tetap monorepo; yang terpisah hanya target deploy-nya.
 
 | Bagian | Target | Catatan |
 |---|---|---|
-| `apps/web` | Vercel | Root Directory `apps/web`, Build Command `npm run build` |
-| `apps/api` | Server Biznet | Instance yang dipakai `apps/web` saat ini: `https://api-teamku.movoncreative.dev` |
+| `apps/web` | Server Biznet (Dokploy) | `https://teamku.movoncreative.dev`, build dari `apps/web/Dockerfile` |
+| `apps/api` | Server Biznet (Dokploy) | `https://api-teamku.movoncreative.dev` |
 
-Browser hanya berbicara ke domain Vercel. `apps/web/next.config.ts` mem-proxy
+Project Vercel lama (`teamku-web`) di-pause dan build-nya dimatikan
+(Ignored Build Step `exit 0`), jadi tidak ada deploy ganda. Untuk menyalakan
+lagi: Resume project dan kembalikan Ignored Build Step ke Automatic. Karena itu
+`apps/web/vercel.json` dan cabang `VERCEL` di `apps/web/next.config.ts` serta
+`apps/web/scripts/require-api-origin.mjs` sengaja disimpan sebagai jalur rollback,
+lalu dihapus bersama project Vercel (D2 di plan Dokploy).
+
+`MOVON_APP_BASE_URL` di API harus `https://teamku.movoncreative.dev`, karena
+tautan undangan dan reset password dibentuk dari nilai ini.
+
+Browser hanya berbicara ke domain web. `apps/web/next.config.ts` mem-proxy
 `/api/*` ke `${MOVON_API_ORIGIN}/api/v1/*`, sehingga cookie sesi tetap
 first-party dan tidak ada CORS di jalur browser.
 
 `MOVON_API_ORIGIN` dibutuhkan saat **build**, bukan runtime — Next membakukan
 rewrite ke `routes-manifest.json`. Bila kosong, build tetap berhasil namun
 mem-proxy ke `localhost`. `apps/web/scripts/require-api-origin.mjs` berjalan
-sebagai `prebuild` dan menggagalkan build bila variabel kosong di Vercel/CI.
-Karena itu Build Command harus `npm run build`, bukan `next build`.
+sebagai `prebuild` dan menggagalkan build bila variabel kosong di Docker/CI.
+Karena itu build harus lewat `npm run build`, bukan `next build`.
 
 Semua state API (termasuk sesi, lockout login, dan state OAuth) ada di
 PostgreSQL, jadi API tidak lagi terikat ke satu proses. Job terjadwal dan
 operasional lainnya ada di [docs/runbook.md](docs/runbook.md).
 
-Langkah lengkap ada di
+Langkah deploy Dokploy, ID app, dan rollback ada di
+[docs/plans/2026-10-22-001-deploy-web-to-dokploy-plan.md](docs/plans/2026-10-22-001-deploy-web-to-dokploy-plan.md).
+Riwayat deploy Vercel sebelumnya:
 [docs/plans/2026-09-12-001-migrate-web-to-vercel-plan.md](docs/plans/2026-09-12-001-migrate-web-to-vercel-plan.md).
 
 ## Operations

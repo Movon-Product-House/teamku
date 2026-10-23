@@ -2,7 +2,7 @@
 title: "chore: Pindahkan deploy apps/web ke Vercel (monorepo dipertahankan)"
 type: plan
 date: 2026-09-12
-status: ready
+status: superseded
 scope: deployment-only
 ---
 

@@ -135,7 +135,7 @@ components:
 
 # Design System: Teamku v2
 
-Sumber desain: papan `00 · Design System` di `mockups/design.pen`. Sumber nilai di kode: `@theme` di `apps/web/src/app/globals.css`. Bagian frontmatter di antara penanda `GENERATED` dibuat ulang oleh `npm run design:sync` (CI gagal bila tidak sinkron); bagian lain ditulis tangan dan hanya memakai nama token. Contoh hidup: `/design-system` di dev server dan preview Vercel.
+Sumber desain: papan `00 · Design System` di `mockups/design.pen`. Sumber nilai di kode: `@theme` di `apps/web/src/app/globals.css`. Bagian frontmatter di antara penanda `GENERATED` dibuat ulang oleh `npm run design:sync` (CI gagal bila tidak sinkron); bagian lain ditulis tangan dan hanya memakai nama token. Contoh hidup: `/design-system` di dev server.
 
 ## 1. Overview
 
