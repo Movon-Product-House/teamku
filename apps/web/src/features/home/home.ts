@@ -29,13 +29,22 @@ export function formatDuration(ms: number): string {
   return hours ? `${hours}j ${minutes % 60}m` : `${minutes}m`;
 }
 
-/** Check-out toast: this session, then the whole day. */
-export function checkOutMessage(result: CheckOutOut): string {
-  const session = formatDuration(result.effective_hours * HOUR_MS);
+const weekday = new Intl.DateTimeFormat("id-ID", { weekday: "long", timeZone: "Asia/Jakarta" });
+const wibDay = (iso: string) => Math.floor((Date.parse(iso) + WIB_OFFSET_MS) / DAY_MS);
+// The API rounds hours to 2 decimals (50 min → 0.83), so round to the nearest minute, not down.
+const formatHours = (hours: number) => formatDuration(Math.round(hours * 60) * 60_000);
+
+/** Check-out toast: this session, then the whole check-in day. */
+export function checkOutMessage(result: CheckOutOut, checkedInAt?: string): string {
+  const session = formatHours(result.effective_hours);
   // The web can deploy ahead of the API, which then sends no total.
   if (result.total_hours_today == null) return `Sesi ini ${session}.`;
-  const total = formatDuration(result.total_hours_today * HOUR_MS);
-  return `Sesi ini ${session} · total hari ini ${total}.`;
+  // A night shift's total belongs to the day it started, not the day it ends.
+  const day =
+    checkedInAt && wibDay(checkedInAt) !== wibDay(result.checked_out_at)
+      ? `hari ${weekday.format(new Date(checkedInAt))}`
+      : "hari ini";
+  return `Sesi ini ${session} · total ${day} ${formatHours(result.total_hours_today)}.`;
 }
 
 export type Span = { start: Date; end: Date };

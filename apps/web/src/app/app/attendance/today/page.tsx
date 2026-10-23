@@ -281,7 +281,11 @@ export default function Today() {
         longitude: position.coords.longitude,
         accuracy_meters: position.coords.accuracy,
       });
-      notify("success", "Check-out berhasil", checkOutMessage(result));
+      notify(
+        "success",
+        "Check-out berhasil",
+        checkOutMessage(result, attendance?.session?.checked_in_at),
+      );
       await load().then(syncShell);
     } catch (reason) {
       notify(

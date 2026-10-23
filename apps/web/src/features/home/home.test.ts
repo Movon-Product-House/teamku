@@ -85,6 +85,32 @@ describe("home", () => {
     // An API deployed behind the web sends no total.
     const olderApi = { id: "s", checked_out_at: "", effective_hours: 0.25 } as CheckOutOut;
     expect(checkOutMessage(olderApi)).toBe("Sesi ini 15m.");
+    // 50 minutes arrives as 0.83 hours and must not read as 49m.
+    expect(
+      checkOutMessage({
+        id: "s",
+        checked_out_at: "",
+        effective_hours: 0.83,
+        total_hours_today: 0.83,
+      }),
+    ).toBe("Sesi ini 50m · total hari ini 50m.");
+  });
+
+  it("names the check-in day in the toast when a night shift ends after midnight WIB", () => {
+    // Wednesday 20:00 WIB to Thursday 02:00 WIB.
+    const nightShift = {
+      id: "s",
+      checked_out_at: "2026-10-21T19:00:00Z",
+      effective_hours: 6,
+      total_hours_today: 7,
+    };
+    expect(checkOutMessage(nightShift, "2026-10-21T13:00:00Z")).toBe(
+      "Sesi ini 6j 0m · total hari Rabu 7j 0m.",
+    );
+    // Same WIB day: still "hari ini".
+    expect(checkOutMessage(nightShift, "2026-10-21T18:00:00Z")).toBe(
+      "Sesi ini 6j 0m · total hari ini 7j 0m.",
+    );
   });
 
   it("turns today's sessions into timeline spans, the open one running until now", () => {
