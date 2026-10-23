@@ -2,7 +2,7 @@
 title: "chore: Deploy apps/web ke Dokploy (teamku.movoncreative.dev)"
 type: plan
 date: 2026-10-22
-status: in-progress
+status: done
 scope: deployment-only
 ---
 
@@ -24,9 +24,9 @@ Langkah 1–5 sudah diterapkan, dan deploy pertama berhasil (2026-10-22):
 - Log runtime bersih (`Ready in 278ms`).
 - Login `employee@movon.test` lewat `/api/auth/login` → 200, cookie `teamku_session` ter-set, `/api/me` dengan cookie itu → 200.
 
-2026-10-23: env API (langkah 6) sudah di-set dan redirect URI Google Calendar sudah ditambahkan. Project Vercel di-pause (langkah 8). D1–D5 sudah diputuskan, lihat di bawah.
+2026-10-23: env API (langkah 6) sudah di-set dan redirect URI Google Calendar sudah ditambahkan. `watchPaths` API sudah `["apps/api/**"]` (langkah 7). Project Vercel di-pause (langkah 8). D1–D5 sudah diputuskan, lihat di bawah. Sejak #47 (client Orval), proxy web hanya `/api/v1/*`, jadi cek di bawah memakai `/api/v1/me`.
 
-Belum dikerjakan: cek tampilan di browser (langkah 5), verifikasi link email (langkah 6), `watchPaths` API (langkah 7), dan hapus project Vercel (D2).
+Tindak lanjut, di luar plan ini: cek tampilan di browser (langkah 5), verifikasi link email (langkah 6), dan hapus project Vercel beserta Git integration-nya setelah seminggu stabil (D2).
 
 ID Dokploy: app web `OHsNStwHssFaX2TvzllJt` (`teamku-web-95comu`), domain `FaKPB8uuutkDVegZAcCF8`.
 
@@ -78,7 +78,7 @@ Env runtime dibiarkan kosong: server standalone tidak butuh apa-apa selain `HOST
 - MCP `application-deploy`, lalu cek log build lewat `deployment-readLogs` dan log runtime lewat `application-readLogs`.
 - Cek:
   - `curl -sI https://teamku.movoncreative.dev/` → 307 ke `/login`, dengan sertifikat LE valid. ✅
-  - `curl -s https://teamku.movoncreative.dev/api/me` → 401 JSON dari FastAPI, bukan 404/500 dari Next. Ini membuktikan F4 dan K1. ✅
+  - `curl -s https://teamku.movoncreative.dev/api/v1/me` → 401 JSON dari FastAPI, bukan 404/500 dari Next. Ini membuktikan F4 dan K1. ✅ (dicek ulang 2026-10-23; sebelum #47 path-nya `/api/me`)
   - Login manual di browser, lalu cek cookie sesi ter-set di `teamku.movoncreative.dev` dan halaman beranda memuat data. ⏳
 
 ### 6. Env API (lewat UI Dokploy, bukan MCP) — selesai, kecuali verifikasi email
@@ -89,9 +89,9 @@ MCP meredaksi env dan `saveEnvironment` mengganti seluruh string env, jadi env A
 - Kalau Google Calendar dipakai: tambahkan redirect URI `https://teamku.movoncreative.dev/api/v1/settings/calendar/google/callback` di Google Cloud Console. Kalau env redirect URI Google di-set eksplisit, ganti juga.
 - Verifikasi: kirim satu email reset password atau invite ke alamat tim, lalu pastikan link-nya mengarah ke domain baru.
 
-### 7. Watch paths API (MCP `application-saveGithubProvider` untuk app API) — belum
+### 7. Watch paths API (MCP `application-saveGithubProvider` untuk app API) — selesai
 
-Dicek 2026-10-23: `watchPaths` API masih `[]`, jadi push docs-only (#48) ikut me-rebuild API.
+Sampai 2026-10-23 `watchPaths` API masih `[]`, jadi push docs-only (#48) ikut me-rebuild API. Sudah di-set 2026-10-23, dan field source lain terverifikasi tidak berubah.
 
 - Isi `watchPaths: ["apps/api/**"]`. Field lain (repo, branch, `buildPath: apps/api/`, `githubId`) harus dikirim ulang persis seperti yang sekarang, karena call ini mengganti seluruh konfigurasi source.
 
