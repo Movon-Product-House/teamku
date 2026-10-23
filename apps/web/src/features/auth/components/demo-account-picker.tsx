@@ -10,7 +10,7 @@ const accounts = [
   { label: "Fresh check-in", email: "fresh@movon.test" },
 ];
 
-/** Opt-in: picker hanya tampil bila NEXT_PUBLIC_DEMO_ACCOUNTS=1 (lokal, preview Vercel). Tanpa env ini mati. */
+/** Opt-in: picker hanya tampil bila NEXT_PUBLIC_DEMO_ACCOUNTS=1 (lokal). Tanpa env ini mati. */
 export const showDemoAccounts = process.env.NEXT_PUBLIC_DEMO_ACCOUNTS === "1";
 
 export const demoCredentials = showDemoAccounts

@@ -33,5 +33,5 @@ jobs:
           fi
       - run: npm run build
         env:
-          # Build CI hanya memverifikasi kompilasi; origin asli di-set di Vercel.
+          # Build CI hanya memverifikasi kompilasi; origin asli di-set sebagai build arg di Dokploy.
           MOVON_API_ORIGIN: http://127.0.0.1:8000

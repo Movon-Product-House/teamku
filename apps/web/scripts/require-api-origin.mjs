@@ -7,14 +7,14 @@
 // sama-sama melaporkan phase-production-build dan NODE_ENV=production,
 // sehingga keduanya mustahil dibedakan dari dalam config.
 //
-// Hanya aktif di Vercel/CI supaya build lokal tetap bisa memakai default
+// Hanya aktif di Vercel/CI (Dockerfile men-set CI=1) supaya build lokal tetap bisa memakai default
 // localhost, dan developer yang menyimpan env di .env.local tidak kena
 // false positive (skrip Node tidak memuat .env.local).
 if ((process.env.VERCEL || process.env.CI) && !process.env.MOVON_API_ORIGIN) {
   console.error(
     "\nMOVON_API_ORIGIN belum di-set.\n" +
-      "Set di Vercel > Settings > Environment Variables untuk Production,\n" +
-      "Preview, dan Development, lalu deploy ulang.\n",
+      "Set sebagai build arg Docker (Dokploy: Build-time Arguments), lalu\n" +
+      "deploy ulang.\n",
   );
   process.exit(1);
 }

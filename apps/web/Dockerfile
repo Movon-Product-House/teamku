@@ -2,6 +2,8 @@ FROM node:22-alpine AS build
 WORKDIR /app
 ARG MOVON_API_ORIGIN
 ENV MOVON_API_ORIGIN=${MOVON_API_ORIGIN}
+# Menyalakan guard prebuild: build gagal bila MOVON_API_ORIGIN kosong, bukan proxy senyap ke localhost.
+ENV CI=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
