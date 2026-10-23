@@ -60,7 +60,10 @@ Repositori tetap monorepo; yang terpisah hanya target deploy-nya.
 
 Project Vercel lama (`teamku-web`) di-pause dan build-nya dimatikan
 (Ignored Build Step `exit 0`), jadi tidak ada deploy ganda. Untuk menyalakan
-lagi: Resume project dan kembalikan Ignored Build Step ke Automatic.
+lagi: Resume project dan kembalikan Ignored Build Step ke Automatic. Karena itu
+`apps/web/vercel.json` dan cabang `VERCEL` di `apps/web/next.config.ts` serta
+`apps/web/scripts/require-api-origin.mjs` sengaja disimpan sebagai jalur rollback,
+lalu dihapus bersama project Vercel (D2 di plan Dokploy).
 
 `MOVON_APP_BASE_URL` di API harus `https://teamku.movoncreative.dev`, karena
 tautan undangan dan reset password dibentuk dari nilai ini.

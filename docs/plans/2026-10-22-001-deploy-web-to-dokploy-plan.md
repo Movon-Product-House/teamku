@@ -107,7 +107,7 @@ Sampai 2026-10-23 `watchPaths` API masih `[]`, jadi push docs-only (#48) ikut me
 - D2. Auto-deploy Vercel diputus (project di-pause). Project dan Git integration-nya dihapus setelah seminggu stabil.
 - D3. `/design-system` (F8): cek di `apps/web/src/app/design-system/page.tsx` diganti jadi `NODE_ENV === "production"` (PR #50). Halaman ada di `next dev`, hilang di build production mana pun.
 - D4. Guard `MOVON_API_ORIGIN` (F4): `apps/web/Dockerfile` men-set `ENV CI=1` di stage build (PR #50). Bukan `ARG CI` seperti usulan awal, supaya guard selalu aktif tanpa build arg tambahan di Dokploy.
-- D5. `ARG NEXT_PUBLIC_DEMO_ACCOUNTS` (F9) disarankan di review PR #50, supaya picker demo bisa dinyalakan/dimatikan lewat Build-time Arguments Dokploy (butuh redeploy). Default kosong, jadi tetap mati sesuai D1.
+- D5. `ARG NEXT_PUBLIC_DEMO_ACCOUNTS` (F9) ditambahkan di `apps/web/Dockerfile` (PR #50, saran review), supaya picker demo bisa dinyalakan/dimatikan lewat Build-time Arguments Dokploy (butuh redeploy). Default kosong, jadi tetap mati sesuai D1.
 
 ## Rollback
 
