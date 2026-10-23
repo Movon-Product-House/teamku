@@ -6,7 +6,7 @@ description: Slice one Teamku v2 revamp screen (kode seperti D3, M6, HM4, P2a) d
 # Slice screen
 
 Satu run = satu kode layar beserta varian STATE-nya = satu branch = satu PR.
-Aturan kode ada di `apps/web/README.md` dan dipaksa CI; baca bagian **Aturan** sebelum mulai. Pola acuan: `apps/web/src/features/leave/`.
+Aturan kode: `apps/web/AGENTS.md` (sebagian dipaksa `npm run check`, sisanya dijaga review). Pola acuan: `apps/web/src/features/leave/`.
 
 ## 0. Ambil tiket
 
@@ -40,7 +40,7 @@ Buat tabel dan tunjukkan ke user **sebelum coding**:
 | Sheet keputusan | `npx shadcn add sheet` | `shared/ui/sheet.tsx` |
 | Kartu saldo cuti | komponen feature | `features/leave/components/balance-card.tsx` |
 
-Keputusan per elemen, urut dari yang paling diutamakan: sudah ada di `shared/ui/` → primitive shadcn baru (via CLI) → komponen feature. Komponen naik ke `shared/ui/` hanya bila memenuhi syarat reusable di README.
+Keputusan per elemen, urut dari yang paling diutamakan: sudah ada di `shared/ui/` → primitive shadcn baru (via CLI) → komponen feature. Komponen naik ke `shared/ui/` hanya bila memenuhi syarat reusable di `apps/web/AGENTS.md` (bagian Komponen).
 
 Token dan aturan visual ada di `DESIGN.md` (root repo); contoh hidup semua komponen di `/design-system`. Bila nilai mockup belum punya token, tambahkan token di `@theme` pada `apps/web/src/app/globals.css` lalu jalankan `npm run design:sync` dalam PR yang sama, bukan sebagai hex atau px di komponen.
 
@@ -48,7 +48,7 @@ Token dan aturan visual ada di `DESIGN.md` (root repo); contoh hidup semua kompo
 
 ## 4. Implementasi
 
-Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + `*.test.ts` → komponen → `app/.../page.tsx` re-export. Akar layar v2 diberi `data-surface="v2"`. Bila layar menggantikan halaman legacy, lakukan juga langkah "Memigrasi satu halaman lama" di README.
+Ikuti pola `features/leave`: `types.ts` → hook di `api.ts` → logika murni + `*.test.ts` → komponen → `app/.../page.tsx` re-export. Akar layar v2 diberi `data-surface="v2"`. Bila layar menggantikan halaman legacy, lakukan juga langkah "Memigrasi satu halaman lama" di `apps/web/AGENTS.md`.
 
 **Selesai bila:** setiap varian dari langkah 1 punya representasi di kode (loading, error, kosong, dan STATE dari mockup), dan logika bercabang punya test.
 

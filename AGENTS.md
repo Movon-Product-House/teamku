@@ -18,17 +18,13 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/ag
 
 ## Front-end (`apps/web`)
 
-Conventions, structure and the page-migration recipe: `apps/web/README.md`. Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
+Code rules: `apps/web/AGENTS.md`; read it before changing anything in `apps/web`. Run `npm run check` in `apps/web` before pushing. Building a v2 revamp screen from `mockups/`: use the `slice-screen` skill (`.claude/skills/slice-screen/`).
 FE PRs put their screenshot evidence in the PR description (mockup next to each state, desktop + mobile), uploaded with `scripts/pr-evidence.sh`; see step 6 of the `slice-screen` skill.
 Visual tokens and rules: `DESIGN.md`; product context (users, tone, principles): `PRODUCT.md`.
 
 ## API (`apps/api`)
 
-Conventions, module layout, tenancy rules and how to add a module + migration: `apps/api/README.md`. Architecture decisions: `docs/adr/0002-backend-api-architecture.md`. Run `scripts/check.sh` in `apps/api` before pushing (needs PostgreSQL; see the README).
-
-- The API is **full async**: every handler and dependency is `async def`, the DB is `AsyncSession`, outbound HTTP is `httpx.AsyncClient`. Sync libraries or CPU work go through `anyio.to_thread.run_sync`. Never write a sync `def` endpoint, even though the FastAPI skill allows it.
-- ORM is **SQLAlchemy 2 (`Mapped[]`) with separate Pydantic schemas, not SQLModel**. Do not convert models to SQLModel.
-- Schema changes only through Alembic revisions; no raw SQL in `modules/` (the tenant filter only covers ORM queries).
+Code rules: `apps/api/AGENTS.md`; read it before changing anything in `apps/api`. Run `scripts/check.sh` in `apps/api` before pushing (needs PostgreSQL; setup in `apps/api/README.md`).
 
 ## Claude Code plugins
 

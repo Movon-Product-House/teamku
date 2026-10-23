@@ -33,6 +33,6 @@
 
 - Setiap domain bisa dibaca dan diubah tanpa membuka file lain, dan `scripts/check.sh` (ruff, pyrefly, import-linter, pytest di PG18 sungguhan) menjadi gerbang yang sama di lokal dan di CI.
 - Semua state ada di PostgreSQL, termasuk lockout login dan state OAuth, sehingga API tidak lagi terikat ke satu proses.
-- Modul baru harus menambahkan model ke `alembic/env.py` dan membuat revisi Alembic sendiri. Caranya ada di `apps/api/README.md`.
+- Modul baru harus menambahkan model ke `alembic/env.py` dan membuat revisi Alembic sendiri. Caranya ada di `apps/api/AGENTS.md` (Menambah modul).
 - Library baru harus dicek dulu apakah punya API async. Kalau tidak, panggilannya dibungkus `anyio.to_thread.run_sync`. Rule ruff `ASYNC` menangkap sebagian kesalahan ini.
 - Relasi ORM memakai `lazy="raise"`, sehingga data relasi harus dimuat eksplisit dengan `selectinload`/`joinedload`.
