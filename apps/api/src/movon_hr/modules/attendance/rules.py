@@ -1,4 +1,4 @@
-"""Pure attendance rules: geofence distance, allowed radius, reverify slots, day bounds."""
+"""Pure attendance rules: geofence distance, allowed radius, reverify slots, lateness."""
 
 from datetime import date, datetime, time, timedelta
 from math import asin, cos, radians, sin, sqrt
@@ -42,17 +42,6 @@ def is_missed(due_at: datetime, now: datetime) -> bool:
 
 def is_late(checked_in_at: datetime, work_start: time) -> bool:
     return checked_in_at.astimezone(JAKARTA).time() >= work_start
-
-
-def parse_hhmm(value: str) -> time:
-    hour, minute = value.split(":")
-    return time(int(hour), int(minute))
-
-
-def jakarta_day_bounds(day: date) -> tuple[datetime, datetime]:
-    """[start, end) of a Jakarta calendar day, for timestamptz range filters."""
-    start = datetime.combine(day, time(0), JAKARTA)
-    return start, start + timedelta(days=1)
 
 
 def clock_out_alert_day(

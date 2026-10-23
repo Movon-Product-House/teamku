@@ -9,7 +9,7 @@ from movon_hr.modules.attendance.schemas import AgendaItemOut
 from movon_hr.modules.employees.schemas import EmployeeOut
 from movon_hr.modules.leave.models import LeaveStatus
 
-type DashboardAttentionKind = Literal["late", "not_checked_in", "missed_reverify"]
+type DashboardAttentionKind = Literal["late", "not_checked_in", "open_session", "missed_reverify"]
 
 
 class DashboardAttendanceOut(BaseModel):
@@ -26,7 +26,7 @@ class DashboardAttentionOut(BaseModel):
     employee: str
     title: str
     kind: DashboardAttentionKind
-    # The late check-in or the missed reverify; null for no check-in yet.
+    # The late check-in, the open session's check-in or the missed reverify; null for no check-in.
     at: datetime | None
 
 
@@ -48,6 +48,7 @@ class DashboardOut(BaseModel):
     current_user: EmployeeOut
     headcount: int
     present: int
+    # Not present and not on leave: attention not_checked_in plus open_session, once work starts.
     absent: int
     on_leave: int
     late: int

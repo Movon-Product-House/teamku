@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
 from movon_hr.core.settings import settings
-from movon_hr.core.time import JAKARTA
+from movon_hr.core.time import JAKARTA, jakarta_day_bounds, parse_hhmm
 from movon_hr.modules.attendance import rules
 from movon_hr.modules.attendance.models import AlertReceipt, Attendance, LocationEvent
 from movon_hr.modules.attendance.service import open_slot
@@ -118,8 +118,8 @@ async def evaluate_tenant(db: AsyncSession, now: datetime) -> list[AlertEmail]:
         return []
     local_now = now.astimezone(JAKARTA)
     today = local_now.date()
-    reminder_in = datetime.combine(today, rules.parse_hhmm(policy.clock_in_reminder_time), JAKARTA)
-    start, end = rules.jakarta_day_bounds(today)
+    reminder_in = datetime.combine(today, parse_hhmm(policy.clock_in_reminder_time), JAKARTA)
+    start, end = jakarta_day_bounds(today)
 
     employees = list(
         await db.scalars(select(Employee).where(Employee.status == "active").order_by(Employee.id))
@@ -160,7 +160,7 @@ async def evaluate_tenant(db: AsyncSession, now: datetime) -> list[AlertEmail]:
             clock_out_day = rules.clock_out_alert_day(
                 open_record.checked_in_at,
                 now,
-                rules.parse_hhmm(policy.clock_out_reminder_time),
+                parse_hhmm(policy.clock_out_reminder_time),
                 policy.max_open_hours,
             )
             if clock_out_day is not None:

@@ -37,9 +37,9 @@ async def test_dashboard_numbers_per_role(client, login_headers) -> None:
     assert await numbers(client, await login_headers("hr@movon.test")) == (
         19, 7, 12, 0, 4, 37, 1, 7, 4
     )  # fmt: skip
-    # Engineering: 6 people, 3 present (manager 08:50, Ayu 09:10, Gilang 09:14).
+    # Engineering without the manager: 5 people, 2 present (Ayu 09:10, Gilang 09:14).
     assert await numbers(client, await login_headers("manager@movon.test")) == (
-        6, 3, 3, 0, 2, 50, 1, 3, 1
+        5, 2, 3, 0, 2, 40, 1, 2, 0
     )  # fmt: skip
     # An employee sees only themselves and never pending approvals.
     assert await numbers(client, await login_headers("employee@movon.test")) == (
@@ -93,6 +93,35 @@ async def test_manager_sees_who_needs_attention_today(
     assert rows["Gilang Ramadhan"] == str(await employee_id("gilang@movon.test"))
 
 
+async def test_the_manager_is_not_part_of_their_own_team(client, db, login_headers) -> None:
+    today = datetime(2026, 10, 21, tzinfo=JAKARTA).date()
+    await add_leave(db, "manager@movon.test", today, today, "Cuti sendiri", status="approved")
+
+    body = await manager_dashboard(client, login_headers)
+
+    assert "Raka Pratama" not in {item["employee"] for item in body["attention"]}
+    assert "Raka Pratama" not in {item["employee"] for item in body["team_leave"]}
+    assert "Raka Pratama" not in {item["employee"] for item in body["attendance"]}
+
+
+async def test_a_session_left_open_yesterday_is_listed_not_hidden(
+    client, db, login_headers
+) -> None:
+    yesterday = datetime(2026, 10, 20, 17, 0, tzinfo=JAKARTA)
+    await add_attendance(db, "employee@movon.test", checked_in_at=yesterday, agenda=[{}])
+
+    body = await manager_dashboard(client, login_headers)
+
+    open_session = [item for item in body["attention"] if item["employee"] == "Sinta Lestari"]
+    assert [(item["kind"], datetime.fromisoformat(item["at"])) for item in open_session] == [
+        ("open_session", yesterday)
+    ]
+    # Still not checked in today, so the bar and the list count her the same way.
+    assert body["absent"] == sum(
+        item["kind"] in {"not_checked_in", "open_session"} for item in body["attention"]
+    )
+
+
 async def test_late_follows_the_work_start_time_setting(client, login_headers) -> None:
     hr = await login_headers("hr@movon.test")
     office = (await client.get("/api/v1/settings/office", headers=hr)).json()
@@ -133,9 +162,8 @@ async def test_only_the_first_session_of_the_day_decides_late(client, db, login_
 async def test_team_agenda_lists_each_item_with_its_owner(client, login_headers) -> None:
     body = await manager_dashboard(client, login_headers)
 
-    assert len(body["agenda"]) == body["agenda_total"] == 3
+    assert len(body["agenda"]) == body["agenda_total"] == 2
     assert {item["employee"] for item in body["agenda"]} == {
-        "Raka Pratama",
         "Ayu Maharani",
         "Gilang Ramadhan",
     }

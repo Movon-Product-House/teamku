@@ -5,6 +5,7 @@ from movon_hr.modules.attendance.rules import (
     allowed_check_in_radius_meters,
     clock_out_alert_day,
     haversine_meters,
+    is_late,
 )
 from movon_hr.seed import OFFICE_LATITUDE, OFFICE_LONGITUDE, OFFICE_RADIUS_METERS
 
@@ -39,3 +40,13 @@ def test_clock_out_alert_waits_for_the_reminder_or_max_open_hours() -> None:
     # ... and stays keyed to its check-in day past midnight, however old it gets.
     assert due((21, 20, 0), (22, 6, 0)) == wednesday
     assert due((21, 20, 0), (24, 9, 0)) == wednesday
+
+
+def test_a_check_in_at_or_after_work_start_is_late() -> None:
+    def check_in(hour: int, minute: int) -> datetime:
+        return datetime(2026, 10, 21, hour, minute, tzinfo=JAKARTA)
+
+    assert is_late(check_in(9, 10), time(9, 0))
+    assert is_late(check_in(9, 0), time(9, 0))
+    assert not is_late(check_in(8, 55), time(9, 0))
+    assert not is_late(check_in(9, 10), time(9, 15))

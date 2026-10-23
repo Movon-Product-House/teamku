@@ -11,5 +11,6 @@ export type DashboardAttentionKind = typeof DashboardAttentionKind[keyof typeof 
 export const DashboardAttentionKind = {
   late: 'late',
   not_checked_in: 'not_checked_in',
+  open_session: 'open_session',
   missed_reverify: 'missed_reverify',
 } as const;

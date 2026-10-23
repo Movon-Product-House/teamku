@@ -6,9 +6,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
-from movon_hr.core.time import jakarta_date
+from movon_hr.core.time import jakarta_date, jakarta_day_bounds, parse_hhmm
 from movon_hr.modules.attendance.models import Attendance, LocationEvent
-from movon_hr.modules.attendance.rules import is_late, jakarta_day_bounds, parse_hhmm
+from movon_hr.modules.attendance.service import is_late
 from movon_hr.modules.dashboard import rules
 from movon_hr.modules.dashboard.schemas import (
     DashboardAgendaOut,
@@ -31,6 +31,9 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
             employees_service.visible_query(user).where(Employee.status == "active")
         )
     }
+    if user.role == "manager":
+        # A manager's team is the rest of the department, not themselves.
+        employees.pop(user.id, None)
     ids = list(employees)
     now = datetime.now(UTC)
     today = jakarta_date(now)
@@ -48,14 +51,18 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
             .order_by(Attendance.checked_in_at.desc())
         )
     )
-    open_from_earlier_day = set(
-        await db.scalars(
-            select(Attendance.employee_id).where(
-                Attendance.employee_id.in_(ids),
-                Attendance.checked_out_at.is_(None),
-                Attendance.checked_in_at < start,
+    open_from_earlier_day = dict(
+        (
+            await db.execute(
+                select(Attendance.employee_id, Attendance.checked_in_at).where(
+                    Attendance.employee_id.in_(ids),
+                    Attendance.checked_out_at.is_(None),
+                    Attendance.checked_in_at < start,
+                )
             )
         )
+        .tuples()
+        .all()
     )
     missed_reverify = {
         employee_id: at
@@ -134,7 +141,8 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
             for member in sorted(employees.values(), key=lambda item: item.name)
             for kind, at in rules.attention(
                 first_check_in=first_check_in.get(member.id),
-                open_from_earlier_day=member.id in open_from_earlier_day,
+                late=member.id in late,
+                open_since=open_from_earlier_day.get(member.id),
                 on_leave=member.id in on_leave,
                 missed_reverify_at=missed_reverify.get(member.id),
                 now=now,

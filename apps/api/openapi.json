@@ -2932,6 +2932,7 @@
         "enum": [
           "late",
           "not_checked_in",
+          "open_session",
           "missed_reverify"
         ]
       },
