@@ -1,4 +1,4 @@
-"""Pure attendance rules: geofence distance, allowed radius, reverify slots, day bounds."""
+"""Pure attendance rules: geofence distance, allowed radius, reverify slots, lateness."""
 
 from datetime import date, datetime, time, timedelta
 from math import asin, cos, radians, sin, sqrt
@@ -11,7 +11,6 @@ MAX_ACCURACY_CREDIT_METERS = 50
 LOW_ACCURACY_METERS = 100
 # A reverify slot counts as missed this long after it is due.
 REVERIFY_GRACE = timedelta(minutes=15)
-LATE_AFTER = time(9, 0)  # hardcoded, kept as is (#19)
 TARGET_HOURS_PER_DAY = 8  # ponytail: fixed until shifts exist; per-office setting when they do
 
 
@@ -41,19 +40,8 @@ def is_missed(due_at: datetime, now: datetime) -> bool:
     return now >= due_at + REVERIFY_GRACE
 
 
-def is_late(checked_in_at: datetime) -> bool:
-    return checked_in_at.astimezone(JAKARTA).time() >= LATE_AFTER
-
-
-def parse_hhmm(value: str) -> time:
-    hour, minute = value.split(":")
-    return time(int(hour), int(minute))
-
-
-def jakarta_day_bounds(day: date) -> tuple[datetime, datetime]:
-    """[start, end) of a Jakarta calendar day, for timestamptz range filters."""
-    start = datetime.combine(day, time(0), JAKARTA)
-    return start, start + timedelta(days=1)
+def is_late(checked_in_at: datetime, work_start: time) -> bool:
+    return checked_in_at.astimezone(JAKARTA).time() >= work_start
 
 
 def clock_out_alert_day(

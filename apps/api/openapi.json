@@ -2830,8 +2830,56 @@
         "title": "CreatedEmployeeOut",
         "description": "Returned by POST /employees when HR set the password."
       },
+      "DashboardAgendaOut": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "employee_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Employee Id"
+          },
+          "employee": {
+            "type": "string",
+            "title": "Employee"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "status",
+          "employee_id",
+          "employee"
+        ],
+        "title": "DashboardAgendaOut"
+      },
       "DashboardAttendanceOut": {
         "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Employee Id"
+          },
           "employee": {
             "type": "string",
             "title": "Employee"
@@ -2870,6 +2918,7 @@
         },
         "type": "object",
         "required": [
+          "employee_id",
           "employee",
           "department",
           "checked_in_at",
@@ -2877,6 +2926,96 @@
           "anomaly"
         ],
         "title": "DashboardAttendanceOut"
+      },
+      "DashboardAttentionKind": {
+        "type": "string",
+        "enum": [
+          "late",
+          "not_checked_in",
+          "open_session",
+          "missed_reverify"
+        ]
+      },
+      "DashboardAttentionOut": {
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Employee Id"
+          },
+          "employee": {
+            "type": "string",
+            "title": "Employee"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DashboardAttentionKind"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "employee_id",
+          "employee",
+          "title",
+          "kind",
+          "at"
+        ],
+        "title": "DashboardAttentionOut"
+      },
+      "DashboardLeaveOut": {
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Employee Id"
+          },
+          "employee": {
+            "type": "string",
+            "title": "Employee"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LeaveStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "employee_id",
+          "employee",
+          "title",
+          "start_date",
+          "end_date",
+          "status"
+        ],
+        "title": "DashboardLeaveOut"
       },
       "DashboardOut": {
         "properties": {
@@ -2919,12 +3058,37 @@
             "type": "integer",
             "title": "Agenda Completed"
           },
+          "work_start_time": {
+            "type": "string",
+            "title": "Work Start Time"
+          },
           "attendance": {
             "items": {
               "$ref": "#/components/schemas/DashboardAttendanceOut"
             },
             "type": "array",
             "title": "Attendance"
+          },
+          "attention": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardAttentionOut"
+            },
+            "type": "array",
+            "title": "Attention"
+          },
+          "agenda": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardAgendaOut"
+            },
+            "type": "array",
+            "title": "Agenda"
+          },
+          "team_leave": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardLeaveOut"
+            },
+            "type": "array",
+            "title": "Team Leave"
           }
         },
         "type": "object",
@@ -2939,7 +3103,11 @@
           "pending_approvals",
           "agenda_total",
           "agenda_completed",
-          "attendance"
+          "work_start_time",
+          "attendance",
+          "attention",
+          "agenda",
+          "team_leave"
         ],
         "title": "DashboardOut"
       },
@@ -3978,6 +4146,10 @@
             "type": "integer",
             "title": "Reverify Window End Minutes"
           },
+          "work_start_time": {
+            "type": "string",
+            "title": "Work Start Time"
+          },
           "alerts_enabled": {
             "type": "boolean",
             "title": "Alerts Enabled"
@@ -4014,6 +4186,7 @@
           "reverify_count_per_day",
           "reverify_window_start_minutes",
           "reverify_window_end_minutes",
+          "work_start_time",
           "alerts_enabled",
           "clock_in_reminder_time",
           "clock_out_reminder_time",
@@ -4343,6 +4516,18 @@
               }
             ],
             "title": "Reverify Window End Minutes"
+          },
+          "work_start_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Start Time"
           },
           "alerts_enabled": {
             "anyOf": [

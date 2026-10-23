@@ -8,9 +8,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from movon_hr.core.identity import Employee
-from movon_hr.core.time import jakarta_date
+from movon_hr.core.time import jakarta_date, jakarta_day_bounds, parse_hhmm
 from movon_hr.modules.attendance import rules
 from movon_hr.modules.attendance.models import Attendance, IdempotencyKey, LocationEvent
+
+# Named here so other modules reach it through service (apps/api/AGENTS.md).
+from movon_hr.modules.attendance.rules import is_late
 from movon_hr.modules.attendance.schemas import (
     CheckInIn,
     CheckInOut,
@@ -62,7 +65,7 @@ async def office_for(db: AsyncSession, employee: Employee) -> WorkLocation:
 
 
 async def sessions_on(db: AsyncSession, employee_id: uuid.UUID, day: date) -> list[Attendance]:
-    start, end = rules.jakarta_day_bounds(day)
+    start, end = jakarta_day_bounds(day)
     found = await db.scalars(
         select(Attendance)
         .where(
@@ -107,7 +110,7 @@ def worked_hours(session: Attendance, now: datetime) -> float:
     """Up to check-out (or now), but never past the end of the check-in day."""
     until = min(
         session.checked_out_at or now,
-        rules.jakarta_day_bounds(jakarta_date(session.checked_in_at))[1],
+        jakarta_day_bounds(jakarta_date(session.checked_in_at))[1],
     )
     return (until - session.checked_in_at).total_seconds() / 3600
 
@@ -155,8 +158,8 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
     """
     today = jakarta_date()
     days = [today - timedelta(days=today.weekday() - offset) for offset in range(5)]
-    start, _ = rules.jakarta_day_bounds(days[0])
-    _, end = rules.jakarta_day_bounds(days[-1])
+    start, _ = jakarta_day_bounds(days[0])
+    _, end = jakarta_day_bounds(days[-1])
     sessions = await db.scalars(
         select(Attendance)
         .where(
@@ -176,13 +179,15 @@ async def week(db: AsyncSession, user: Employee) -> WeekOut:
             )
         )
     ).all()
+    office = await settings_service.primary_location(db)
+    work_start = parse_hhmm(office.work_start_time)
     now = datetime.now(UTC)
     hours = dict.fromkeys(days, 0.0)
     late: dict[date, bool] = {}
     for item in sessions:
         day = jakarta_date(item.checked_in_at)
         hours[day] += worked_hours(item, now)
-        late.setdefault(day, rules.is_late(item.checked_in_at))
+        late.setdefault(day, is_late(item.checked_in_at, work_start))
     return WeekOut(
         target_hours=rules.TARGET_HOURS_PER_DAY,
         days=[

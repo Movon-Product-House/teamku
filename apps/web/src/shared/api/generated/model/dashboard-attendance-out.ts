@@ -7,6 +7,7 @@
 import type { AttendanceAnomaly } from './attendance-anomaly';
 
 export interface DashboardAttendanceOut {
+  employee_id: string;
   employee: string;
   department: string;
   checked_in_at: string;

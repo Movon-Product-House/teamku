@@ -37,6 +37,7 @@ const empty: AttendanceSettings = {
   reverify_count_per_day: 1,
   reverify_window_start_minutes: 60,
   reverify_window_end_minutes: 420,
+  work_start_time: "09:00",
   alerts_enabled: false,
   clock_in_reminder_time: "09:15",
   clock_out_reminder_time: "18:15",

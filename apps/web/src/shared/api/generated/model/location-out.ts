@@ -15,6 +15,7 @@ export interface LocationOut {
   reverify_count_per_day: number;
   reverify_window_start_minutes: number;
   reverify_window_end_minutes: number;
+  work_start_time: string;
   alerts_enabled: boolean;
   clock_in_reminder_time: string;
   clock_out_reminder_time: string;
