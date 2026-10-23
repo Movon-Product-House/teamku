@@ -9,6 +9,7 @@ import type { LeaveStatus } from './leave-status';
 export interface DashboardLeaveOut {
   employee_id: string;
   employee: string;
+  title: string;
   start_date: string;
   end_date: string;
   status: LeaveStatus;

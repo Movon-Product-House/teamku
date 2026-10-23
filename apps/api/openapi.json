@@ -2987,6 +2987,10 @@
             "type": "string",
             "title": "Employee"
           },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
           "start_date": {
             "type": "string",
             "format": "date",
@@ -3005,6 +3009,7 @@
         "required": [
           "employee_id",
           "employee",
+          "title",
           "start_date",
           "end_date",
           "status"

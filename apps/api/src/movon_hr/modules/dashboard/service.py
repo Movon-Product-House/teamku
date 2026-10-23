@@ -152,6 +152,7 @@ async def dashboard(db: AsyncSession, user: Employee) -> DashboardOut:
             DashboardLeaveOut(
                 employee_id=item.employee_id,
                 employee=employees[item.employee_id].name,
+                title=employees[item.employee_id].title,
                 start_date=item.start_date,
                 end_date=item.end_date,
                 status=item.status,

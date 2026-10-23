@@ -38,6 +38,7 @@ class DashboardAgendaOut(AgendaItemOut):
 class DashboardLeaveOut(BaseModel):
     employee_id: uuid.UUID
     employee: str
+    title: str
     start_date: date
     end_date: date
     status: LeaveStatus

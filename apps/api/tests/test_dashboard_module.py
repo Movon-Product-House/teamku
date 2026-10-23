@@ -159,9 +159,9 @@ async def test_team_leave_covers_the_next_two_weeks(client, db, login_headers) -
 
     # The seed's pending request (Ayu, in 7 days) shows too, so the manager sees it coming.
     assert [
-        (item["employee"], item["start_date"], item["end_date"], item["status"])
+        (item["employee"], item["title"], item["start_date"], item["end_date"], item["status"])
         for item in body["team_leave"]
     ] == [
-        ("Sinta Lestari", str(today - day), str(today + day), "approved"),
-        ("Ayu Maharani", str(today + 7 * day), str(today + 8 * day), "pending"),
+        ("Sinta Lestari", "Frontend Engineer", str(today - day), str(today + day), "approved"),
+        ("Ayu Maharani", "QA Engineer", str(today + 7 * day), str(today + 8 * day), "pending"),
     ]
