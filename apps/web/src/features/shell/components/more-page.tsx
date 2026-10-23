@@ -3,10 +3,11 @@
 import { ChevronRight, LogOut, Monitor } from "lucide-react";
 import Link from "next/link";
 import { useGetMe } from "@/shared/api/generated";
+import { initials } from "@/shared/lib/format";
 import { AuthTransition } from "@/shared/ui/auth-transition";
 import { Button } from "@/shared/ui/button";
 import { usePolledAttendanceToday } from "../api";
-import { initials, moreGroups, type NavItem, profile, workLocation } from "../nav";
+import { moreGroups, type NavItem, profile, workLocation } from "../nav";
 import { roleLabels } from "../types";
 import { useLogout } from "../use-logout";
 import { StillWorkingNote } from "./account-menu";

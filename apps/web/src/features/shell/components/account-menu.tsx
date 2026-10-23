@@ -3,6 +3,7 @@
 import { ChevronsUpDown, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import type { MeOut } from "@/shared/api/generated/model";
+import { initials } from "@/shared/lib/format";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { initials, profile, workLocation } from "../nav";
+import { profile, workLocation } from "../nav";
 import { roleLabels } from "../types";
 
 /** S3 on desktop: opened from the name at the bottom of the sidebar. */
