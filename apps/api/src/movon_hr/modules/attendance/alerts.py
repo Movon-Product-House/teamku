@@ -119,15 +119,19 @@ async def evaluate_tenant(db: AsyncSession, now: datetime) -> list[AlertEmail]:
     local_now = now.astimezone(JAKARTA)
     today = local_now.date()
     reminder_in = datetime.combine(today, rules.parse_hhmm(policy.clock_in_reminder_time), JAKARTA)
-    reminder_out = datetime.combine(
-        today, rules.parse_hhmm(policy.clock_out_reminder_time), JAKARTA
-    )
     start, end = rules.jakarta_day_bounds(today)
 
     employees = list(
         await db.scalars(select(Employee).where(Employee.status == "active").order_by(Employee.id))
     )
     sessions = await sessions_by_employee(db, start, end)
+    # Check-in allows one open session per employee; it may predate today (a night shift).
+    open_sessions = {
+        record.employee_id: record
+        for record in await db.scalars(
+            select(Attendance).where(Attendance.checked_out_at.is_(None))
+        )
+    }
     anomalies = set(
         (
             await db.execute(
@@ -143,20 +147,30 @@ async def evaluate_tenant(db: AsyncSession, now: datetime) -> list[AlertEmail]:
     emails: list[AlertEmail] = []
     for employee in employees:
         todays = sessions.get(employee.id, [])
-        open_record = next((item for item in todays if item.checked_out_at is None), None)
-        due: list[str] = []
+        open_record = open_sessions.get(employee.id)
+        due: list[tuple[str, date]] = []
         if (
             local_now >= reminder_in
             and not todays
+            and open_record is None
             and not await has_approved_leave(db, employee.id, today)
         ):
-            due.append("missed_clock_in")
+            due.append(("missed_clock_in", today))
         if open_record is not None:
-            hours_open = (now - open_record.checked_in_at).total_seconds() / 3600
-            if local_now >= reminder_out or hours_open >= policy.max_open_hours:
-                due.append("missed_clock_out")
+            clock_out_day = rules.clock_out_alert_day(
+                open_record.checked_in_at,
+                now,
+                rules.parse_hhmm(policy.clock_out_reminder_time),
+                policy.max_open_hours,
+            )
+            if clock_out_day is not None:
+                due.append(("missed_clock_out", clock_out_day))
         if not employee.is_remote:
-            due += [kind for anomaly, kind in LIMITS.items() if (employee.id, anomaly) in anomalies]
-        for kind in due:
-            emails += await emit(db, kind, employee, employees, policy, today)
+            due += [
+                (kind, today)
+                for anomaly, kind in LIMITS.items()
+                if (employee.id, anomaly) in anomalies
+            ]
+        for kind, day in due:
+            emails += await emit(db, kind, employee, employees, policy, day)
     return emails

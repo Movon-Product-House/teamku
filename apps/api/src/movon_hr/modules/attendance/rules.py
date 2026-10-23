@@ -4,7 +4,7 @@ from datetime import date, datetime, time, timedelta
 from math import asin, cos, radians, sin, sqrt
 from random import uniform
 
-from movon_hr.core.time import JAKARTA
+from movon_hr.core.time import JAKARTA, jakarta_date
 
 # GPS uncertainty may expand the allowed radius slightly, but never enough to check in from home.
 MAX_ACCURACY_CREDIT_METERS = 50
@@ -54,3 +54,20 @@ def jakarta_day_bounds(day: date) -> tuple[datetime, datetime]:
     """[start, end) of a Jakarta calendar day, for timestamptz range filters."""
     start = datetime.combine(day, time(0), JAKARTA)
     return start, start + timedelta(days=1)
+
+
+def clock_out_alert_day(
+    checked_in_at: datetime, now: datetime, reminder_time: time, max_open_hours: int
+) -> date | None:
+    """Day to key the open-session alert to, or None while it is not due.
+
+    Due once the session has been open max_open_hours, or once the clock-out reminder of its
+    check-in day passes; a session opened after that reminder (a night shift) only waits for
+    max_open_hours. Keyed to the check-in day, so a session alerts once even across midnight.
+    """
+    day = jakarta_date(checked_in_at)
+    reminder = datetime.combine(day, reminder_time, JAKARTA)
+    hours_open = (now - checked_in_at).total_seconds() / 3600
+    if hours_open >= max_open_hours or checked_in_at < reminder <= now:
+        return day
+    return None

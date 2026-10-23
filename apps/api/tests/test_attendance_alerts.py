@@ -44,6 +44,12 @@ async def run_alerts(db) -> None:
         await send_email(email.to, email.subject, email.body, kind="attendance_alert")
 
 
+async def add_open_session(db, checked_in_at: datetime) -> None:
+    await add_attendance(
+        db, "fresh@movon.test", checked_in_at=checked_in_at, agenda=[{"title": "Shift"}]
+    )
+
+
 async def attendance_alerts_for(db, email: str) -> list:
     return [item for item in await notifications_for(db, email) if item.title in ALERT_TITLES]
 
@@ -121,6 +127,60 @@ async def test_session_before_midnight_wib_does_not_count_for_the_new_day(db, cl
 
     titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
     assert titles == ["Belum clock-in"]
+
+
+async def test_night_shift_still_open_past_max_hours_after_midnight_notifies(db, clock) -> None:
+    await enable_alerts(db)
+    await add_open_session(db, datetime(2026, 10, 21, 21, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 22, 0, tzinfo=UTC))  # 07:00 WIB Thursday, open 10 hours
+
+    await run_alerts(db)
+    await run_alerts(db)
+
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
+    # The open session counts as being at work, so no clock-in reminder for Thursday.
+    assert titles == ["Sesi masih terbuka"]
+    email = last_email_to("fresh@movon.test")
+    assert email is not None and email.subject.startswith("Sesi masih terbuka")
+
+
+async def test_night_shift_started_after_clock_out_reminder_waits_for_max_hours(db, clock) -> None:
+    await enable_alerts(db, clock_out_reminder_time="18:15")
+    await add_open_session(db, datetime(2026, 10, 21, 20, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 21, 13, 30, tzinfo=UTC))  # 20:30 WIB Wednesday
+
+    await run_alerts(db)
+    assert await attendance_alerts_for(db, "fresh@movon.test") == []
+
+    clock.move_to(datetime(2026, 10, 21, 23, tzinfo=UTC))  # 06:00 WIB Thursday, open 10 hours
+    await run_alerts(db)
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
+    assert titles == ["Sesi masih terbuka"]
+
+
+async def test_session_alerted_before_midnight_stays_silent_after_it(db, clock) -> None:
+    await enable_alerts(db, clock_out_reminder_time="18:15")
+    await add_open_session(db, datetime(2026, 10, 21, 9, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 21, 11, 30, tzinfo=UTC))  # 18:30 WIB Wednesday
+    await run_alerts(db)
+
+    clock.move_to(datetime(2026, 10, 22, 0, tzinfo=UTC))  # 07:00 WIB Thursday, open 22 hours
+    await run_alerts(db)
+
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
+    assert titles == ["Sesi masih terbuka"]
+
+
+async def test_session_open_for_days_still_skips_the_clock_in_reminder(db, clock) -> None:
+    await enable_alerts(db)
+    await add_open_session(db, datetime(2026, 10, 19, 21, tzinfo=JAKARTA))
+    clock.move_to(datetime(2026, 10, 22, 0, tzinfo=UTC))  # 07:00 WIB Thursday, open 58 hours
+
+    await run_alerts(db)
+
+    # Check-in stays blocked until that session is closed, so a clock-in reminder can't help.
+    titles = [item.title for item in await attendance_alerts_for(db, "fresh@movon.test")]
+    assert titles == ["Sesi masih terbuka"]
 
 
 async def test_alert_managers_notifies_department_manager_and_hr(client, db, login_headers) -> None:
